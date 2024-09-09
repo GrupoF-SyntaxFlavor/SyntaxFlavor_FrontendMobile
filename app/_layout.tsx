@@ -7,7 +7,7 @@ import { View } from 'react-native';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
-import TopNavBar from '@/components/TopNavBar';
+import TopNavBar from '@/components/navigation/TopNavBar';
 import { Ionicons } from '@expo/vector-icons';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
