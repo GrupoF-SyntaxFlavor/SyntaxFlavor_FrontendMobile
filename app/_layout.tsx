@@ -3,9 +3,12 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { View } from 'react-native';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import TopNavBar from '@/components/TopNavBar';
+import { Ionicons } from '@expo/vector-icons';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -26,12 +29,26 @@ export default function RootLayout() {
     return null;
   }
 
+  const screenIcons: { [key: string]: { name: keyof typeof Ionicons.glyphMap; link: string; }[] } = {
+    "(tabs)": [{ name: "cart-outline", link: "/cart" }],
+    "cart": [],
+    "+not-found": [],
+  };
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
+      <View style={{ flex: 1 }}>
+        <Stack
+          screenOptions={({ route }) => ({
+            header: () => <TopNavBar icons={screenIcons[route.name] || []} />,
+            animation: 'none',
+          })}
+        >
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen  name="cart" />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </View>
     </ThemeProvider>
   );
 }

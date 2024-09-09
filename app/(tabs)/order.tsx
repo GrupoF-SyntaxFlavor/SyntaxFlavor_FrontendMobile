@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export default function IndexScreen() {
+export default function OrderScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Inicio Page</Text>
+      <Text style={styles.text}>Pedidos Page</Text>
     </View>
   );
 }
