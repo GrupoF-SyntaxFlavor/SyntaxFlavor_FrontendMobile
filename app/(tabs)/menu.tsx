@@ -1,16 +1,22 @@
 import React from 'react';
-import { View, Text, Image, Button, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 
 export default function Menu() {
-    const products = [
+  const products = [
     { 
-        name: 'Onigiris de Atún', 
-        description: 'Deliciosos triángulos de arroz rellenos de atún fresco, sazonados con un toque de salsa de soya y envueltos en una capa de alga nori crujiente.', 
-        price: 25,
-        image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'
+      name: 'Onigiris de Atún', 
+      description: 'Deliciosos triángulos de arroz rellenos de atún fresco, sazonados con un toque de salsa de soya y envueltos en una capa de alga nori crujiente.', 
+      price: 25,
+      image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'
     },
     // Puedes agregar más productos aquí
-    ];
+    {name: 'Cheesecake de Uvas', description: 'Un postre delicioso y fresco, perfecto para cualquier ocasión.', price: 30, image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'},
+    {name: 'Tacos de Pollo', description: 'Tacos de pollo con guacamole y salsa de chipotle.', price: 40, image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'},
+    {name: 'Pizza de Pepperoni', description: 'Pizza de pepperoni con queso mozzarella y salsa de tomate.', price: 50, image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'},
+    {name: 'Hamburguesa Clásica', description: 'Hamburguesa con carne de res, lechuga, tomate, cebolla y queso cheddar.', price: 35, image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'},
+    {name: 'Té Helado', description: 'Té helado de limón, perfecto para refrescarte en un día caluroso.', price: 15, image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'},
+    {name: 'Pastel de Chocolate', description: 'Un pastel de chocolate esponjoso y delicioso, perfecto para los amantes del chocolate.', price: 30, image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'},
+  ];
 
   return (
     <ScrollView style={styles.container}>
@@ -44,13 +50,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 2,
+    position: 'relative',  // Para que el botón se posicione dentro de la tarjeta
   },
   cardContent: {
     flexDirection: 'row',
@@ -76,11 +80,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   image: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 100,  // Aumenta el tamaño de la imagen
+    height: 100,  // Aumenta el tamaño de la imagen
+    borderRadius: 50,  // Sigue siendo redonda
   },
   addButton: {
+    position: 'absolute',
+    top: 10,  // Posiciona el botón en la parte superior
+    right: 10,  // Posiciona el botón en la esquina derecha
     width: 40,
     height: 40,
     borderRadius: 20,
