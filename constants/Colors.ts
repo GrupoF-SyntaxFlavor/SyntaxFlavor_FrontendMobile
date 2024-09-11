@@ -24,3 +24,30 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
 };
+
+// const palette = {
+//   green: '#86AB9A',
+//   lightGreen: '#D1E4DE',
+//   greenGray: '#A1B2AA',
+//   lightGray: '#F0F0F2',
+//   darkGray: '#898988',
+// };
+
+// export const Colors = {
+//   light: {
+//     text: palette.darkGray,       // Texto en modo claro
+//     background: palette.lightGray,  // Fondo en modo claro
+//     tint: palette.green,          // Color primario
+//     icon: palette.darkGray,       // Color de iconos
+//     tabIconDefault: palette.darkGray,
+//     tabIconSelected: palette.green,
+//   },
+//   dark: {
+//     text: palette.lightGray,      // Texto en modo oscuro
+//     background: palette.darkGray, // Fondo en modo oscuro
+//     tint: palette.lightGreen,     // Color primario en modo oscuro
+//     icon: palette.lightGray,      // Color de iconos en modo oscuro
+//     tabIconDefault: palette.lightGray,
+//     tabIconSelected: palette.lightGreen,
+//   },
+// };

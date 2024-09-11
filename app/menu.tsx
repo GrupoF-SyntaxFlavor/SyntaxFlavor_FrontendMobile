@@ -12,13 +12,13 @@ export default function Menu() {
       price: 25,
       image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'
     },
-    // Puedes agregar más productos aquí
-    {name: 'Cheesecake de Uvas', description: 'Un postre delicioso y fresco, perfecto para cualquier ocasión.', price: 30, image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'},
-    {name: 'Tacos de Pollo', description: 'Tacos de pollo con guacamole y salsa de chipotle.', price: 40, image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'},
-    {name: 'Pizza de Pepperoni', description: 'Pizza de pepperoni con queso mozzarella y salsa de tomate.', price: 50, image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'},
-    {name: 'Hamburguesa Clásica', description: 'Hamburguesa con carne de res, lechuga, tomate, cebolla y queso cheddar.', price: 35, image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'},
-    {name: 'Té Helado', description: 'Té helado de limón, perfecto para refrescarte en un día caluroso.', price: 15, image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'},
-    {name: 'Pastel de Chocolate', description: 'Un pastel de chocolate esponjoso y delicioso, perfecto para los amantes del chocolate.', price: 30, image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'},
+    // Agregar más productos aquí
+    {name: 'Cheesecake de Uvas', description: 'Un postre delicioso y fresco, perfecto para cualquier ocasión.', price: 30, image: 'https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/vimdb/230649.jpg'},
+    {name: 'Tacos de Pollo', description: 'Tacos de pollo con guacamole y salsa de chipotle.', price: 40, image: 'https://www.vvsupremo.com/wp-content/uploads/2017/06/Chicken-Tacos-900x570-sRGB.jpg'},
+    {name: 'Pizza de Pepperoni', description: 'Pizza de pepperoni con queso mozzarella y salsa de tomate.', price: 50, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIoXjS-sXqWGIsMTB_m3av-Oh-Fgi93hBrzg&s'},
+    {name: 'Hamburguesa Clásica', description: 'Hamburguesa con carne de res, lechuga, tomate, cebolla y queso cheddar.', price: 35, image: 'https://img.freepik.com/fotos-premium/foto-stock-hamburguesa-clasica-aislada-blanco_940723-217.jpg'},
+    {name: 'Té Helado', description: 'Té helado de limón, perfecto para refrescarte en un día caluroso.', price: 15, image: 'https://imag.bonviveur.com/te-helado.jpg'},
+    {name: 'Pastel de Chocolate', description: 'Un pastel de chocolate esponjoso y delicioso, perfecto para los amantes del chocolate.', price: 30, image: 'https://i.pinimg.com/736x/42/36/b1/4236b10d070cb898106d84a6f2fa4a2c.jpg'},
   ];
 
   const categories = [
@@ -90,10 +90,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: '#fff',
+    backgroundColor: '#f7f7f7',
   },
   card: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#007BFF',
+    backgroundColor: '#60A6A5',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     // maxHeight: '10%',
   },
   selectedCategoryButton: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#d1e4de',
     borderColor: '#000',
   },
   categoryText: {
