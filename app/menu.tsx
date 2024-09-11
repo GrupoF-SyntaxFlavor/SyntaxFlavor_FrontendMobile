@@ -1,7 +1,10 @@
-import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 
 export default function Menu() {
+  const [selectedCategory, setSelectedCategory] = useState('Menú');
+  
   const products = [
     { 
       name: 'Onigiris de Atún', 
@@ -18,7 +21,50 @@ export default function Menu() {
     {name: 'Pastel de Chocolate', description: 'Un pastel de chocolate esponjoso y delicioso, perfecto para los amantes del chocolate.', price: 30, image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'},
   ];
 
+  const categories = [
+    { label: 'Menú', icon: 'restaurant' },
+    { label: 'Más vendidos' },
+    { label: 'Precio más bajo primero' },
+    { label: 'Vegano' },
+    { label: 'Sin gluten' },
+  ];
+
+  const handleCategoryPress = (category: string) => {
+    setSelectedCategory(category);
+  };
+
   return (
+    <View style={{ flex: 1 }}>
+<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryBar}>
+        {categories.map((category, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[
+              styles.categoryButton,
+              selectedCategory === category.label && styles.selectedCategoryButton,
+            ]}
+            onPress={() => handleCategoryPress(category.label)}
+          >
+            {category.icon && (
+              <Ionicons
+                name={category.icon as any}
+                size={10}
+                color={selectedCategory === category.label ? '#000' : '#666'}
+                style={{ marginRight: 5 }}
+              />
+            )}
+            <Text
+              style={[
+                styles.categoryText,
+                selectedCategory === category.label && styles.selectedCategoryText,
+              ]}
+            >
+              {category.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    {/*  */}
     <ScrollView style={styles.container}>
       {products.map((product, index) => (
         <View key={index} style={styles.card}>
@@ -36,6 +82,7 @@ export default function Menu() {
         </View>
       ))}
     </ScrollView>
+    </View>
   );
 }
 
@@ -100,4 +147,42 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
   },
+  // categorias
+  categoryBar: {
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    backgroundColor: '#f9f9f9',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    maxHeight: '10%',
+  },
+  categoryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    // maxHeight: '10%',
+  },
+  selectedCategoryButton: {
+    backgroundColor: '#e0e0e0',
+    borderColor: '#000',
+  },
+  categoryText: {
+    fontSize: 14,
+    color: '#666',
+  },
+  selectedCategoryText: {
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  // menuContainer: {
+  //   flex: 1,
+  //   padding: 10,
+  //   backgroundColor: '#fff',
+  // },
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import Menu from './menu';
+import Menu from '../menu';
 import { View, Text, StyleSheet } from 'react-native';
 
 export default function IndexScreen() {
@@ -8,7 +8,7 @@ export default function IndexScreen() {
   //     <Text style={styles.text}>Inicio Page</Text>
   //   </View>
   // );
-  return <Menu />; // Llama al componente de menú
+  return <Menu/>; // Llama al componente de menú
 }
 
 const styles = StyleSheet.create({
