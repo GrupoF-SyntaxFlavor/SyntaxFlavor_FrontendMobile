@@ -24,10 +24,6 @@ export default function MenuItem() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Ionicons name="arrow-back" size={24} color="black" />
-      </TouchableOpacity>
-
       <Text style={styles.title}>{productName}</Text>
 
       <Image
