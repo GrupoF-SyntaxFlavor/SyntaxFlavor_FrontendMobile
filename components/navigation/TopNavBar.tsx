@@ -4,7 +4,7 @@ import { Link, useRouter, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
-import { useCart } from '@/contexts/CartContext'; // Ajusta la ruta según tu estructura de archivos
+import { useCart } from '@/contexts/CartContext';
 
 interface TopNavBarProps {
   icons?: { name: keyof typeof Ionicons.glyphMap; link: string }[];
