@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { Link, useRouter, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
+import { useCart } from '@/contexts/CartContext'; // Ajusta la ruta según tu estructura de archivos
 
 interface TopNavBarProps {
   icons?: { name: keyof typeof Ionicons.glyphMap; link: string }[];
@@ -13,6 +14,7 @@ export default function TopNavBar({ icons = [] }: TopNavBarProps) {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const pathname = usePathname();
+  const { cartItems } = useCart();
 
   return (
     <View style={[styles.container, { backgroundColor: Colors[colorScheme ?? 'light'].background }]}>
@@ -28,6 +30,11 @@ export default function TopNavBar({ icons = [] }: TopNavBarProps) {
           <Link key={index} href={icon.link as any} asChild>
             <TouchableOpacity style={styles.icon}>
               <Ionicons name={icon.name} size={30} color={Colors[colorScheme ?? 'light'].tint} />
+              {icon.name === 'cart-outline' && cartItems.length > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{cartItems.length}</Text>
+                </View>
+              )}
             </TouchableOpacity>
           </Link>
         ))}
@@ -60,5 +67,22 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginLeft: 15,
+    position: 'relative',
+  },
+  badge: {
+    position: 'absolute',
+    top: -5,
+    right: -10,
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });

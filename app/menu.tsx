@@ -1,25 +1,12 @@
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
-import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useCart } from '@/contexts/CartContext'; 
 
 export default function Menu() {
-  const [selectedCategory, setSelectedCategory] = useState('Menú');
-  
-  const products = [
-    { 
-      name: 'Onigiris de Atún', 
-      description: 'Deliciosos triángulos de arroz rellenos de atún fresco, sazonados con un toque de salsa de soya y envueltos en una capa de alga nori crujiente.', 
-      price: 25,
-      image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg'
-    },
-    // Agregar más productos aquí
-    {name: 'Cheesecake de Uvas', description: 'Un postre delicioso y fresco, perfecto para cualquier ocasión.', price: 30, image: 'https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/vimdb/230649.jpg'},
-    {name: 'Tacos de Pollo', description: 'Tacos de pollo con guacamole y salsa de chipotle.', price: 40, image: 'https://www.vvsupremo.com/wp-content/uploads/2017/06/Chicken-Tacos-900x570-sRGB.jpg'},
-    {name: 'Pizza de Pepperoni', description: 'Pizza de pepperoni con queso mozzarella y salsa de tomate.', price: 50, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIoXjS-sXqWGIsMTB_m3av-Oh-Fgi93hBrzg&s'},
-    {name: 'Hamburguesa Clásica', description: 'Hamburguesa con carne de res, lechuga, tomate, cebolla y queso cheddar.', price: 35, image: 'https://img.freepik.com/fotos-premium/foto-stock-hamburguesa-clasica-aislada-blanco_940723-217.jpg'},
-    {name: 'Té Helado', description: 'Té helado de limón, perfecto para refrescarte en un día caluroso.', price: 15, image: 'https://imag.bonviveur.com/te-helado.jpg'},
-    {name: 'Pastel de Chocolate', description: 'Un pastel de chocolate esponjoso y delicioso, perfecto para los amantes del chocolate.', price: 30, image: 'https://i.pinimg.com/736x/42/36/b1/4236b10d070cb898106d84a6f2fa4a2c.jpg'},
-  ];
+  const { cartItems, addToCart, menuItems } = useCart();
+  const navigation = useNavigation();
 
   const categories = [
     { label: 'Menú', icon: 'restaurant' },
@@ -29,59 +16,40 @@ export default function Menu() {
     { label: 'Sin gluten' },
   ];
 
-  const handleCategoryPress = (category: string) => {
-    setSelectedCategory(category);
-  };
-
   return (
     <View style={{ flex: 1 }}>
-<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryBar}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryBar}>
         {categories.map((category, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.categoryButton,
-              selectedCategory === category.label && styles.selectedCategoryButton,
-            ]}
-            onPress={() => handleCategoryPress(category.label)}
-          >
+          <TouchableOpacity key={index} style={styles.categoryButton}>
             {category.icon && (
-              <Ionicons
-                name={category.icon as any}
-                size={10}
-                color={selectedCategory === category.label ? '#000' : '#666'}
-                style={{ marginRight: 5 }}
-              />
+              <Ionicons name={category.icon as any} size={10} color="#666" style={{ marginRight: 5 }} />
             )}
-            <Text
-              style={[
-                styles.categoryText,
-                selectedCategory === category.label && styles.selectedCategoryText,
-              ]}
-            >
-              {category.label}
-            </Text>
+            <Text style={styles.categoryText}>{category.label}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
-    {/*  */}
-    <ScrollView style={styles.container}>
-      {products.map((product, index) => (
-        <View key={index} style={styles.card}>
-          <View style={styles.cardContent}>
-            <View style={styles.textContainer}>
-              <Text style={styles.title}>{product.name}</Text>
-              <Text style={styles.description}>{product.description}</Text>
-              <Text style={styles.price}>Bs. {product.price}</Text>
+      <ScrollView style={styles.container}>
+        {menuItems.map((product, index) => (
+          <View key={index} style={styles.card}>
+            <View style={styles.cardContent}>
+              <View style={styles.textContainer}>
+                <Text style={styles.title}>{product.name}</Text>
+                <Text style={styles.description}>{product.description}</Text>
+                <Text style={styles.price}>Bs. {product.price}</Text>
+                <Text>Disponible: {product.quantity}</Text>
+              </View>
+              <Image source={{ uri: product.image }} style={styles.image} />
             </View>
-            <Image source={{ uri: product.image }} style={styles.image} />
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => product.quantity > 0 && addToCart(product)}
+              disabled={product.quantity <= 0}
+            >
+              <Text style={styles.addButtonText}>+</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.addButton}>
-            <Text style={styles.addButtonText}>+</Text>
-          </TouchableOpacity>
-        </View>
-      ))}
-    </ScrollView>
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -148,25 +116,27 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   // categorias
-  categoryBar: {
-    paddingVertical: 10,
-    paddingHorizontal: 10,
+    categoryBar: {
+    paddingVertical: 8,
+    paddingHorizontal: 8,
     backgroundColor: '#f9f9f9',
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
-    maxHeight: '10%',
+    maxHeight: '13%',
+    flexWrap: 'wrap',
   },
   categoryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     backgroundColor: '#fff',
     borderRadius: 20,
     marginRight: 10,
     borderWidth: 1,
     borderColor: '#ddd',
-    // maxHeight: '10%',
+    minHeight: 40,
+    flexWrap: 'wrap',
   },
   selectedCategoryButton: {
     backgroundColor: '#d1e4de',
