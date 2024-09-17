@@ -11,9 +11,11 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarInactiveTintColor: Colors[colorScheme ?? "light"].tabIconDefault,
         tabBarStyle: {
+          backgroundColor: Colors[colorScheme ?? "light"].background, // Color de fondo para la barra de pestañas
           borderTopWidth: 1,
-          borderTopColor: "#ddd",
+          borderTopColor: "#ddd", // Borde superior de la barra de pestañas
           height: 100,
           paddingBottom: 25,
           paddingTop: 5,

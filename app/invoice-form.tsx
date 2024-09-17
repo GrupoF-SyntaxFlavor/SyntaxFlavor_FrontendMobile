@@ -71,27 +71,27 @@ export default function InvoiceScreen() {
   return (
     <ScrollView style={styles.container}>
       {/* Título de la página */}
-      <Text style={styles.title}>Datos de facturación</Text>
-
       {/* Tabla de productos seleccionados */}
-      <Text style={styles.subtitle}>Resumen</Text>
+      <View style={styles.card}>
+        <Text style={styles.title}>Resumen</Text>
 
-      <DataTable>
-        <DataTable.Header>
-          <DataTable.Title>Producto</DataTable.Title>
-          <DataTable.Title numeric>Cantidad</DataTable.Title>
-          <DataTable.Title numeric>Total</DataTable.Title>
-        </DataTable.Header>
-        {products.map((item) => (
-          <DataTable.Row key={item.id}>
-            <DataTable.Cell>{item.name}</DataTable.Cell>
-            <DataTable.Cell numeric>{item.quantity}</DataTable.Cell>
-            <DataTable.Cell numeric>
-              {item.price * item.quantity}
-            </DataTable.Cell>
-          </DataTable.Row>
-        ))}
-      </DataTable>
+        <DataTable>
+          <DataTable.Header>
+            <DataTable.Title>Producto</DataTable.Title>
+            <DataTable.Title numeric>Cantidad</DataTable.Title>
+            <DataTable.Title numeric>Total</DataTable.Title>
+          </DataTable.Header>
+          {products.map((item) => (
+            <DataTable.Row key={item.id}>
+              <DataTable.Cell>{item.name}</DataTable.Cell>
+              <DataTable.Cell numeric>{item.quantity}</DataTable.Cell>
+              <DataTable.Cell numeric>
+                {item.price * item.quantity}
+              </DataTable.Cell>
+            </DataTable.Row>
+          ))}
+        </DataTable>
+      </View>
 
       {/* Total de la compra */}
       <Text style={styles.priceTotal}>Total: {calculateTotal()}</Text>
@@ -109,14 +109,23 @@ export default function InvoiceScreen() {
           label="Nombre/ Razón Social"
           value={billName}
           onChangeText={onChangeBillName}
+          theme={{ colors: { primary: "#60A6A5" } }} // Color verde para el borde y el foco
+          style={styles.input} // Aplica el estilo desde el StyleSheet
         />
+
         <HelperText type="error" visible={hasErrorsBillName()}>
           El nombre debe contener sólo letras
         </HelperText>
       </View>
       {/* NIT o CI para la factura */}
       <View>
-        <TextInput label="NIT/ CI" value={nit} onChangeText={onChangeNit} />
+        <TextInput
+          label="NIT/ CI"
+          value={nit}
+          onChangeText={onChangeNit}
+          theme={{ colors: { primary: "#60A6A5" } }} // Color verde para el borde y el foco
+          style={styles.input} // Aplica el estilo desde el StyleSheet
+        />
         <HelperText type="error" visible={hasErrorsNit()}>
           El NIT/ CI debe contener sólo números
         </HelperText>
@@ -125,12 +134,6 @@ export default function InvoiceScreen() {
       <View style={{ marginBottom: 10 }}></View>
       <Divider />
       <View style={{ marginBottom: 10 }}></View>
-      {/* 
-      <Text style={styles.subtitle}>Método de pago</Text>
-      <Image
-        source={require("../assets/images/qr_code.png")} // Cambia la ruta según tu carpeta
-        style={styles.image}
-      /> */}
       <TouchableOpacity
         style={styles.submitButton}
         onPress={handlePaymentPress}
@@ -145,44 +148,55 @@ export default function InvoiceScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: "#fff",
+    padding: 20, // Un poco más de espacio
+    backgroundColor: "#f7f7f7", // Fondo más claro y neutro
   },
   title: {
-    fontSize: 24,
+    fontSize: 26, // Un poco más grande para destacar
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 20,
+    color: "#333", // Un tono más oscuro para legibilidad
+    marginBottom: 5, // Mayor separación con el contenido
+  },
+  card: {
+    backgroundColor: "#fff", // Fondo blanco
+    borderRadius: 10, // Bordes redondeados
+    padding: 15, // Relleno interno
+    shadowColor: "#000", // Sombra para dar efecto de tarjeta
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2, // Elevación en Android para la sombra
+    marginBottom: 20, // Espacio inferior
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 20, // Un poco más grande
     fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 10,
+    textAlign: "left", // Alineación a la izquierda para una estructura más profesional
+    color: "#333", // Mismo tono oscuro
+    marginBottom: 15, // Mayor separación entre secciones
   },
   priceTotal: {
-    fontSize: 18,
+    fontSize: 20, // Tamaño mayor para destacar el total
     fontWeight: "bold",
     textAlign: "right",
-    marginBottom: 5,
+    marginBottom: 10, // Más espacio para resaltar
     marginRight: 15,
   },
   submitButton: {
-    backgroundColor: "#007BFF",
-    paddingVertical: 10,
-    borderRadius: 5,
+    backgroundColor: "#60A6A5", // Color más suave para que se integre bien con la aplicación
+    paddingVertical: 15, // Aumentamos el relleno para hacerlo más clicable
+    borderRadius: 10, // Bordes más redondeados para mayor suavidad
     alignItems: "center",
+    marginTop: 20, // Espacio antes del botón
   },
   submitButtonText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
-  image: {
-    width: "80%", // La imagen ocupará el 80% del ancho del contenedor
-    height: undefined, // Altura automática para mantener la proporción
-    aspectRatio: 1, // Mantiene la proporción de la imagen (1:1 para cuadrado)
-    resizeMode: "contain", // Contiene la imagen dentro del área sin distorsión
-    alignSelf: "center", // Asegura que esté centrada en su contenedor
+  input: {
+    backgroundColor: "#fff", // Fondo blanco
+    marginBottom: 15, // Espacio entre los inputs
   },
 });
