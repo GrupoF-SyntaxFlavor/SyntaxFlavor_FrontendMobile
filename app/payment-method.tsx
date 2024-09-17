@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams } from "expo-router"; // Importamos el hook para acceder a los parámetros
 
 export default function Payment() {
+  const { billName = "", nit = "" } = useLocalSearchParams(); // Aseguramos que billName y nit tengan un valor por defecto
   const [selectedMethod, setSelectedMethod] = useState("QR"); // Estado para el método de pago seleccionado
 
   return (
@@ -41,12 +43,17 @@ export default function Payment() {
       <View style={[styles.card, styles.userDetails]}>
         <View style={styles.detailRow}>
           <Ionicons name="information-circle-outline" size={24} color="black" />
-          <Text style={styles.detailText}>Silva</Text>
+          <Text style={styles.detailText}>
+            {billName ? billName : "Nombre no proporcionado"}{" "}
+            {/* Valor predeterminado */}
+          </Text>
         </View>
 
         <View style={styles.detailRow}>
           <Ionicons name="pricetag-outline" size={24} color="black" />
-          <Text style={styles.detailText}>152647596</Text>
+          <Text style={styles.detailText}>
+            {nit ? nit : "NIT/CI no proporcionado"} {/* Valor predeterminado */}
+          </Text>
         </View>
       </View>
 

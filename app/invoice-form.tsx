@@ -14,7 +14,13 @@ export default function InvoiceScreen() {
   const router = useRouter();
 
   const handlePaymentPress = () => {
-    router.push("/payment-method");
+    router.push({
+      pathname: "/payment-method",
+      params: {
+        billName: billName,
+        nit: nit,
+      },
+    });
   };
 
   const [items] = React.useState([
