@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
+import { useRouter } from 'expo-router'; // Importa router
 
 const initialProducts = [
   { id: '1', name: 'Promo patito', price: 'Bs. 20', quantity: 1, image: 'https://via.placeholder.com/100' },
@@ -11,6 +12,7 @@ const initialProducts = [
 export default function CartScreen() {
   const [products, setProducts] = useState(initialProducts);
   const colorScheme = useColorScheme();
+  const router = useRouter(); // Obtén el router
 
   const updateQuantity = (id: string, delta: number) => {
     setProducts((prevProducts) =>
@@ -59,7 +61,11 @@ export default function CartScreen() {
       <View style={styles.payButtonContainer}>
         <TouchableOpacity
           style={[styles.payButton, { backgroundColor: colorScheme === 'dark' ? '#000' : Colors[colorScheme ?? 'light'].tint }]}
-          onPress={() => {}}
+          onPress={() => {  
+            // Navigate to the payment form
+            router.push('/invoice-form');
+
+          }} 
         >
           <Text style={[styles.payButtonText, { color: colorScheme === 'dark' ? '#fff' : Colors[colorScheme ?? 'light'].background }]}>Ir a Pagar</Text>
         </TouchableOpacity>
