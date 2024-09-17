@@ -34,9 +34,9 @@ export default function InvoiceScreen() {
   // Lista de productos seleccionados
   const [products, setProducts] = useState(items); 
   //Campo para el nombre de la factura
-  const [billName, setBillName] = React.useState('');
+  const [billName, setBillName] = React.useState('Doe');
   //Campo para el NIT o CI de la factura
-  const [nit, setNit] = React.useState('');
+  const [nit, setNit] = React.useState('123456');
 
   //Funciones para el nombre de la factura
   const onChangeBillName = (billName: React.SetStateAction<string>) => setBillName(billName);
@@ -109,13 +109,14 @@ export default function InvoiceScreen() {
 
       <Text style={styles.subtitle}>Método de pago</Text>
       <Image
-        source={require('../assets/images/QR_code.svg')}  // Cambia la ruta según tu carpeta
+        source={require('../assets/images/qr_code.png')}  // Cambia la ruta según tu carpeta
         style={styles.image}
       />
       {/* Botón para procesar */}
       <TouchableOpacity style={styles.submitButton}>
         <Text style={styles.submitButtonText}>Pagado</Text>
       </TouchableOpacity>
+      <View style={{ marginBottom: 30 }}></View>
     </ScrollView >
   );
 }
