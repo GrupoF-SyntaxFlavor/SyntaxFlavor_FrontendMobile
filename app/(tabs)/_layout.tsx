@@ -16,8 +16,8 @@ export default function TabLayout() {
           backgroundColor: Colors[colorScheme ?? "light"].background, // Color de fondo para la barra de pestañas
           borderTopWidth: 1,
           borderTopColor: "#ddd", // Borde superior de la barra de pestañas
-          height: 100,
-          paddingBottom: 25,
+          height: 80,
+          paddingBottom: 10,
           paddingTop: 5,
         },
         headerShown: false, // Ocultar la barra de navegación predeterminada

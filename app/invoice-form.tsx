@@ -115,7 +115,7 @@ export default function InvoiceScreen() {
           label="Nombre/ Razón Social"
           value={billName}
           onChangeText={onChangeBillName}
-          theme={{ colors: { primary: "#60A6A5" } }} // Color verde para el borde y el foco
+          theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
           style={styles.input} // Aplica el estilo desde el StyleSheet
         />
 
@@ -129,7 +129,7 @@ export default function InvoiceScreen() {
           label="NIT/ CI"
           value={nit}
           onChangeText={onChangeNit}
-          theme={{ colors: { primary: "#60A6A5" } }} // Color verde para el borde y el foco
+          theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
           style={styles.input} // Aplica el estilo desde el StyleSheet
         />
         <HelperText type="error" visible={hasErrorsNit()}>
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   submitButton: {
-    backgroundColor: "#60A6A5", // Color más suave para que se integre bien con la aplicación
+    backgroundColor: "#86AB9A", // Color más suave para que se integre bien con la aplicación
     paddingVertical: 15, // Aumentamos el relleno para hacerlo más clicable
     borderRadius: 10, // Bordes más redondeados para mayor suavidad
     alignItems: "center",

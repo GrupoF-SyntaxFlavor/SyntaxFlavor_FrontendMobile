@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   activeMethod: {
-    backgroundColor: "#d1e4de",
+    backgroundColor: "#D1E4DE",
   },
   methodText: {
     fontSize: 16,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   orderButton: {
-    backgroundColor: "#60A6A5",
+    backgroundColor: "#86AB9A",
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
