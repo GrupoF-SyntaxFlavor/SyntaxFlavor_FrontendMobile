@@ -3,25 +3,25 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+const tintColorLight = "#86AB9A";
+const tintColorDark = "#fff";
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    text: "#11181C", // Texto oscuro para modo claro
+    background: "#fff", // Fondo blanco para modo claro
+    tint: tintColorLight, // Color verde como color principal
+    icon: "#60A6A5", // Color para iconos en modo claro
+    tabIconDefault: "#A1B2AA", // Icono de pestaña por defecto
+    tabIconSelected: tintColorLight, // Icono seleccionado en verde
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    text: "#ECEDEE", // Texto claro para modo oscuro
+    background: "#151718", // Fondo oscuro para modo oscuro
+    tint: tintColorDark, // Color verde como color principal en modo oscuro
+    icon: "#9BA1A6", // Iconos en gris claro en modo oscuro
+    tabIconDefault: "#9BA1A6", // Icono de pestaña por defecto
+    tabIconSelected: tintColorDark, // Icono seleccionado en verde
   },
 };
 

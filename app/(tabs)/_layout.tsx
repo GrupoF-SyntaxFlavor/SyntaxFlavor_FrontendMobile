@@ -11,11 +11,13 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarInactiveTintColor: Colors[colorScheme ?? "light"].tabIconDefault,
         tabBarStyle: {
+          backgroundColor: Colors[colorScheme ?? "light"].background, // Color de fondo para la barra de pestañas
           borderTopWidth: 1,
-          borderTopColor: "#ddd",
-          height: 100,
-          paddingBottom: 25,
+          borderTopColor: "#ddd", // Borde superior de la barra de pestañas
+          height: 80,
+          paddingBottom: 10,
           paddingTop: 5,
         },
         headerShown: false, // Ocultar la barra de navegación predeterminada

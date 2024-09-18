@@ -9,6 +9,7 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import TopNavBar from '@/components/navigation/TopNavBar';
 import { Ionicons } from '@expo/vector-icons';
+import { CartProvider } from '@/contexts/CartContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -37,20 +38,22 @@ export default function RootLayout() {
   };
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <View style={{ flex: 1 }}>
-        <Stack
-          screenOptions={({ route }) => ({
-            header: () => <TopNavBar icons={screenIcons[route.name] || []} />,
-            animation: 'none',
-          })}
-        >
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen  name="cart" />
-          <Stack.Screen  name="invoice-form" />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-      </View>
-    </ThemeProvider>
+    <CartProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <View style={{ flex: 1 }}>
+          <Stack
+            screenOptions={({ route }) => ({
+              header: () => <TopNavBar icons={screenIcons[route.name] || []} />,
+              animation: 'none',
+            })}
+          >
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="cart" />
+            <Stack.Screen name="invoice-form" />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </View>
+      </ThemeProvider>
+    </CartProvider>
   );
 }

@@ -4,12 +4,15 @@ import { fetchMenuItems } from "./service/MenuService";
 import {
   View,
   Text,
-  Image,
-  ScrollView,
   StyleSheet,
+  ScrollView,
+  Image,
   TouchableOpacity,
 } from "react-native";
-import { router } from "expo-router"; // Usamos el hook para manejar la navegación
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { useCart } from "@/contexts/CartContext";
+import { router } from "expo-router";
 
 interface Product {
   name: string;
@@ -21,6 +24,8 @@ export default function Menu() {
   var [products, setProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("Menú");
   const [loading, setLoading] = useState(true);
+  const { cartItems, addToCart, menuItems } = useCart();
+  const navigation = useNavigation();
 
   useEffect(() => {
     const loadMenuItems = async () => {
@@ -40,8 +45,6 @@ export default function Menu() {
     return undefined;
   }, []);
 
-  
-
   const categories = [
     { label: "Menú", icon: "restaurant" },
     { label: "Más vendidos" },
@@ -49,10 +52,6 @@ export default function Menu() {
     { label: "Vegano" },
     { label: "Sin gluten" },
   ];
-
-  const handleCategoryPress = (category: string) => {
-    setSelectedCategory(category);
-  };
 
   const handleProductPress = (product: any) => {
     // Navegamos a 'menu-item' y pasamos los datos del producto como query params
@@ -77,52 +76,40 @@ export default function Menu() {
         style={styles.categoryBar}
       >
         {categories.map((category, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.categoryButton,
-              selectedCategory === category.label &&
-                styles.selectedCategoryButton,
-            ]}
-            onPress={() => handleCategoryPress(category.label)}
-          >
+          <TouchableOpacity key={index} style={styles.categoryButton}>
             {category.icon && (
               <Ionicons
                 name={category.icon as any}
                 size={10}
-                color={selectedCategory === category.label ? "#000" : "#666"}
+                color="#666"
                 style={{ marginRight: 5 }}
               />
             )}
-            <Text
-              style={[
-                styles.categoryText,
-                selectedCategory === category.label &&
-                  styles.selectedCategoryText,
-              ]}
-            >
-              {category.label}
-            </Text>
+            <Text style={styles.categoryText}>{category.label}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
-      {/*  */}
       <ScrollView style={styles.container}>
-        {products.map((product, index) => (
+        {menuItems.map((product, index) => (
           <TouchableOpacity
             key={index}
             onPress={() => handleProductPress(product)}
           >
-            <View style={styles.card}>
+            <View key={index} style={styles.card}>
               <View style={styles.cardContent}>
                 <View style={styles.textContainer}>
                   <Text style={styles.title}>{product.name }</Text>
                   <Text style={styles.description}>{product.description}</Text>
                   <Text style={styles.price}>Bs. {product.price}</Text>
+                  <Text>Disponible: {product.quantity}</Text>
                 </View>
                 <Image source={{ uri: "https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg"}} style={styles.image} />
               </View>
-              <TouchableOpacity style={styles.addButton}>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => product.quantity > 0 && addToCart(product)}
+                disabled={product.quantity <= 0}
+              >
                 <Text style={styles.addButtonText}>+</Text>
               </TouchableOpacity>
             </View>
@@ -185,35 +172,39 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#60A6A5",
+    backgroundColor: "#86AB9A",
     justifyContent: "center",
     alignItems: "center",
   },
   addButtonText: {
     color: "#fff",
+    top: 2,
+    left: 1,
     fontSize: 24,
     fontWeight: "bold",
   },
   // categorias
   categoryBar: {
-    paddingVertical: 10,
-    paddingHorizontal: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
     backgroundColor: "#f9f9f9",
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
-    maxHeight: "10%",
+    maxHeight: "13%",
+    flexWrap: "wrap",
   },
   categoryButton: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 8,
-    paddingHorizontal: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     backgroundColor: "#fff",
     borderRadius: 20,
     marginRight: 10,
     borderWidth: 1,
     borderColor: "#ddd",
-    // maxHeight: '10%',
+    minHeight: 40,
+    flexWrap: "wrap",
   },
   selectedCategoryButton: {
     backgroundColor: "#d1e4de",
@@ -227,9 +218,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#000",
   },
-  // menuContainer: {
-  //   flex: 1,
-  //   padding: 10,
-  //   backgroundColor: '#fff',
-  // },
 });
