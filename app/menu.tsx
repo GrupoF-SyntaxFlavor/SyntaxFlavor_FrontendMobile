@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
+import { fetchMenuItems } from "./service/MenuService";
 import {
   View,
   Text,
@@ -12,9 +14,36 @@ import { useNavigation } from "@react-navigation/native";
 import { useCart } from "@/contexts/CartContext";
 import { router } from "expo-router";
 
+interface Product {
+  name: string;
+  description: string;
+  price: number;
+  // image: string;
+}
 export default function Menu() {
+  var [products, setProducts] = useState<Product[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("Menú");
+  const [loading, setLoading] = useState(true);
   const { cartItems, addToCart, menuItems } = useCart();
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const loadMenuItems = async () => {
+      try {
+        products = await fetchMenuItems();
+        setProducts(products); // Actualizamos el estado con los productos obtenidos
+      } catch (error) {
+        console.error("Error loading menu items:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    loadMenuItems();
+  
+    // Retorno vacío para evitar el error
+    return undefined;
+  }, []);
 
   const categories = [
     { label: "Menú", icon: "restaurant" },
@@ -36,6 +65,8 @@ export default function Menu() {
       },
     });
   };
+
+
 
   return (
     <View style={{ flex: 1 }}>
@@ -67,12 +98,12 @@ export default function Menu() {
             <View key={index} style={styles.card}>
               <View style={styles.cardContent}>
                 <View style={styles.textContainer}>
-                  <Text style={styles.title}>{product.name}</Text>
+                  <Text style={styles.title}>{product.name }</Text>
                   <Text style={styles.description}>{product.description}</Text>
                   <Text style={styles.price}>Bs. {product.price}</Text>
                   <Text>Disponible: {product.quantity}</Text>
                 </View>
-                <Image source={{ uri: product.image }} style={styles.image} />
+                <Image source={{ uri: "https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg"}} style={styles.image} />
               </View>
               <TouchableOpacity
                 style={styles.addButton}
