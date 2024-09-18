@@ -141,12 +141,14 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#60A6A5",
+    backgroundColor: "#86AB9A",
     justifyContent: "center",
     alignItems: "center",
   },
   addButtonText: {
     color: "#fff",
+    top: 2,
+    left: 1,
     fontSize: 24,
     fontWeight: "bold",
   },
@@ -185,9 +187,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#000",
   },
-  // menuContainer: {
-  //   flex: 1,
-  //   padding: 10,
-  //   backgroundColor: '#fff',
-  // },
 });
