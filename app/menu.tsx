@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { fetchMenuItems } from "./service/MenuService";
 import {
   View,
   Text,
@@ -14,67 +15,32 @@ interface Product {
   name: string;
   description: string;
   price: number;
-  image: string;
+  // image: string;
 }
 export default function Menu() {
+  var [products, setProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("Menú");
+  const [loading, setLoading] = useState(true);
 
-  const products = [
-    {
-      name: "Onigiris de Atún",
-      description:
-        "Deliciosos triángulos de arroz rellenos de atún fresco, sazonados con un toque de salsa de soya y envueltos en una capa de alga nori crujiente.",
-      price: 25,
-      image:
-        "https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg",
-    },
-    // Agregar más productos aquí
-    {
-      name: "Cheesecake de Uvas",
-      description:
-        "Un postre delicioso y fresco, perfecto para cualquier ocasión.",
-      price: 30,
-      image:
-        "https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/vimdb/230649.jpg",
-    },
-    {
-      name: "Tacos de Pollo",
-      description: "Tacos de pollo con guacamole y salsa de chipotle.",
-      price: 40,
-      image:
-        "https://www.vvsupremo.com/wp-content/uploads/2017/06/Chicken-Tacos-900x570-sRGB.jpg",
-    },
-    {
-      name: "Pizza de Pepperoni",
-      description: "Pizza de pepperoni con queso mozzarella y salsa de tomate.",
-      price: 50,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIoXjS-sXqWGIsMTB_m3av-Oh-Fgi93hBrzg&s",
-    },
-    {
-      name: "Hamburguesa Clásica",
-      description:
-        "Hamburguesa con carne de res, lechuga, tomate, cebolla y queso cheddar.",
-      price: 35,
-      image:
-        "https://img.freepik.com/fotos-premium/foto-stock-hamburguesa-clasica-aislada-blanco_940723-217.jpg",
-    },
-    {
-      name: "Té Helado",
-      description:
-        "Té helado de limón, perfecto para refrescarte en un día caluroso.",
-      price: 15,
-      image: "https://imag.bonviveur.com/te-helado.jpg",
-    },
-    {
-      name: "Pastel de Chocolate",
-      description:
-        "Un pastel de chocolate esponjoso y delicioso, perfecto para los amantes del chocolate.",
-      price: 30,
-      image:
-        "https://i.pinimg.com/736x/42/36/b1/4236b10d070cb898106d84a6f2fa4a2c.jpg",
-    },
-  ];
+  useEffect(() => {
+    const loadMenuItems = async () => {
+      try {
+        products = await fetchMenuItems();
+        setProducts(products); // Actualizamos el estado con los productos obtenidos
+      } catch (error) {
+        console.error("Error loading menu items:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    loadMenuItems();
+  
+    // Retorno vacío para evitar el error
+    return undefined;
+  }, []);
+
+  
 
   const categories = [
     { label: "Menú", icon: "restaurant" },
@@ -100,6 +66,8 @@ export default function Menu() {
       },
     });
   };
+
+
 
   return (
     <View style={{ flex: 1 }}>
@@ -148,11 +116,11 @@ export default function Menu() {
             <View style={styles.card}>
               <View style={styles.cardContent}>
                 <View style={styles.textContainer}>
-                  <Text style={styles.title}>{product.name}</Text>
+                  <Text style={styles.title}>{product.name }</Text>
                   <Text style={styles.description}>{product.description}</Text>
                   <Text style={styles.price}>Bs. {product.price}</Text>
                 </View>
-                <Image source={{ uri: product.image }} style={styles.image} />
+                <Image source={{ uri: "https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg"}} style={styles.image} />
               </View>
               <TouchableOpacity style={styles.addButton}>
                 <Text style={styles.addButtonText}>+</Text>
