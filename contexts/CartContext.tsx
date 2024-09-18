@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Product {
   id: number;
@@ -80,6 +81,62 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         quantity: 12
       }
     ]);
+
+  useEffect(() => {
+    const loadCart = async () => {
+      try {
+        const storedCart = await AsyncStorage.getItem('cartItems');
+        if (storedCart) {
+          const parsedCart = JSON.parse(storedCart);
+          setCartItems(parsedCart);
+
+          // Sincronizar el estado del menú con el carrito
+          setMenuItems((prevMenuItems) =>
+            prevMenuItems.map((menuItem) => {
+              const cartItem = parsedCart.find((item: Product) => item.id === menuItem.id);
+              if (cartItem) {
+                return { ...menuItem, quantity: menuItem.quantity - cartItem.quantity };
+              }
+              return menuItem;
+            })
+          );
+        }
+      } catch (error) {
+        console.error('Failed to load cart from storage', error);
+      }
+    };
+
+    loadCart();
+  }, []);
+
+  useEffect(() => {
+    const saveCart = async () => {
+      try {
+        await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
+      } catch (error) {
+        console.error('Failed to save cart to storage', error);
+      }
+    };
+
+    saveCart();
+
+    const clearCartAfterOneHour = setTimeout(() => {
+      console.log('Clearing cart after 1 hour for testing purposes');
+      setMenuItems((prevMenuItems) =>
+        prevMenuItems.map((menuItem) => {
+          const cartItem = cartItems.find((item) => item.id === menuItem.id);
+          if (cartItem) {
+            return { ...menuItem, quantity: menuItem.quantity + cartItem.quantity };
+          }
+          return menuItem;
+        })
+      );
+      setCartItems([]);
+      AsyncStorage.removeItem('cartItems');
+    }, 3600000); // 1 hora
+
+    return () => clearTimeout(clearCartAfterOneHour);
+  }, [cartItems]);
 
   const addToCart = (product: Product) => {
     setCartItems((prevItems) => {
