@@ -32,7 +32,6 @@ export default function RootLayout() {
   const screenIcons: { [key: string]: { name: keyof typeof Ionicons.glyphMap; link: string; }[] } = {
     "(tabs)": [{ name: "cart-outline", link: "/cart" }],
     "cart": [],
-    "invoice-form": [],
     "+not-found": [],
   };
 
@@ -47,7 +46,6 @@ export default function RootLayout() {
         >
           <Stack.Screen name="(tabs)" />
           <Stack.Screen  name="cart" />
-          <Stack.Screen  name="invoice-form" />
           <Stack.Screen name="+not-found" />
         </Stack>
       </View>
