@@ -2,7 +2,7 @@
 
 export const fetchMenuItems = async () => {
     try {
-      const ip="172.18.4.217";
+      const ip="192.168.1.10";
       const response = await fetch(`http://${ip}:8080/api/v1/menu/item`, {
         method: "GET",
         headers: {

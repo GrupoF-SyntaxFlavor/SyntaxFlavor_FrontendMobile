@@ -21,13 +21,22 @@ const Loader = () => {
     outputRange: ['0deg', '360deg'],
   });
 
+  // return (
+  //   <View style={styles.container}>
+  //     <Animated.View
+  //       style={[
+  //         styles.loader,
+  //         { transform: [{ rotate }] }, // Aplica la animación de rotación
+  //       ]}
+  //     />
+  //   </View>
+  // );
   return (
     <View style={styles.container}>
-      <Animated.View
-        style={[
-          styles.loader,
-          { transform: [{ rotate }] }, // Aplica la animación de rotación
-        ]}
+      {/* imagen de pizza.gif de la carpeta images */}
+      <Animated.Image
+      
+        source={require('../assets/images/loader-green.gif')}
       />
     </View>
   );
