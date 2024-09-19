@@ -103,6 +103,7 @@ export default function Menu() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
+            style={styles.categoryBar}
           >
             {categories.map((category, index) => (
               <TouchableOpacity key={index} style={styles.categoryButton}>
