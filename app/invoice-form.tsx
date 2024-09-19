@@ -10,10 +10,12 @@ import {
   Button,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useCart } from '@/contexts/CartContext';
 
 export default function InvoiceScreen() {
   const router = useRouter();
   const [visible, setVisible] = React.useState(false);
+  const { cartItems} = useCart();
 
   const hideDialog = () => setVisible(false);
 
@@ -32,34 +34,8 @@ export default function InvoiceScreen() {
     }
   };
 
-  const [items] = React.useState([
-    {
-      id: 1,
-      name: "Cupcake",
-      price: 356,
-      quantity: 16,
-    },
-    {
-      id: 2,
-      name: "Eclair",
-      price: 262,
-      quantity: 16,
-    },
-    {
-      id: 3,
-      name: "Frozen yogurt",
-      price: 159,
-      quantity: 6,
-    },
-    {
-      id: 4,
-      name: "Gingerbread",
-      price: 305,
-      quantity: 3.7,
-    },
-  ]);
   // Lista de productos seleccionados
-  const [products, setProducts] = useState(items);
+  const [products, setProducts] = useState(cartItems);
   //Campo para el nombre de la factura
   const [billName, setBillName] = React.useState("Doe");
   //Campo para el NIT o CI de la factura
@@ -80,8 +56,10 @@ export default function InvoiceScreen() {
 
   // Calcular el total por producto (cantidad * precio)
   const calculateTotal = (): number => {
-    return items.reduce((total, item) => total + item.price * item.quantity, 0);
+    const total = products.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    return parseFloat(total.toFixed(2)); // Redondea a 2 decimales y convierte a número
   };
+  
 
   return (
     <ScrollView style={styles.container}>
