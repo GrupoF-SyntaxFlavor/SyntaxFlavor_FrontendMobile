@@ -2,7 +2,8 @@
 
 export const fetchMenuItems = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/menu/item", {
+      const ip="172.18.4.217";
+      const response = await fetch(`http://${ip}:8080/api/v1/menu/item`, {
         method: "GET",
         headers: {
           Accept: "application/json",
