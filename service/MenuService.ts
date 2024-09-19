@@ -1,9 +1,9 @@
 // MenuService.ts
+import { BACKEND_URL } from "../constants/.backend-dir";
 
 export const fetchMenuItems = async () => {
     try {
-      const ip="172.18.6.90";
-      const response = await fetch(`http://${ip}:8080/api/v1/menu/item`, {
+      const response = await fetch(`${BACKEND_URL}/api/v1/menu/item`, {
         method: "GET",
         headers: {
           Accept: "application/json",

@@ -2,7 +2,6 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { fetchMenuItems } from "../service/MenuService";
 import Loader from './loader';
-import LoaderKit from 'react-native-loader-kit'
 import {
   View,
   ActivityIndicator,
