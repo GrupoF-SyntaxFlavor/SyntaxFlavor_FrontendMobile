@@ -1,37 +1,61 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { fetchMenuItems } from "./service/MenuService";
+import { fetchMenuItems } from "../service/MenuService";
+import Loader from './loader';
+import LoaderKit from 'react-native-loader-kit'
 import {
   View,
+  ActivityIndicator,
   Text,
   StyleSheet,
   ScrollView,
   Image,
   TouchableOpacity,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useCart } from "@/contexts/CartContext";
 import { router } from "expo-router";
 
-interface Product {
+interface ProductDB {
+  id: number;
   name: string;
   description: string;
   price: number;
   // image: string;
 }
+interface ProductFront {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  quantity: number;
+}
+
 export default function Menu() {
-  var [products, setProducts] = useState<Product[]>([]);
+  var [fetchedProducts, setProducts] = useState<ProductDB[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("Menú");
   const [loading, setLoading] = useState(true);
-  const { cartItems, addToCart, menuItems } = useCart();
+  const { cartItems, addToCart } = useCart();
+  var { menuItems, setMenuItems } = useCart();
+  var [adaptedProducts, setAdaptedProducts] = useState<ProductFront[]>([]);
   const navigation = useNavigation();
 
   useEffect(() => {
     const loadMenuItems = async () => {
       try {
-        products = await fetchMenuItems();
-        setProducts(products); // Actualizamos el estado con los productos obtenidos
+        setLoading(true);
+        fetchedProducts  = await fetchMenuItems();
+        setProducts(fetchedProducts); // Actualizamos el estado con los productos obtenidos
+        adaptedProducts = fetchedProducts.map(product => ({
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg', // Asigna un valor adecuado o vacío si no tienes una imagen
+          quantity: 10000 // Asigna un valor inicial adecuado
+        }));
+        setMenuItems(adaptedProducts); // Actualizamos el estado global con los productos obtenidos
       } catch (error) {
         console.error("Error loading menu items:", error);
       } finally {
@@ -70,56 +94,64 @@ export default function Menu() {
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.categoryBar}
-      >
-        {categories.map((category, index) => (
-          <TouchableOpacity key={index} style={styles.categoryButton}>
-            {category.icon && (
-              <Ionicons
-                name={category.icon as any}
-                size={10}
-                color="#666"
-                style={{ marginRight: 5 }}
-              />
-            )}
-            <Text style={styles.categoryText}>{category.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-      <ScrollView style={styles.container}>
-        {menuItems.map((product, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => handleProductPress(product)}
+      {loading ? (
+        // Si está cargando, muestra el ActivityIndicator
+        <Loader/>
+      ) : (
+        // Si ya no está cargando, muestra el contenido
+        <>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.categoryBar}
           >
-            <View key={index} style={styles.card}>
-              <View style={styles.cardContent}>
-                <View style={styles.textContainer}>
-                  <Text style={styles.title}>{product.name }</Text>
-                  <Text style={styles.description}>{product.description}</Text>
-                  <Text style={styles.price}>Bs. {product.price}</Text>
-                  <Text>Disponible: {product.quantity}</Text>
-                </View>
-                <Image source={{ uri: "https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg"}} style={styles.image} />
-              </View>
-              <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => product.quantity > 0 && addToCart(product)}
-                disabled={product.quantity <= 0}
-              >
-                <Text style={styles.addButtonText}>+</Text>
+            {categories.map((category, index) => (
+              <TouchableOpacity key={index} style={styles.categoryButton}>
+                {category.icon && (
+                  <Ionicons
+                    name={category.icon as any}
+                    size={10}
+                    color="#666"
+                    style={{ marginRight: 5 }}
+                  />
+                )}
+                <Text style={styles.categoryText}>{category.label}</Text>
               </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+            ))}
+          </ScrollView>
+          
+          <ScrollView>
+            {menuItems.map((product, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => handleProductPress(product)}
+              >
+                <View style={styles.card}>
+                  <View style={styles.cardContent}>
+                    <View style={styles.textContainer}>
+                      <Text style={styles.title}>{product.name}</Text>
+                      <Text style={styles.description}>{product.description}</Text>
+                      <Text style={styles.price}>Bs. {product.price}</Text>
+                    </View>
+                    <Image source={{ uri: product.image }} style={styles.image} />
+                  </View>
+                  <TouchableOpacity
+                    style={styles.addButton}
+                    onPress={() => product.quantity > 0 && addToCart(product)}
+                    disabled={product.quantity <= 0}
+                  >
+                    <Text style={styles.addButtonText}>+</Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </>
+      )}
     </View>
   );
+  
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -219,3 +251,4 @@ const styles = StyleSheet.create({
     color: "#000",
   },
 });
+
