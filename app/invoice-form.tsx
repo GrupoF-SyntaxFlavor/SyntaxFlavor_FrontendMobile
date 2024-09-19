@@ -6,21 +6,30 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
+  Modal,
+  Button,
 } from "react-native";
 import { useRouter } from "expo-router";
 
 export default function InvoiceScreen() {
   const router = useRouter();
+  const [visible, setVisible] = React.useState(false);
+
+  const hideDialog = () => setVisible(false);
 
   const handlePaymentPress = () => {
-    router.push({
-      pathname: "/payment-method",
-      params: {
-        billName: billName,
-        nit: nit,
-      },
-    });
+    if(hasErrorsBillName() || hasErrorsNit()) {
+      setVisible(true);
+    }
+    else{
+      router.push({
+        pathname: "/payment-method",
+        params: {
+          billName: billName,
+          nit: nit,
+        },
+      });
+    }
   };
 
   const [items] = React.useState([
@@ -146,6 +155,27 @@ export default function InvoiceScreen() {
       >
         <Text style={styles.submitButtonText}>Método de Pago</Text>
       </TouchableOpacity>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={visible}
+        onRequestClose={() => {
+          setVisible(!visible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.subtitle}>Datos no válidos</Text>
+            <Text style={styles.modalText}>Por favor, revise los datos ingresados</Text>
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={hideDialog}
+            >
+              <Text style={styles.submitButtonText}>  Cerrar  </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <View style={{ marginBottom: 30 }}></View>
     </ScrollView>
   );
@@ -204,5 +234,27 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: "#fff", // Fondo blanco
     marginBottom: 15, // Espacio entre los inputs
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo oscuro semitransparente
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });
