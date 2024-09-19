@@ -1,5 +1,5 @@
 // MenuService.ts
-import { BACKEND_URL } from "../../constants/.backend-dir";
+import { BACKEND_URL } from "../constants/.backend-dir";
 
 export const fetchMenuItems = async () => {
     try {

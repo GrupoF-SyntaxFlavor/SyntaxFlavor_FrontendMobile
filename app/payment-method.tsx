@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router"; // Importamos el hook para acceder a los parámetros
-import { createOrder } from "./service/OrderService";
+import { createOrder } from "@/service/OrderService";
 import { makeOrderPayload } from "@/lib/OrderUtils";
 import { useCart } from "@/contexts/CartContext";
 
