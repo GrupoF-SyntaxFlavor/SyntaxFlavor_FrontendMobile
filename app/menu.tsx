@@ -9,8 +9,7 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native"; 
 import { useCart } from "@/contexts/CartContext";
 import { router } from "expo-router";
 

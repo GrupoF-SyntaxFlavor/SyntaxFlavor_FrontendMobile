@@ -1,8 +1,9 @@
 // MenuService.ts
+import { BACKEND_URL } from "../../constants/.backend-dir";
 
 export const fetchMenuItems = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/menu/item", {
+      const response = await fetch(`${BACKEND_URL}/api/v1/menu/item`, {
         method: "GET",
         headers: {
           Accept: "application/json",
