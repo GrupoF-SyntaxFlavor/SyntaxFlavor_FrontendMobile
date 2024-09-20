@@ -1,16 +1,24 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Alert,
+  ScrollView,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router"; // Importamos el hook para acceder a los parámetros
 import { createOrder } from "@/service/OrderService";
 import { createBill } from "@/service/BillService"; // Importamos el nuevo endpoint
 import { makeOrderPayload } from "@/lib/OrderUtils";
 import { useCart } from "@/contexts/CartContext";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Payment() {
   const { cartItems, updateQuantity, removeFromCart, setCartItems } = useCart();
-  const { billName = "", nit = "" } = useLocalSearchParams(); // Aseguramos que billName y nit tengan un valor por defecto
+  const { billName = "", nit = "", total = "0" } = useLocalSearchParams();
   const [selectedMethod, setSelectedMethod] = useState("QR"); // Estado para el método de pago seleccionado
 
   return (
@@ -49,7 +57,11 @@ export default function Payment() {
         {/* Vista de detalles del usuario */}
         <View style={[styles.card, styles.userDetails]}>
           <View style={styles.detailRow}>
-            <Ionicons name="information-circle-outline" size={24} color="black" />
+            <Ionicons
+              name="information-circle-outline"
+              size={24}
+              color="black"
+            />
             <Text style={styles.detailText}>
               {billName ? billName : "Nombre no proporcionado"}{" "}
               {/* Valor predeterminado */}
@@ -59,7 +71,8 @@ export default function Payment() {
           <View style={styles.detailRow}>
             <Ionicons name="pricetag-outline" size={24} color="black" />
             <Text style={styles.detailText}>
-              {nit ? nit : "NIT/CI no proporcionado"} {/* Valor predeterminado */}
+              {nit ? nit : "NIT/CI no proporcionado"}{" "}
+              {/* Valor predeterminado */}
             </Text>
           </View>
         </View>
@@ -67,13 +80,14 @@ export default function Payment() {
         {/* Total */}
         <View style={styles.totalContainer}>
           <Text style={styles.totalText}>Total:</Text>
-          <Text style={styles.totalAmount}>Bs. 104</Text>
+          <Text style={styles.totalAmount}>Bs. {total}</Text>
         </View>
 
         {/* Botón de "Pedir" */}
-        <TouchableOpacity style={styles.orderButton}
+        <TouchableOpacity
+          style={styles.orderButton}
           onPress={() => {
-            console.log("pressed pay button");  
+            console.log("pressed pay button");
             Alert.alert(
               "Confirmar pedido",
               "¿Estás seguro de que deseas realizar el pedido?",
@@ -81,7 +95,7 @@ export default function Payment() {
                 {
                   text: "Cancelar",
                   onPress: () => console.log("Prompt cancelled"),
-                  style: "cancel"
+                  style: "cancel",
                 },
                 {
                   text: "OK",
@@ -100,8 +114,12 @@ export default function Payment() {
                       }
 
                       // Ensure billName and nit are strings
-                      const billNameString = Array.isArray(billName) ? billName.join(", ") : billName;
-                      const nitString = Array.isArray(nit) ? nit.join(", ") : nit;
+                      const billNameString = Array.isArray(billName)
+                        ? billName.join(", ")
+                        : billName;
+                      const nitString = Array.isArray(nit)
+                        ? nit.join(", ")
+                        : nit;
 
                       // Create the bill
                       const billPayload = {
@@ -113,24 +131,30 @@ export default function Payment() {
                       const billResponse = await createBill(billPayload);
                       console.log("Bill response:", billResponse);
 
-                      Alert.alert("Pedido realizado", "Tu pedido ha sido registrado exitosamente.");
+                      Alert.alert(
+                        "Pedido realizado",
+                        "Tu pedido ha sido registrado exitosamente."
+                      );
 
                       // Clear the cart
                       setCartItems([]);
-                      await AsyncStorage.removeItem('cartItems');
+                      await AsyncStorage.removeItem("cartItems");
 
                       // Redirect user to the home page
-                      router.push('/');
+                      router.push("/");
                     } catch (error) {
                       console.error("Error creating order or bill:", error);
-                      Alert.alert("Error", "Hubo un error al registrar tu orden. intenta nuevamente.");
+                      Alert.alert(
+                        "Error",
+                        "Hubo un error al registrar tu orden. intenta nuevamente."
+                      );
                     }
-                  }
-                }
+                  },
+                },
               ]
             );
           }}
-          >
+        >
           <Text style={styles.orderButtonText}>Pedir</Text>
         </TouchableOpacity>
       </View>

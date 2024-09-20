@@ -1,9 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { fetchMenuItems } from "@/service/MenuService";
-import Loader from '@/components/Loader';
+import Loader from "@/components/Loader";
 import {
   View,
+  ActivityIndicator,
   Text,
   StyleSheet,
   ScrollView,
@@ -43,15 +44,16 @@ export default function Menu() {
     const loadMenuItems = async () => {
       try {
         setLoading(true);
-        fetchedProducts  = await fetchMenuItems();
+        fetchedProducts = await fetchMenuItems();
         setProducts(fetchedProducts); // Actualizamos el estado con los productos obtenidos
-        adaptedProducts = fetchedProducts.map(product => ({
+        adaptedProducts = fetchedProducts.map((product) => ({
           id: product.id,
           name: product.name,
           description: product.description,
           price: product.price,
-          image: 'https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg', // Asigna un valor adecuado o vacío si no tienes una imagen
-          quantity: 10000 // Asigna un valor inicial adecuado
+          image:
+            "https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg", // Asigna un valor adecuado o vacío si no tienes una imagen
+          quantity: 10000, // Asigna un valor inicial adecuado
         }));
         setMenuItems(adaptedProducts); // Actualizamos el estado global con los productos obtenidos
       } catch (error) {
@@ -60,9 +62,9 @@ export default function Menu() {
         setLoading(false);
       }
     };
-  
+
     loadMenuItems();
-  
+
     // Retorno vacío para evitar el error
     return undefined;
   }, []);
@@ -93,7 +95,7 @@ export default function Menu() {
     <View style={{ flex: 1 }}>
       {loading ? (
         // Si está cargando, muestra el ActivityIndicator
-        <Loader/>
+        <Loader />
       ) : (
         // Si ya no está cargando, muestra el contenido
         <>
@@ -116,7 +118,7 @@ export default function Menu() {
               </TouchableOpacity>
             ))}
           </ScrollView>
-          
+
           <ScrollView>
             {menuItems.map((product, index) => (
               <TouchableOpacity
@@ -127,10 +129,15 @@ export default function Menu() {
                   <View style={styles.cardContent}>
                     <View style={styles.textContainer}>
                       <Text style={styles.title}>{product.name}</Text>
-                      <Text style={styles.description}>{product.description}</Text>
+                      <Text style={styles.description}>
+                        {product.description}
+                      </Text>
                       <Text style={styles.price}>Bs. {product.price}</Text>
                     </View>
-                    <Image source={{ uri: product.image }} style={styles.image} />
+                    <Image
+                      source={{ uri: product.image }}
+                      style={styles.image}
+                    />
                   </View>
                   <TouchableOpacity
                     style={styles.addButton}
@@ -159,7 +166,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
-    marginBottom: 15,
+    marginVertical: 5,
+    marginHorizontal: 5,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 5,
