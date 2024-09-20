@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router"; // Importamos el hook para acceder a los parámetros
 import { createOrder } from "@/service/OrderService";
@@ -8,7 +15,7 @@ import { useCart } from "@/contexts/CartContext";
 
 export default function Payment() {
   const { cartItems, updateQuantity, removeFromCart } = useCart();
-  const { billName = "", nit = "" } = useLocalSearchParams(); // Aseguramos que billName y nit tengan un valor por defecto
+  const { billName = "", nit = "", total = "0" } = useLocalSearchParams();
   const [selectedMethod, setSelectedMethod] = useState("QR"); // Estado para el método de pago seleccionado
 
   return (
@@ -64,13 +71,14 @@ export default function Payment() {
       {/* Total */}
       <View style={styles.totalContainer}>
         <Text style={styles.totalText}>Total:</Text>
-        <Text style={styles.totalAmount}>Bs. 104</Text>
+        <Text style={styles.totalAmount}>Bs. {total}</Text>
       </View>
 
       {/* Botón de "Pedir" */}
-      <TouchableOpacity style={styles.orderButton}
+      <TouchableOpacity
+        style={styles.orderButton}
         onPress={() => {
-          console.log("pressed pay button");  
+          console.log("pressed pay button");
           Alert.alert(
             "Confirmar pedido",
             "¿Estás seguro de que deseas realizar el pedido?",
@@ -78,7 +86,7 @@ export default function Payment() {
               {
                 text: "Cancelar",
                 onPress: () => console.log("Prompt cancelled"),
-                style: "cancel"
+                style: "cancel",
               },
               {
                 text: "OK",
@@ -90,20 +98,26 @@ export default function Payment() {
                   try {
                     // Create the order
                     const response = await createOrder(orderPayload);
-                    Alert.alert("Pedido realizado", "Tu pedido ha sido registrado exitosamente.");
+                    Alert.alert(
+                      "Pedido realizado",
+                      "Tu pedido ha sido registrado exitosamente."
+                    );
                     // Redirect user to the home page
                     // TODO: Clear the cart after the order is created
-                    router.push('/');
+                    router.push("/");
                   } catch (error) {
                     console.error("Error creating order:", error);
-                    Alert.alert("Error", "Hubo un error al registrar tu orden. intenta nuevamente.");
-                  } 
-                }
-              }
+                    Alert.alert(
+                      "Error",
+                      "Hubo un error al registrar tu orden. intenta nuevamente."
+                    );
+                  }
+                },
+              },
             ]
           );
         }}
-        >
+      >
         <Text style={styles.orderButtonText}>Pedir</Text>
       </TouchableOpacity>
     </View>
