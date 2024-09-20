@@ -10,25 +10,26 @@ import {
   Button,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { useCart } from '@/contexts/CartContext';
+import { useCart } from "@/contexts/CartContext";
 
 export default function InvoiceScreen() {
   const router = useRouter();
   const [visible, setVisible] = React.useState(false);
-  const { cartItems} = useCart();
+  const { cartItems } = useCart();
 
   const hideDialog = () => setVisible(false);
 
   const handlePaymentPress = () => {
-    if(hasErrorsBillName() || hasErrorsNit()) {
+    if (hasErrorsBillName() || hasErrorsNit()) {
       setVisible(true);
-    }
-    else{
+    } else {
+      const total = calculateTotal();
       router.push({
         pathname: "/payment-method",
         params: {
           billName: billName,
           nit: nit,
+          total: total.toString(),
         },
       });
     }
@@ -45,7 +46,7 @@ export default function InvoiceScreen() {
   const onChangeBillName = (billName: React.SetStateAction<string>) =>
     setBillName(billName);
   const hasErrorsBillName = () => {
-    return !/^[a-zA-Z]+$/.test(billName); // Retorna true si hay caracteres que no son letras
+    return !/^[a-zA-Z\s]+$/.test(billName); // Permite letras y espacios
   };
 
   //Funciones para el NIT o CI de la factura
@@ -56,10 +57,12 @@ export default function InvoiceScreen() {
 
   // Calcular el total por producto (cantidad * precio)
   const calculateTotal = (): number => {
-    const total = products.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const total = products.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
     return parseFloat(total.toFixed(2)); // Redondea a 2 decimales y convierte a número
   };
-  
 
   return (
     <ScrollView style={styles.container}>
@@ -76,7 +79,10 @@ export default function InvoiceScreen() {
           </DataTable.Header>
           {products.map((item) => (
             <DataTable.Row key={item.id}>
-              <DataTable.Cell>{item.name}</DataTable.Cell>
+              <DataTable.Cell style={{ flex: 2 }}>
+                <Text style={{ flexShrink: 1 }}>{item.name}</Text>
+              </DataTable.Cell>
+
               <DataTable.Cell numeric>{item.quantity}</DataTable.Cell>
               <DataTable.Cell numeric>
                 {item.price * item.quantity}
@@ -144,12 +150,11 @@ export default function InvoiceScreen() {
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.subtitle}>Datos no válidos</Text>
-            <Text style={styles.modalText}>Por favor, revise los datos ingresados</Text>
-            <TouchableOpacity
-              style={styles.submitButton}
-              onPress={hideDialog}
-            >
-              <Text style={styles.submitButtonText}>  Cerrar  </Text>
+            <Text style={styles.modalText}>
+              Por favor, revise los datos ingresados
+            </Text>
+            <TouchableOpacity style={styles.submitButton} onPress={hideDialog}>
+              <Text style={styles.submitButtonText}> Cerrar </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -215,17 +220,17 @@ const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo oscuro semitransparente
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo oscuro semitransparente
   },
   modalView: {
     margin: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
     padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -233,6 +238,6 @@ const styles = StyleSheet.create({
   },
   modalText: {
     marginBottom: 15,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
