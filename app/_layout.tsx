@@ -34,7 +34,7 @@ export default function RootLayout() {
     "(tabs)": [{ name: "cart-outline", link: "/cart" }],
     "cart": [],
     "invoice-form": [],
-    "+not-found": [],
+    "menu-item": [{ name: "cart-outline", link: "/cart" }],
   };
 
   return (
@@ -50,7 +50,7 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="cart" />
             <Stack.Screen name="invoice-form" />
-            <Stack.Screen name="+not-found" />
+            <Stack.Screen name="menu-item" />
           </Stack>
         </View>
       </ThemeProvider>

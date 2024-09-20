@@ -12,53 +12,73 @@ export default function CartScreen() {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={cartItems}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Image source={{ uri: item.image }} style={styles.productImage} />
-            <View style={styles.productDetails}>
-              <Text style={styles.productName}>{item.name}</Text>
-              <Text style={styles.productPrice}>Bs. {item.price}</Text>
-              <View style={styles.quantityContainer}>
-                {item.quantity > 1 ? (
+      {cartItems.length === 0 ? (
+        <View style={styles.emptyCartContainer}>
+          <Text style={styles.emptyCartText}>No tienes productos en el carrito</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={cartItems}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Image source={{ uri: item.image }} style={styles.productImage} />
+              <View style={styles.productDetails}>
+                <Text style={styles.productName}>{item.name}</Text>
+                <Text style={styles.productPrice}>Bs. {item.price}</Text>
+                <View style={styles.quantityContainer}>
+                  {item.quantity > 1 ? (
+                    <TouchableOpacity
+                      style={styles.quantityButton}
+                      onPress={() => updateQuantity(item.id, -1)}
+                    >
+                      <Text style={styles.quantityButtonText}>-</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.quantityButton}
+                      onPress={() => removeFromCart(item.id)}
+                    >
+                      <Ionicons name="trash-outline" size={24} color="red" />
+                    </TouchableOpacity>
+                  )}
+                  <Text style={styles.quantity}>{item.quantity}</Text>
                   <TouchableOpacity
                     style={styles.quantityButton}
-                    onPress={() => updateQuantity(item.id, -1)}
+                    onPress={() => updateQuantity(item.id, 1)}
                   >
-                    <Text style={styles.quantityButtonText}>-</Text>
+                    <Text style={styles.quantityButtonText}>+</Text>
                   </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    style={styles.quantityButton}
-                    onPress={() => removeFromCart(item.id)}
-                  >
-                    <Ionicons name="trash-outline" size={24} color="red" />
-                  </TouchableOpacity>
-                )}
-                <Text style={styles.quantity}>{item.quantity}</Text>
-                <TouchableOpacity
-                  style={styles.quantityButton}
-                  onPress={() => updateQuantity(item.id, 1)}
-                >
-                  <Text style={styles.quantityButtonText}>+</Text>
-                </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
-        )}
-      />
+          )}
+        />
+      )}
       <View style={styles.payButtonContainer}>
         <TouchableOpacity
-          style={[styles.payButton, { backgroundColor: colorScheme === 'dark' ? '#000' : Colors[colorScheme ?? 'light'].tint }]}
-          onPress={() => {  
-            // Navigate to the payment form
-            router.push('/invoice-form');
-
-          }} 
+          style={[
+            styles.payButton,
+            {
+              backgroundColor: cartItems.length === 0 ? '#ccc' : (colorScheme === 'dark' ? '#000' : Colors[colorScheme ?? 'light'].tint),
+            },
+          ]}
+          onPress={() => {
+            if (cartItems.length > 0) {
+              // Navigate to the payment form
+              router.push('/invoice-form');
+            }
+          }}
+          disabled={cartItems.length === 0}
         >
-          <Text style={[styles.payButtonText, { color: colorScheme === 'dark' ? '#fff' : Colors[colorScheme ?? 'light'].background }]}>Ir a Pagar</Text>
+          <Text
+            style={[
+              styles.payButtonText,
+              { color: cartItems.length === 0 ? '#888' : (colorScheme === 'dark' ? '#fff' : Colors[colorScheme ?? 'light'].background) },
+            ]}
+          >
+            Ir a Pagar
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -69,6 +89,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  emptyCartContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyCartText: {
+    fontSize: 18,
+    color: '#666',
   },
   card: {
     flexDirection: 'row',
