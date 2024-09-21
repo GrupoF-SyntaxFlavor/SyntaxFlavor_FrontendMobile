@@ -1,10 +1,17 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { Colors } from '@/constants/Colors';
-import { useCart } from '@/contexts/CartContext';
-import { router } from 'expo-router';
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
+import { useCart } from "@/contexts/CartContext";
+import { router } from "expo-router";
 
 export default function CartScreen() {
   const { cartItems, updateQuantity, removeFromCart } = useCart();
@@ -14,7 +21,9 @@ export default function CartScreen() {
     <View style={styles.container}>
       {cartItems.length === 0 ? (
         <View style={styles.emptyCartContainer}>
-          <Text style={styles.emptyCartText}>No tienes productos en el carrito</Text>
+          <Text style={styles.emptyCartText}>
+            No tienes productos en el carrito
+          </Text>
         </View>
       ) : (
         <FlatList
@@ -60,13 +69,18 @@ export default function CartScreen() {
           style={[
             styles.payButton,
             {
-              backgroundColor: cartItems.length === 0 ? '#ccc' : (colorScheme === 'dark' ? '#000' : Colors[colorScheme ?? 'light'].tint),
+              backgroundColor:
+                cartItems.length === 0
+                  ? "#ccc"
+                  : colorScheme === "dark"
+                  ? "#000"
+                  : Colors[colorScheme ?? "light"].tint,
             },
           ]}
           onPress={() => {
             if (cartItems.length > 0) {
               // Navigate to the payment form
-              router.push('/invoice-form');
+              router.push("/invoice-form");
             }
           }}
           disabled={cartItems.length === 0}
@@ -74,7 +88,14 @@ export default function CartScreen() {
           <Text
             style={[
               styles.payButtonText,
-              { color: cartItems.length === 0 ? '#888' : (colorScheme === 'dark' ? '#fff' : Colors[colorScheme ?? 'light'].background) },
+              {
+                color:
+                  cartItems.length === 0
+                    ? "#888"
+                    : colorScheme === "dark"
+                    ? "#fff"
+                    : Colors[colorScheme ?? "light"].background,
+              },
             ]}
           >
             Ir a Pagar
@@ -88,24 +109,24 @@ export default function CartScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   emptyCartContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   emptyCartText: {
     fontSize: 18,
-    color: '#666',
+    color: "#666",
   },
   card: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 10,
     margin: 10,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
     borderRadius: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
@@ -119,30 +140,30 @@ const styles = StyleSheet.create({
   productDetails: {
     flex: 1,
     marginLeft: 10,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   productName: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   productPrice: {
     fontSize: 16,
-    color: '#888',
+    color: "#888",
     marginVertical: 5,
   },
   quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 10,
   },
   quantityButton: {
     padding: 10,
-    backgroundColor: '#ddd',
+    backgroundColor: "#ddd",
     borderRadius: 5,
   },
   quantityButtonText: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   quantity: {
     marginHorizontal: 20,
@@ -151,15 +172,15 @@ const styles = StyleSheet.create({
   payButtonContainer: {
     padding: 10,
     borderTopWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
   },
   payButton: {
     padding: 15,
     borderRadius: 5,
-    alignItems: 'center',
+    alignItems: "center",
   },
   payButtonText: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
