@@ -1,67 +1,105 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { Colors } from '@/constants/Colors';
-
-const initialProducts = [
-  { id: '1', name: 'Promo patito', price: 'Bs. 20', quantity: 1, image: 'https://via.placeholder.com/100' },
-  { id: '2', name: 'Promo caldito', price: 'Bs. 21', quantity: 1, image: 'https://via.placeholder.com/100' },
-];
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
+import { useCart } from "@/contexts/CartContext";
+import { router } from "expo-router";
 
 export default function CartScreen() {
-  const [products, setProducts] = useState(initialProducts);
+  const { cartItems, updateQuantity, removeFromCart } = useCart();
   const colorScheme = useColorScheme();
-
-  const updateQuantity = (id: string, delta: number) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === id ? { ...product, quantity: Math.max(0, product.quantity + delta) } : product
-      )
-    );
-  };
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={products}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.productContainer}>
-            <Image source={{ uri: item.image }} style={styles.productImage} />
-            <View style={styles.productDetails}>
-              <Text style={styles.productName}>{item.name}</Text>
-              <Text style={styles.productPrice}>{item.price}</Text>
-              <View style={styles.quantityContainer}>
-                <TouchableOpacity
-                  style={styles.quantityButton}
-                  onPress={() => updateQuantity(item.id, -1)}
-                >
-                  <Text style={styles.quantityButtonText}>-</Text>
-                </TouchableOpacity>
-                <Text style={styles.quantity}>{item.quantity}</Text>
-                <TouchableOpacity
-                  style={styles.quantityButton}
-                  onPress={() => updateQuantity(item.id, 1)}
-                >
-                  <Text style={styles.quantityButtonText}>+</Text>
-                </TouchableOpacity>
+      {cartItems.length === 0 ? (
+        <View style={styles.emptyCartContainer}>
+          <Text style={styles.emptyCartText}>
+            No tienes productos en el carrito
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={cartItems}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Image source={{ uri: item.image }} style={styles.productImage} />
+              <View style={styles.productDetails}>
+                <Text style={styles.productName}>{item.name}</Text>
+                <Text style={styles.productPrice}>Bs. {item.price}</Text>
+                <View style={styles.quantityContainer}>
+                  {item.quantity > 1 ? (
+                    <TouchableOpacity
+                      style={styles.quantityButton}
+                      onPress={() => updateQuantity(item.id, -1)}
+                    >
+                      <Text style={styles.quantityButtonText}>-</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.quantityButton}
+                      onPress={() => removeFromCart(item.id)}
+                    >
+                      <Ionicons name="trash-outline" size={24} color="red" />
+                    </TouchableOpacity>
+                  )}
+                  <Text style={styles.quantity}>{item.quantity}</Text>
+                  <TouchableOpacity
+                    style={styles.quantityButton}
+                    onPress={() => updateQuantity(item.id, 1)}
+                  >
+                    <Text style={styles.quantityButtonText}>+</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={() => {}}
-            >
-              <Text style={styles.editButtonText}>Editar</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
+          )}
+        />
+      )}
       <View style={styles.payButtonContainer}>
         <TouchableOpacity
-          style={[styles.payButton, { backgroundColor: colorScheme === 'dark' ? '#000' : Colors[colorScheme ?? 'light'].tint }]}
-          onPress={() => {}}
+          style={[
+            styles.payButton,
+            {
+              backgroundColor:
+                cartItems.length === 0
+                  ? "#ccc"
+                  : colorScheme === "dark"
+                  ? "#000"
+                  : Colors[colorScheme ?? "light"].tint,
+            },
+          ]}
+          onPress={() => {
+            if (cartItems.length > 0) {
+              // Navigate to the payment form
+              router.push("/invoice-form");
+            }
+          }}
+          disabled={cartItems.length === 0}
         >
-          <Text style={[styles.payButtonText, { color: colorScheme === 'dark' ? '#fff' : Colors[colorScheme ?? 'light'].background }]}>Ir a Pagar</Text>
+          <Text
+            style={[
+              styles.payButtonText,
+              {
+                color:
+                  cartItems.length === 0
+                    ? "#888"
+                    : colorScheme === "dark"
+                    ? "#fff"
+                    : Colors[colorScheme ?? "light"].background,
+              },
+            ]}
+          >
+            Ir a Pagar
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -71,79 +109,78 @@ export default function CartScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
-  productContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  emptyCartContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyCartText: {
+    fontSize: 18,
+    color: "#666",
+  },
+  card: {
+    flexDirection: "row",
     padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    margin: 10,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
   productImage: {
     width: 100,
     height: 100,
-    marginRight: 10,
+    borderRadius: 10,
   },
   productDetails: {
     flex: 1,
+    marginLeft: 10,
+    justifyContent: "center",
   },
   productName: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: "bold",
   },
   productPrice: {
     fontSize: 16,
+    color: "#888",
+    marginVertical: 5,
   },
   quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  quantity: {
-    marginHorizontal: 10,
-    fontSize: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
   },
   quantityButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#007AFF',
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 10,
+    backgroundColor: "#ddd",
+    borderRadius: 5,
   },
   quantityButtonText: {
-    color: '#fff',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
-  editButton: {
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: '#007AFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  editButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  quantity: {
+    marginHorizontal: 20,
+    fontSize: 18,
   },
   payButtonContainer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
+    padding: 10,
+    borderTopWidth: 1,
+    borderColor: "#ddd",
   },
   payButton: {
-    width: '80%',
     padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
+    borderRadius: 5,
+    alignItems: "center",
   },
   payButtonText: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
