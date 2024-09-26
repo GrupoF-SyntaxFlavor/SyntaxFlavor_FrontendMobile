@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   Button,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useCart } from "@/contexts/CartContext";
@@ -16,35 +17,16 @@ export default function InvoiceScreen() {
   const router = useRouter();
   const [visible, setVisible] = React.useState(false);
   const { cartItems } = useCart();
-
-  const hideDialog = () => setVisible(false);
-
-  const handlePaymentPress = () => {
-    if (hasErrorsBillName() || hasErrorsNit()) {
-      setVisible(true);
-    } else {
-      const total = calculateTotal();
-      router.push({
-        pathname: "/payment-method",
-        params: {
-          billName: billName,
-          nit: nit,
-          total: total.toString(),
-        },
-      });
-    }
-  };
-
-  // Lista de productos seleccionados
-  const [products, setProducts] = useState(cartItems);
-  //Campo para el nombre de la factura
-  const [billName, setBillName] = React.useState("Doe");
-  //Campo para el NIT o CI de la factura
-  const [nit, setNit] = React.useState("123456");
+  const [products, setProducts] = useState(cartItems); //Productos seleccionados
+  const defaultBillName = "Silva";
+  const defaultNit = "123456";
+  const [billName, setBillName] = React.useState(defaultBillName);
+  const [nit, setNit] = React.useState(defaultNit);
 
   //Funciones para el nombre de la factura
   const onChangeBillName = (billName: React.SetStateAction<string>) =>
-    setBillName(billName);
+    setBillName(billName); // Actualiza el estado del nombre de la factura
+
   const hasErrorsBillName = () => {
     return !/^[a-zA-Z\s]+$/.test(billName); // Permite letras y espacios
   };
@@ -53,6 +35,50 @@ export default function InvoiceScreen() {
   const onChangeNit = (nit: React.SetStateAction<string>) => setNit(nit);
   const hasErrorsNit = () => {
     return !/^\d+$/.test(nit); // Retorna true si hay caracteres no numéricos
+  };
+
+  const hideDialog = () => setVisible(false);
+
+  const handlePaymentPress = () => {
+    if (hasErrorsBillName() || hasErrorsNit()) {
+      setVisible(true); // Mostrar modal si hay errores
+    } else {
+      // Verificar si los datos han sido modificados
+      if (billName !== defaultBillName || nit !== defaultNit) {
+        Alert.alert(
+          "Guardar Datos", // <-- Título del Alert
+          "¿Desea guardar los nuevos datos como predeterminados?",
+          [
+            {
+              text: "No",
+              onPress: () => proceedToPayment(),
+              style: "cancel",
+            },
+            { text: "Sí", onPress: () => saveAndProceed() },
+          ]
+        );
+      } else {
+        proceedToPayment();
+      }
+    }
+  };
+
+  // Función para guardar los nuevos datos ingresados
+  const saveAndProceed = () => {
+    console.log("Datos guardados: ", billName, nit);
+    proceedToPayment();
+  };
+
+  const proceedToPayment = () => {
+    const total = calculateTotal(); // Calcular total
+    router.push({
+      pathname: "/payment-method",
+      params: {
+        billName: billName,
+        nit: nit,
+        total: total.toString(),
+      },
+    });
   };
 
   // Calcular el total por producto (cantidad * precio)
@@ -90,10 +116,10 @@ export default function InvoiceScreen() {
             </DataTable.Row>
           ))}
         </DataTable>
+        <Text style={styles.priceTotal}>Total: {calculateTotal()}</Text>
       </View>
 
       {/* Total de la compra */}
-      <Text style={styles.priceTotal}>Total: {calculateTotal()}</Text>
 
       {/* Espacio entre la tabla y el divisor */}
       <View style={{ marginBottom: 10 }}></View>
@@ -129,10 +155,7 @@ export default function InvoiceScreen() {
           El NIT/ CI debe contener sólo números
         </HelperText>
       </View>
-      {/* Espacio entre los datos y el divisor */}
-      <View style={{ marginBottom: 10 }}></View>
       <Divider />
-      <View style={{ marginBottom: 10 }}></View>
       <TouchableOpacity
         style={styles.submitButton}
         onPress={handlePaymentPress}
@@ -153,8 +176,8 @@ export default function InvoiceScreen() {
             <Text style={styles.modalText}>
               Por favor, revise los datos ingresados
             </Text>
-            <TouchableOpacity style={styles.submitButton} onPress={hideDialog}>
-              <Text style={styles.submitButtonText}> Cerrar </Text>
+            <TouchableOpacity style={styles.modalButton} onPress={hideDialog}>
+              <Text style={styles.modalButtonText}> Cerrar </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -189,18 +212,20 @@ const styles = StyleSheet.create({
     marginBottom: 20, // Espacio inferior
   },
   subtitle: {
-    fontSize: 20, // Un poco más grande
+    fontSize: 22, // Un poco más grande
     fontWeight: "bold",
-    textAlign: "left", // Alineación a la izquierda para una estructura más profesional
+    textAlign: "center", // Alineación a la izquierda para una estructura más profesional
     color: "#333", // Mismo tono oscuro
     marginBottom: 15, // Mayor separación entre secciones
+    marginTop: 10, // Separación del título anterior
   },
   priceTotal: {
-    fontSize: 20, // Tamaño mayor para destacar el total
+    fontSize: 20,
     fontWeight: "bold",
     textAlign: "right",
-    marginBottom: 10, // Más espacio para resaltar
-    marginRight: 15,
+    marginTop: 15,
+    marginBottom: 0,
+    marginRight: 5,
   },
   submitButton: {
     backgroundColor: "#86AB9A", // Color más suave para que se integre bien con la aplicación
@@ -216,7 +241,6 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: "#fff", // Fondo blanco
-    marginBottom: 15, // Espacio entre los inputs
   },
   centeredView: {
     flex: 1,
@@ -225,19 +249,28 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo oscuro semitransparente
   },
   modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 35,
+    margin: 10,
+    backgroundColor: "#F0F0F2",
+    borderRadius: 25,
+    padding: 25,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    width: "85%",
   },
   modalText: {
-    marginBottom: 15,
+    marginBottom: 16,
+    fontSize: 17,
     textAlign: "center",
+  },
+  modalButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: "#86AB9A",
+    borderRadius: 5,
+    marginHorizontal: 10,
+  },
+  modalButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 15,
   },
 });
