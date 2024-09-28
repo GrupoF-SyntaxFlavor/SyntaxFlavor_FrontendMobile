@@ -14,6 +14,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useCart } from "@/contexts/CartContext";
 import { router } from "expo-router";
+import { Product } from "@/models/Product";
 
 interface ProductDB {
   id: number;
@@ -77,7 +78,7 @@ export default function Menu() {
     { label: "Sin gluten" },
   ];
 
-  const handleProductPress = (product: ProductFront) => {
+  const handleProductPress = (product: Product) => {
     // Navegamos a 'menu-item' y pasamos los datos del producto como query params
     router.push({
       pathname: "/menu-item",

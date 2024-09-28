@@ -6,6 +6,8 @@ import { useEffect } from 'react';
 import { View } from 'react-native';
 import 'react-native-reanimated';
 
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 import { useColorScheme } from '@/hooks/useColorScheme';
 import TopNavBar from '@/components/navigation/TopNavBar';
 import { Ionicons } from '@expo/vector-icons';
@@ -39,23 +41,25 @@ export default function RootLayout() {
   };
 
   return (
-    <CartProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <CartProvider>
       <PastOrdersProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <View style={{ flex: 1 }}>
-        <Stack
+          <Stack
           screenOptions={({ route }) => ({
-          header: () => <TopNavBar icons={screenIcons[route.name] || []} />,
-          animation: 'none',
+            header: () => <TopNavBar icons={screenIcons[route.name] || []} />,
+            animation: 'none',
           })}
-        >
+          >
           <Stack.Screen name="cart" />
           <Stack.Screen name="invoice-form" />
           <Stack.Screen name="menu-item" />
-        </Stack>
+          </Stack>
         </View>
-      </ThemeProvider>
+        </ThemeProvider>
       </PastOrdersProvider>
-    </CartProvider>
+      </CartProvider>
+    </GestureHandlerRootView>
   );
 }
