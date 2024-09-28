@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { fetchPastOrders } from '@/service/OrderService';
-import { PastOrder } from '@/models/PastOrder';
+import React, {  } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ScrollView } from 'react-native-gesture-handler';
 import { usePastOrders } from '@/contexts/PastOrdersContext';
@@ -10,21 +8,6 @@ import { OrderStatusValues, OrderStatusLabels } from '@/constants/OrderStatusVal
 
 const PastOrdersScreen = () => {
     const { pastOrders, loadPastOrders } = usePastOrders();
-
-    /* const renderOrder = ({ item }: { item: PastOrder }) => {
-        console.log("Rendering order:", item);
-        return (
-        <View style={styles.orderContainer}>
-            <Text style={styles.orderDate}>{item.orderTimestamp}</Text>
-            <Text style={styles.orderStatus}>{item.orderStatus}</Text>
-                {item.orderItems.map((product) => (
-                    <View style={styles.productContainer}>
-                    <Text>{product.menuItemName}</Text>
-                    <Text>{product.quantity}</Text>
-                </View>
-                ))}
-        </View>
-    ) }; */
 
     return (
         <View style={styles.container}>
@@ -40,10 +23,15 @@ const PastOrdersScreen = () => {
                       <Ionicons name="time-outline" size={20} color="#FFA500" />
                       <Text style={styles.pendingStatus}>{OrderStatusLabels.PENDING}</Text>
                     </View>
-                  ) : (
+                  ) : order.orderStatus === OrderStatusValues.DELIVERED ? (
                     <View style={styles.statusContainer}>
                       <Ionicons name="checkmark-done-outline" size={20} color="green" />
                       <Text style={styles.deliveredStatus}>{OrderStatusLabels.DELIVERED}</Text>
+                    </View>
+                  ) : (
+                    <View style={styles.statusContainer}>
+                      <Ionicons name="close-circle-outline" size={20} color="red" />
+                      <Text style={styles.cancelledStatus}>{OrderStatusLabels.CANCELLED}</Text>
                     </View>
                   )}
                 </View>
@@ -58,7 +46,8 @@ const PastOrdersScreen = () => {
                   {/* TODO: get order total */}
                 <Text style={styles.total}>Total: Bs. 0</Text>
     
-                {order.orderStatus === OrderStatusValues.DELIVERED && (
+                {order.orderStatus !== OrderStatusValues.PENDING && (
+                    /* TODO: Add functionality to set cart from button */
                   <TouchableOpacity style={styles.refreshButton}>
                     <Ionicons name="refresh-outline" size={20} color="#000" />
                   </TouchableOpacity>
@@ -112,6 +101,10 @@ const styles = StyleSheet.create({
     },
     deliveredStatus: {
       color: "green",
+      marginLeft: 5,
+    },
+    cancelledStatus: {
+      color: "red",
       marginLeft: 5,
     },
     orderItems: {
