@@ -9,6 +9,7 @@ import { PastOrder } from '@/models/PastOrder';
 import { useCart } from '@/contexts/CartContext';
 import { orderToProducts } from '@/lib/OrderUtils';
 import Loader from '@/components/Loader';
+import { cancelOrder } from '@/service/OrderService';
 
 const PastOrdersScreen = () => {
   const { pastOrders, loadPastOrders } = usePastOrders();
@@ -41,8 +42,37 @@ const PastOrdersScreen = () => {
     Alert.alert('Carrito actualizado', 'Los productos de la orden seleccionada han sido añadidos al carrito');
   };
 
+  const handleCancelOrder = (order: PastOrder) => {
+    // Show a confirmation dialog to cancel the order
+    Alert.alert(
+      'Cancelar orden',
+      '¿Está seguro que desea cancelar esta orden?',
+      [
+        {
+          text: 'Sí',
+          onPress: async () => {
+            try {
+              await cancelOrder(order.orderId);
+              console.log('Orden cancelada', 'La orden ha sido cancelada');
+              Alert.alert('Orden cancelada', 'La orden ha sido cancelada, apersónate por caja para solicitar un reembolso');
+              // Refresh the past orders list
+              await loadPastOrders(1); // TODO: Use the actual customer ID
+            } catch (error) {
+              console.error('Error cancelando orden:', error);
+              Alert.alert('No se pudo cancelar la orden', 'En este momento la orden no puede ser cancelada, por favor intente más tarde');
+            }
+          },
+        },
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+      ]
+    );
+  }
+
   const calculateTotal = (order: PastOrder) => order.orderItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)
-  
+
 
   if (loading) {
     return (
@@ -93,16 +123,21 @@ const PastOrdersScreen = () => {
                 </Text>
               ))}
             </View>
-            {/* TODO: get order total */}
             <Text style={styles.total}>Total: Bs. {calculateTotal(order)}</Text>
 
-            {order.orderStatus !== OrderStatusValues.PENDING && (
-              /* TODO: Add functionality to set cart from button */
+            {order.orderStatus !== OrderStatusValues.PENDING ? (
               <TouchableOpacity
                 style={styles.refreshButton}
                 onPress={() => handleRefreshOrder(order)}
               >
                 <Ionicons name="refresh-outline" size={20} color="#000" />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.refreshButton}
+                onPress={() => handleCancelOrder(order)}
+              >
+                <Ionicons name="close-outline" size={20} color="red" />
               </TouchableOpacity>
             )}
           </View>
