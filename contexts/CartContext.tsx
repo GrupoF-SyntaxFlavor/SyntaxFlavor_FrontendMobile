@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Product } from '../models/Product';
+import { PastOrder } from '@/models/PastOrder';
 
 interface CartContextProps {
   cartItems: Product[];
