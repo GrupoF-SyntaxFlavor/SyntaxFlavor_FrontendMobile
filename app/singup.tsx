@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import { TextInput } from "react-native-paper";
+import { TextInput, HelperText } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -69,6 +69,7 @@ export default function SignupScreen() {
             theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
             onChangeText={setName}
           />
+
           <TextInput
             style={styles.input}
             label="Correo electronico"
@@ -80,7 +81,7 @@ export default function SignupScreen() {
             keyboardType="email-address"
           />
           <TouchableOpacity
-            style={styles.button}
+            style={[styles.button, !isStepOneValid && styles.buttonDisabled]} // Aplica el estilo de deshabilitado si no es válido
             onPress={handleNextStep}
             disabled={!isStepOneValid} // Habilita/deshabilita el botón
           >
@@ -123,7 +124,7 @@ export default function SignupScreen() {
             keyboardType="numeric"
           />
           <TouchableOpacity
-            style={styles.button}
+            style={[styles.button, !isStepTwoValid && styles.buttonDisabled]}
             onPress={handleNextStep}
             disabled={!isStepTwoValid}
           >
@@ -163,7 +164,7 @@ export default function SignupScreen() {
             secureTextEntry
           />
           <TouchableOpacity
-            style={styles.button}
+            style={[styles.button, !isStepThreeValid && styles.buttonDisabled]} // Aplica el estilo de deshabilitado si no es válido
             onPress={handleNextStep}
             disabled={!isStepThreeValid}
           >
@@ -234,6 +235,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 0,
     alignItems: "center",
+  },
+  buttonDisabled: {
+    backgroundColor: "#ccc", // Cambia el color de fondo del botón deshabilitado
   },
   buttonText: {
     color: "#fff",
