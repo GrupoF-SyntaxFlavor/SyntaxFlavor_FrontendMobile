@@ -1,11 +1,6 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { TextInput } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons"; // Para el icono de retroceso
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -19,7 +14,7 @@ export default function LoginScreen() {
 
   const handleLoginPress = () => {
     // Lógica para el botón de iniciar sesión
-    router.push("/(tabs)/menu"); // Redirige a la vista principal de la app
+    router.push("/(tabs)/menu");
   };
 
   const handleCreateAccountPress = () => {
@@ -45,18 +40,20 @@ export default function LoginScreen() {
       {/* Campo de Correo Electrónico */}
       <TextInput
         style={styles.input}
-        placeholder="Correo Electrónico"
+        label="Correo Electrónico"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
+        theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
       />
 
       {/* Campo de Contraseña */}
       <TextInput
         style={styles.input}
-        placeholder="Contraseña"
+        label="Contraseña"
         value={password}
         onChangeText={setPassword}
+        theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
         secureTextEntry
       />
 
@@ -105,17 +102,18 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "100%",
-    height: 50,
+    height: 60,
     borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 15,
     marginBottom: 20,
     fontSize: 16,
+    backgroundColor: "#fff", // Fondo blanco
   },
   loginButton: {
     backgroundColor: "#86AB9A", // Color verde para el botón
-    width: "100%",
+    width: "80%",
     paddingVertical: 15,
     borderRadius: 10,
     marginTop: 10,

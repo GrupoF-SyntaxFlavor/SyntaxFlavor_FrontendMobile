@@ -1,16 +1,14 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { TextInput } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
 
 export default function SignupScreen() {
+  const colorScheme = useColorScheme();
+
   const [step, setStep] = useState(1); // Controla el paso actual
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -32,7 +30,11 @@ export default function SignupScreen() {
   };
 
   const handlePreviousStep = () => {
-    if (step > 1) {
+    if (step === 1) {
+      // Si estamos en el primer paso, redirigir a la página de inicio o la página deseada
+      router.push("/");
+    } else {
+      // Si estamos en cualquier otro paso, disminuir el contador del paso
       setStep(step - 1);
     }
   };
@@ -44,26 +46,37 @@ export default function SignupScreen() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={handlePreviousStep} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={24} color="black" />
+      {/* Botón de retroceso */}
+      <TouchableOpacity style={styles.backButton} onPress={handlePreviousStep}>
+        <Ionicons
+          name="arrow-back"
+          size={30}
+          color={Colors[colorScheme ?? "light"].tint}
+        />
       </TouchableOpacity>
       {step === 1 && (
         <View style={styles.stepContainer}>
           <Text style={styles.title}>¡Empecemos!</Text>
-          <Text style={styles.subtitle}>
+          <Text style={styles.firstSubtitle}>
             Para comenzar, necesitamos algunos datos
           </Text>
           <TextInput
             style={styles.input}
-            placeholder="¿Cómo podemos llamarte?"
+            label="¿Cómo podemos llamarte?"
+            placeholder="Ingresa tu nombre"
+            placeholderTextColor="#89898B" // Cambia el color del texto del placeholder
             value={name}
+            theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
             onChangeText={setName}
           />
           <TextInput
             style={styles.input}
-            placeholder="Ingresa tu correo electrónico"
+            label="Correo electronico"
+            placeholder="Ingresa tu correo"
+            placeholderTextColor="#89898B" // Cambia el color del texto del placeholder
             value={email}
             onChangeText={setEmail}
+            theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
             keyboardType="email-address"
           />
           <TouchableOpacity
@@ -74,28 +87,38 @@ export default function SignupScreen() {
             <Text style={styles.buttonText}>Siguiente ➔</Text>
           </TouchableOpacity>
           <Image
-            source={require("../assets/images/sushi.png")}
-            style={styles.image}
+            source={require("../assets/images/pizza_box.png")}
+            style={styles.imageFirstStep}
           />
         </View>
       )}
 
       {step === 2 && (
         <View style={styles.stepContainer}>
+          <Image
+            source={require("../assets/images/book_coffee.gif")}
+            style={styles.imageSecondStep}
+          />
           <Text style={styles.title}>Facturación</Text>
-          <Text style={styles.subtitle}>
+          <Text style={styles.secondSubtitle}>
             Proporciónanos tu nombre o razón social y NIT/CI
           </Text>
           <TextInput
             style={styles.input}
-            placeholder="Ingresa el nombre de facturación"
+            label="Nombre de facturación"
+            placeholder="Nombre o Razón Social"
+            placeholderTextColor="#89898B"
             value={billName}
+            theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
             onChangeText={setBillName}
           />
           <TextInput
             style={styles.input}
-            placeholder="Ingresa tu NIT/CI"
+            label="Ingresa tu NIT/CI"
+            placeholder="NIT/CI"
+            placeholderTextColor="#89898B"
             value={nit}
+            theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
             onChangeText={setNit}
             keyboardType="numeric"
           />
@@ -106,31 +129,37 @@ export default function SignupScreen() {
           >
             <Text style={styles.buttonText}>Siguiente ➔</Text>
           </TouchableOpacity>
-          <Image
-            source={require("../assets/images/sushi.png")}
-            style={styles.image}
-          />
         </View>
       )}
 
       {step === 3 && (
         <View style={styles.stepContainer}>
-          <Text style={styles.title}>Asegura tu cuenta</Text>
-          <Text style={styles.subtitle}>
-            Crea una contraseña segura, asegúrate de usar al menos 8 caracteres.
+          <Text style={styles.thirdTitle}>Asegura tu cuenta</Text>
+          <Text style={styles.thirdSubtitle}>
+            Crea una contraseña segura, asegúrate de usar al menos 8 caracteres
           </Text>
+          <Image
+            source={require("../assets/images/cat_cafe.png")}
+            style={styles.imageThirdStep}
+          />
           <TextInput
             style={styles.input}
-            placeholder="Crea una contraseña"
+            label="Crea una contraseña"
+            placeholder="Contraseña"
+            placeholderTextColor="#89898B"
             value={password}
             onChangeText={setPassword}
+            theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
             secureTextEntry
           />
           <TextInput
             style={styles.input}
-            placeholder="Confirma tu contraseña"
+            label="Confirma tu contraseña"
+            placeholder="Contraseña"
+            placeholderTextColor="#89898B"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
+            theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
             secureTextEntry
           />
           <TouchableOpacity
@@ -140,10 +169,6 @@ export default function SignupScreen() {
           >
             <Text style={styles.buttonText}>Completar Registro</Text>
           </TouchableOpacity>
-          <Image
-            source={require("../assets/images/sushi.png")}
-            style={styles.image}
-          />
         </View>
       )}
     </View>
@@ -163,44 +188,80 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 28,
+    fontSize: 38,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 30,
+    textAlign: "center",
   },
-  subtitle: {
-    fontSize: 16,
+  thirdTitle: {
+    fontSize: 38,
+    fontWeight: "bold",
+    marginBottom: 30,
+    marginTop: 25,
+    textAlign: "center",
+  },
+  firstSubtitle: {
+    fontSize: 22,
+    marginBottom: 70,
+    marginHorizontal: 20,
+    textAlign: "center",
+  },
+  secondSubtitle: {
+    fontSize: 22,
+    marginBottom: 30,
+    marginHorizontal: 20,
+    textAlign: "center",
+  },
+  thirdSubtitle: {
+    fontSize: 22,
     marginBottom: 20,
+    marginHorizontal: 20,
     textAlign: "center",
   },
   input: {
-    width: "100%",
-    padding: 10,
+    width: "90%",
     borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 15,
+    backgroundColor: "#fff",
   },
   button: {
+    width: "90%",
     backgroundColor: "#86AB9A",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop: 10,
+    paddingVertical: 17,
+    borderRadius: 30,
+    marginTop: 20,
+    marginBottom: 0,
+    alignItems: "center",
   },
   buttonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: "bold",
   },
   backButton: {
     position: "absolute",
-    top: 40,
-    left: 10,
+    top: 50,
+    left: 20,
   },
-  image: {
-    width: 200,
+  imageFirstStep: {
+    width: 375,
     height: 200,
     marginTop: 20,
+    resizeMode: "contain",
+  },
+  imageSecondStep: {
+    width: 375,
+    height: 250,
+    marginTop: 20,
+    resizeMode: "contain",
+    marginBottom: 30,
+  },
+  imageThirdStep: {
+    width: 250,
+    height: 250,
+    marginTop: 0,
     resizeMode: "contain",
   },
 });
