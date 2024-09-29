@@ -8,7 +8,9 @@ export default function WelcomeScreen() {
   const handleLoginPress = () => {
     router.push("/login"); // Redirige a la pantalla de login
   };
-
+  const handleSingUpPress = () => {
+    router.push("/singup"); // Redirige a la pantalla de login
+  };
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
@@ -38,7 +40,7 @@ export default function WelcomeScreen() {
         {/* Botón de Registrarse */}
         <TouchableOpacity
           style={styles.registerButton}
-          onPress={handleLoginPress}
+          onPress={handleSingUpPress}
         >
           <Text style={styles.buttonText}>Registrate</Text>
         </TouchableOpacity>
