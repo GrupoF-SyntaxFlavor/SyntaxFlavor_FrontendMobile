@@ -9,11 +9,14 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 import "react-native-reanimated";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import TopNavBar from "@/components/navigation/TopNavBar";
 import { Ionicons } from "@expo/vector-icons";
 import { CartProvider } from "@/contexts/CartContext";
+import { PastOrdersProvider } from "@/contexts/PastOrdersContext";
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -43,27 +46,34 @@ export default function RootLayout() {
   };
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <View style={{ flex: 1 }}>
-        {/* Envoltura del CartProvider y acceso a las demás pantallas */}
-        <CartProvider>
-          <Stack
-            screenOptions={({ route }) => ({
-              header: () => <TopNavBar icons={screenIcons[route.name] || []} />,
-              animation: "none",
-            })}
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <CartProvider>
+        <PastOrdersProvider>
+          <ThemeProvider
+            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
           >
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="singup" options={{ headerShown: false }} />
-            <Stack.Screen name="login" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="cart" />
-            <Stack.Screen name="invoice-form" />
-            <Stack.Screen name="menu-item" />
-            <Stack.Screen name="payment-method" />
-          </Stack>
-        </CartProvider>
-      </View>
-    </ThemeProvider>
+            <View style={{ flex: 1 }}>
+              <Stack
+                screenOptions={({ route }) => ({
+                  header: () => (
+                    <TopNavBar icons={screenIcons[route.name] || []} />
+                  ),
+                  animation: "none",
+                })}
+              >
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="singup" options={{ headerShown: false }} />
+                <Stack.Screen name="login" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="cart" />
+                <Stack.Screen name="invoice-form" />
+                <Stack.Screen name="menu-item" />
+                <Stack.Screen name="payment-method" />
+              </Stack>
+            </View>
+          </ThemeProvider>
+        </PastOrdersProvider>
+      </CartProvider>
+    </GestureHandlerRootView>
   );
 }
