@@ -1,11 +1,14 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { useRouter } from "expo-router"; // Asegúrate de importar useRouter
 
-export default function WelcomeScreen({
-  onContinue,
-}: {
-  onContinue: () => void;
-}) {
+export default function WelcomeScreen() {
+  const router = useRouter();
+
+  const handleLoginPress = () => {
+    router.push("/login"); // Redirige a la pantalla de login
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
@@ -33,12 +36,15 @@ export default function WelcomeScreen({
       {/* Botones */}
       <View style={styles.bottomContainer}>
         {/* Botón de Registrarse */}
-        <TouchableOpacity style={styles.registerButton} onPress={onContinue}>
+        <TouchableOpacity
+          style={styles.registerButton}
+          onPress={handleLoginPress}
+        >
           <Text style={styles.buttonText}>Registrate</Text>
         </TouchableOpacity>
 
         {/* Botón de Iniciar Sesión */}
-        <TouchableOpacity style={styles.loginButton} onPress={onContinue}>
+        <TouchableOpacity style={styles.loginButton} onPress={handleLoginPress}>
           <Text style={styles.loginText}>Iniciar Sesión</Text>
         </TouchableOpacity>
       </View>

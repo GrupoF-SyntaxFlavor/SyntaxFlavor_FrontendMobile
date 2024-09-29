@@ -14,7 +14,6 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import TopNavBar from "@/components/navigation/TopNavBar";
 import { Ionicons } from "@expo/vector-icons";
 import { CartProvider } from "@/contexts/CartContext";
-import WelcomeScreen from "./welcome"; // Asegúrate de que WelcomeScreen esté en la raíz de "app"
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -23,8 +22,6 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
-
-  const [isWelcomeShown, setIsWelcomeShown] = useState(false); // Estado para controlar si la bienvenida ya se mostró
 
   useEffect(() => {
     if (loaded) {
@@ -48,30 +45,23 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <View style={{ flex: 1 }}>
-        {!isWelcomeShown ? (
-          // Pantalla de bienvenida (fuera del CartProvider)
-          <WelcomeScreen onContinue={() => setIsWelcomeShown(true)} />
-        ) : (
-          <>
-            {/* Envoltura del CartProvider y acceso a las demás pantallas */}
-            <CartProvider>
-              <Stack
-                screenOptions={({ route }) => ({
-                  header: () => (
-                    <TopNavBar icons={screenIcons[route.name] || []} />
-                  ),
-                  animation: "none",
-                })}
-              >
-                <Stack.Screen name="(tabs)" />
-                <Stack.Screen name="cart" />
-                <Stack.Screen name="invoice-form" />
-                <Stack.Screen name="menu-item" />
-                <Stack.Screen name="payment-method" />
-              </Stack>
-            </CartProvider>
-          </>
-        )}
+        {/* Envoltura del CartProvider y acceso a las demás pantallas */}
+        <CartProvider>
+          <Stack
+            screenOptions={({ route }) => ({
+              header: () => <TopNavBar icons={screenIcons[route.name] || []} />,
+              animation: "none",
+            })}
+          >
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="login" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="cart" />
+            <Stack.Screen name="invoice-form" />
+            <Stack.Screen name="menu-item" />
+            <Stack.Screen name="payment-method" />
+          </Stack>
+        </CartProvider>
       </View>
     </ThemeProvider>
   );
