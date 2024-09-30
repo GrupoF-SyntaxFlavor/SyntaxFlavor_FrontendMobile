@@ -141,7 +141,7 @@ export default function Payment() {
                       await AsyncStorage.removeItem("cartItems");
 
                       // Redirect user to the home page
-                      router.push("/");
+                      router.push("/(tabs)/menu");
                     } catch (error) {
                       console.error("Error creating order or bill:", error);
                       Alert.alert(
