@@ -16,29 +16,12 @@ import { useCart } from "@/contexts/CartContext";
 import { router } from "expo-router";
 import { Product } from "@/models/Product";
 
-interface ProductDB {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  // image: string;
-}
-interface ProductFront {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  quantity: number;
-}
-
 export default function Menu() {
-  var [fetchedProducts, setProducts] = useState<ProductDB[]>([]);
+  var [fetchedProducts, setProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("Menú");
   const [loading, setLoading] = useState(true);
   const { cartItems, addToCart } = useCart();
   var { menuItems, setMenuItems } = useCart();
-  var [adaptedProducts, setAdaptedProducts] = useState<ProductFront[]>([]);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -46,17 +29,9 @@ export default function Menu() {
       try {
         setLoading(true);
         fetchedProducts = await fetchMenuItems();
-        setProducts(fetchedProducts); // Actualizamos el estado con los productos obtenidos
-        adaptedProducts = fetchedProducts.map((product) => ({
-          id: product.id,
-          name: product.name,
-          description: product.description,
-          price: product.price,
-          image:
-            "https://images.pond5.com/pixel-sushi-vector-illustration-isolated-illustration-155825087_iconm.jpeg", // Asigna un valor adecuado o vacío si no tienes una imagen
-          quantity: 10000, // Asigna un valor inicial adecuado
-        }));
-        setMenuItems(adaptedProducts); // Actualizamos el estado global con los productos obtenidos
+        console.log("fetchedProducts", fetchedProducts);
+        setMenuItems(fetchedProducts); // Products should match the backend DTO
+        
       } catch (error) {
         console.error("Error loading menu items:", error);
       } finally {
