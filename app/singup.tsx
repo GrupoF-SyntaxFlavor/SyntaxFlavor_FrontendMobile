@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from "react-native";
 import { TextInput, HelperText } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
+
+import { signup } from "@/service/UserService";
 
 export default function SignupScreen() {
   const colorScheme = useColorScheme();
@@ -19,13 +21,24 @@ export default function SignupScreen() {
 
   const router = useRouter();
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     if (step < 3) {
       setStep(step + 1);
     } else {
-      // Completar registro
-      console.log("Registro completado");
-      router.push("/(tabs)/menu");
+      try {
+        const signupData = { name, email, password, nit, billName };
+        const response = await signup(signupData);
+        // console.log("signup response in tsx:", response);
+        if (response?.responseCode == 'USR-001') {
+          // Mostrar mensaje de éxito y redirigir al login
+          Alert.alert('Registro exitoso', '¡Felicidades! Haz creado tu cuenta exitosamente.\nInicie sesión, por favor.');
+          router.push("/login");
+        } else {
+          Alert.alert('Error', 'Los datos ingresados no son válidos, intenta de nuevo.');
+        }
+      } catch (error) {
+        // console.error("Login error:", error);
+        Alert.alert('Error', 'Ocurrió un problema al intentar crear la cuenta.');}
     }
   };
 
