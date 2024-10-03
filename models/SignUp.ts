@@ -4,5 +4,5 @@ export interface SignUp {
     billName : string;
     nit : string;
     password : string;
-    confirmPassword : string;
+    // confirmPassword : string;
 }
