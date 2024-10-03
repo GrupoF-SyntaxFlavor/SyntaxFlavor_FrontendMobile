@@ -1,10 +1,14 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { TextInput } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons"; // Para el icono de retroceso
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
+
+import { login } from "@/service/Login";
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -12,9 +16,37 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const colorScheme = useColorScheme();
 
-  const handleLoginPress = () => {
+  const handleLoginPress = async () => {
+    try {
+      // Llamar al servicio de login
+      const loginData = { email, password };
+      const response = await login(loginData);
+      console.log("Login response in tsx:", response);
+
+      if (response?.payload?.access_token) {
+        // Guardar el token en AsyncStorage si la autenticación es exitosa
+        await AsyncStorage.setItem('access_token', response.payload.access_token);
+        await AsyncStorage.setItem('refresh_token', response.payload.refresh_token);
+        await AsyncStorage.setItem('expires_in', response.payload.expires_in.toString());
+        await AsyncStorage.setItem('refresh_expires_in', response.payload.refresh_expires_in.toString());
+        await AsyncStorage.setItem('refresh_token', response.payload.refresh_token);
+
+        console.log("Login successful:", response.payload);
+        console.log('setItems', AsyncStorage.getItem);
+        
+        // Redirigir a la pantalla de menú
+        router.push("/(tabs)/menu");
+      } else {
+        // Mostrar alerta en caso de error en la autenticación
+        Alert.alert('Error', 'Las credenciales no son válidas, intenta de nuevo.');
+      }
+    } catch (error) {
+      // Manejar errores de red o de la API
+      console.error("Login error:", error);
+      Alert.alert('Error', 'Ocurrió un problema al intentar iniciar sesión.');
+    }
     // Lógica para el botón de iniciar sesión
-    router.push("/(tabs)/menu");
+    // router.push("/(tabs)/menu");
   };
 
   const handleCreateAccountPress = () => {
