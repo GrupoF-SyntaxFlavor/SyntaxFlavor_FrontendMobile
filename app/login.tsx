@@ -21,7 +21,7 @@ export default function LoginScreen() {
       // Llamar al servicio de login
       const loginData = { email, password };
       const response = await login(loginData);
-      console.log("Login response in tsx:", response);
+      // console.log("Login response in tsx:", response);
 
       if (response?.payload?.access_token) {
         // Guardar el token en AsyncStorage si la autenticación es exitosa
@@ -31,8 +31,8 @@ export default function LoginScreen() {
         await AsyncStorage.setItem('refresh_expires_in', response.payload.refresh_expires_in.toString());
         await AsyncStorage.setItem('refresh_token', response.payload.refresh_token);
 
-        console.log("Login successful:", response.payload);
-        console.log('setItems', AsyncStorage.getItem);
+        // console.log("Login successful:", response.payload);
+        // console.log('setItems', AsyncStorage.getItem);
         
         // Redirigir a la pantalla de menú
         router.push("/(tabs)/menu");
