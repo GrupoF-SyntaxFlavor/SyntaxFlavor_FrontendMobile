@@ -102,7 +102,7 @@ export default function Payment() {
                   onPress: async () => {
                     console.log("cartitems", cartItems);
                     // Create the order
-                    const orderPayload = makeOrderPayload(1, cartItems);
+                    const orderPayload = makeOrderPayload( cartItems);
                     console.log("makeorderpayload", orderPayload);
                     try {
                       // Create the order
