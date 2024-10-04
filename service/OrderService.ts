@@ -34,9 +34,22 @@ export const createOrder = async (order: Order) => {
     }
 }
 
-export const fetchPastOrders = async (customerId: number) => {
+export const fetchPastOrders = async () => {
     try {
-        const response = await fetch(`${BACKEND_URL}/api/v1/public/order/customer?customerId=${customerId}`);
+        // Recuperar el token desde AsyncStorage
+        const token = await AsyncStorage.getItem('access_token');
+        // console.log("recupera el token", token)
+        
+        if (!token) {
+        throw new Error('No se encontró un token de acceso');
+        }
+        const response = await fetch(`${BACKEND_URL}/api/v1/public/order/customer`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/json",
+            },
+            });
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
