@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,29 +6,78 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
+  Alert
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { getCustomerProfile, updateCustomerProfile } from "@/service/UserService"; // Asegúrate de tener la ruta correcta para importar la función
+
 
 export default function ProfileScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [editField, setEditField] = useState(""); // Estado para controlar qué campo se edita ("name" o "ci")
-  const [newName, setNewName] = useState("Silva"); // Nombre inicial
-  const [newCI, setNewCI] = useState("1234567890"); // CI/NIT inicial
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState(""); // Estado para el correo
+  const [billName, setBillName] = useState(""); // Estado para el billName
+  const [CI, setCI] = useState(""); // Estado para CI/NIT
   const [inputValue, setInputValue] = useState(""); // Valor del campo de entrada
+  const [originalBillName, setOriginalBillName] = useState(""); // Estado para guardar el billName original
+  const [originalCI, setOriginalCI] = useState("");
+  
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getCustomerProfile(); // Llama al endpoint
+        setName(data.payload.user.name); // Establece el nombre del usuario
+        setEmail(data.payload.user.email); // Establece el correo
+        setBillName(data.payload.billName); // Establece el billName
+        setCI(data.payload.nit); // Establece el CI/NIT
+        setOriginalBillName(data.payload.billName); // Guarda el valor original de billName
+        setOriginalCI(data.payload.nit);
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+      }
+    };
+    fetchProfile(); // Ejecutar la función para obtener el perfil
+  }, []);
 
-  const handleEditPress = (field: "name" | "ci") => {
+  const handleEditPress = (field: "billName" | "ci") => {
     setEditField(field);
+    if (field === "billName") {
+      setInputValue(billName);
+    } else if (field === "ci") {
+      setInputValue(CI);
+    }
     setModalVisible(true);
   };
 
-  const handleSavePress = () => {
-    if (editField === "name") {
-      setNewName(inputValue);
+  const handleSavePress = async () => {
+    if (editField === "billName") {
+      setBillName(inputValue); // Actualizar billName en el estado local
     } else if (editField === "ci") {
-      setNewCI(inputValue);
+      setCI(inputValue); // Actualizar CI en el estado local
     }
-    setInputValue("");
-    setModalVisible(false);
+
+    try {
+      console.log("bill", billName);
+      console.log("nit", CI);
+    
+      // Verifica qué campo se está editando y envía los valores correctos
+      if (editField === "billName") {
+        await updateCustomerProfile(inputValue, originalCI); // Envía el nuevo billName y el CI original
+        setBillName(inputValue); // Actualiza el estado local de billName
+        setOriginalBillName(inputValue); // Actualiza el valor original de billName
+      } else if (editField === "ci") {
+        await updateCustomerProfile(originalBillName, inputValue); // Envía el billName original y el nuevo CI
+        setCI(inputValue); // Actualiza el estado local de CI
+        setOriginalCI(inputValue); // Actualiza el valor original de CI
+      }
+    
+      Alert.alert("Éxito", "Datos de facturación actualizados correctamente.");
+      setModalVisible(false);
+    } catch (error) {
+      Alert.alert("Error", "Hubo un problema al actualizar los datos.");
+      console.error("Error al actualizar los datos:", error);
+    }
   };
 
   const handleCancelPress = () => {
@@ -36,7 +85,7 @@ export default function ProfileScreen() {
     setModalVisible(false);
   };
 
-  const handleNameChange = (text: string) => {
+  const handleBillNameChange = (text: string) => {
     const filteredText = text.replace(/[^a-zA-Z\s]/g, ""); // Filtrar solo letras y espacios
     setInputValue(filteredText);
   };
@@ -51,7 +100,7 @@ export default function ProfileScreen() {
       {/* Sección de la foto y nombre del usuario */}
       <View style={styles.profileHeader}>
         <Ionicons name="person-circle" size={150} color="#86AB9A" />
-        <Text style={styles.profileName}>Karina Silva</Text>
+        <Text style={styles.profileName}>{name}</Text>
       </View>
 
       {/* Información de Facturación */}
@@ -63,7 +112,7 @@ export default function ProfileScreen() {
             <Text style={styles.fieldLabel}>Correo Electrónico</Text>
           </View>
           <View style={styles.userInfoContainer}>
-            <Text style={styles.userInfo}>karina.silva@gmail.com</Text>
+            <Text style={styles.userInfo}>{email}</Text>
             {/* <TouchableOpacity>
               <Text style={styles.editText}>Editar</Text>
             </TouchableOpacity> */}
@@ -81,8 +130,8 @@ export default function ProfileScreen() {
             <Text style={styles.fieldLabel}>Nombre de Facturación</Text>
           </View>
           <View style={styles.userInfoContainer}>
-            <Text style={styles.userInfo}>{newName}</Text>
-            <TouchableOpacity onPress={() => handleEditPress("name")}>
+            <Text style={styles.userInfo}>{billName}</Text>
+            <TouchableOpacity onPress={() => handleEditPress("billName")}>
               <Text style={styles.editText}>Editar</Text>
             </TouchableOpacity>
           </View>
@@ -95,7 +144,7 @@ export default function ProfileScreen() {
             <Text style={styles.fieldLabel}>CI/NIT</Text>
           </View>
           <View style={styles.userInfoContainer}>
-            <Text style={styles.userInfo}>{newCI}</Text>
+            <Text style={styles.userInfo}>{CI}</Text>
             <TouchableOpacity onPress={() => handleEditPress("ci")}>
               <Text style={styles.editText}>Editar</Text>
             </TouchableOpacity>
@@ -106,21 +155,15 @@ export default function ProfileScreen() {
         <Modal visible={isModalVisible} transparent={true} animationType="fade">
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>
-                {editField === "name"
-                  ? "Editar Nombre de Facturación"
-                  : "Editar CI/NIT"}
+            <Text style={styles.modalTitle}>
+                {editField === "billName" ? "Editar Nombre de Facturación" : "Editar CI/NIT"}
               </Text>
               <TextInput
                 style={styles.input}
-                placeholder={`Ingrese nuevo ${
-                  editField === "name" ? "nombre" : "CI/NIT"
-                }`}
+                placeholder={`Ingrese nuevo ${editField === "billName" ? "nombre" : "CI/NIT"}`}
                 value={inputValue}
-                onChangeText={
-                  editField === "name" ? handleNameChange : handleCIChange
-                }
-                keyboardType={editField === "name" ? "default" : "numeric"} // Teclado numérico para CI/NIT
+                onChangeText={editField === "billName" ? handleBillNameChange : handleCIChange}
+                keyboardType={editField === "billName" ? "default" : "numeric"} // Teclado numérico para CI/NIT
               />
               <View style={styles.modalButtons}>
                 <TouchableOpacity

@@ -5,7 +5,7 @@ import { fetchPastOrders } from '@/service/OrderService';
 
 interface PastOrdersContextProps {
   pastOrders: PastOrder[];
-  loadPastOrders: (customerId: number) => void;
+  loadPastOrders: () => void;
 }
 
 const PastOrdersContext = createContext<PastOrdersContextProps | undefined>(undefined);
@@ -13,11 +13,10 @@ const PastOrdersContext = createContext<PastOrdersContextProps | undefined>(unde
 export const PastOrdersProvider = ({ children }: { children: ReactNode }) => {
   const [pastOrders, setPastOrders] = useState<PastOrder[]>([]);
 
-  const loadPastOrders = async (customerId: number) => {
-    const mockId = 2;
+  const loadPastOrders = async () => {
     try {
-      console.log('Loading past orders for customer:', mockId);
-      const response = await fetchPastOrders(mockId);
+      // console.log('Loading past orders for customer:');
+      const response = await fetchPastOrders();
       console.log('Response received:', response);
       setPastOrders(response.payload as PastOrder[]);
     } catch (error) {
@@ -26,7 +25,7 @@ export const PastOrdersProvider = ({ children }: { children: ReactNode }) => {
   };
 
     useEffect(() => {
-        loadPastOrders(1);
+        loadPastOrders();
     }, []);
 
     return (

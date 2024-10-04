@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DataTable, Divider, TextInput, HelperText } from "react-native-paper";
 import {
   ScrollView,
@@ -12,16 +12,34 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useCart } from "@/contexts/CartContext";
+import { getCustomerProfile, updateCustomerProfile } from "@/service/UserService"; 
 
 export default function InvoiceScreen() {
   const router = useRouter();
   const [visible, setVisible] = React.useState(false);
   const { cartItems } = useCart();
   const [products, setProducts] = useState(cartItems); //Productos seleccionados
-  const defaultBillName = "Silva";
-  const defaultNit = "123456";
-  const [billName, setBillName] = React.useState(defaultBillName);
-  const [nit, setNit] = React.useState(defaultNit);
+  const [billName, setBillName] = React.useState(""); // Estado para el nombre de facturación
+  const [nit, setNit] = React.useState(""); // Estado para el NIT/CI
+  const [originalBillName, setOriginalBillName] = useState(""); // Estado para el nombre original
+  const [originalNit, setOriginalNit] = useState(""); 
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const profileData = await getCustomerProfile(); // Llama al servicio
+        setBillName(profileData.payload.billName); // Establece el nombre de facturación
+        setNit(profileData.payload.nit); // Establece el NIT/CI
+        setOriginalBillName(profileData.payload.billName); // Guarda el nombre original
+        setOriginalNit(profileData.payload.nit); // Guarda el NIT original
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+        Alert.alert("Error", "No se pudieron cargar los datos de facturación.");
+      }
+    };
+
+    fetchProfileData(); // Llama a la función cuando se monta el componente
+  }, []);
 
   //Funciones para el nombre de la factura
   const onChangeBillName = (billName: React.SetStateAction<string>) =>
@@ -44,7 +62,7 @@ export default function InvoiceScreen() {
       setVisible(true); // Mostrar modal si hay errores
     } else {
       // Verificar si los datos han sido modificados
-      if (billName !== defaultBillName || nit !== defaultNit) {
+      if (billName !== originalBillName || nit !== originalNit) {
         Alert.alert(
           "Guardar Datos", // <-- Título del Alert
           "¿Desea guardar los nuevos datos como predeterminados?",
@@ -63,10 +81,16 @@ export default function InvoiceScreen() {
     }
   };
 
-  // Función para guardar los nuevos datos ingresados
-  const saveAndProceed = () => {
-    console.log("Datos guardados: ", billName, nit);
-    proceedToPayment();
+  const saveAndProceed = async () => {
+    try {
+      // Llamar al servicio para actualizar los datos de facturación
+      await updateCustomerProfile(billName, nit); // Guarda los nuevos datos en el backend
+      Alert.alert("Éxito", "Datos de facturación actualizados correctamente.");
+      proceedToPayment(); // Proceder al pago después de guardar
+    } catch (error) {
+      console.error("Error al actualizar los datos de facturación:", error);
+      Alert.alert("Error", "Hubo un problema al actualizar los datos de facturación.");
+    }
   };
 
   const proceedToPayment = () => {

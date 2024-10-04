@@ -22,7 +22,7 @@ const PastOrdersScreen = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
-      await loadPastOrders(1); // TODO: Use the actual customer ID
+      await loadPastOrders();
       setLoading(false);
     };
 
@@ -68,33 +68,10 @@ const PastOrdersScreen = () => {
                 "La orden ha sido cancelada, apersónate por caja para solicitar un reembolso"
               );
               // Refresh the past orders list
-              await loadPastOrders(1); // TODO: Use the actual customer ID
-            } catch (error: any) {
-              console.error("Error cancelando orden:", error);
-
-              // Verifica si el error es un objeto con responseCode
-              if (
-                error &&
-                typeof error === "object" &&
-                "responseCode" in error
-              ) {
-                if (error.responseCode === "ORD-602") {
-                  Alert.alert(
-                    "No se pudo cancelar la orden",
-                    "No se puede cancelar el pedido, ya que cocina marcó el pedido como completado."
-                  );
-                } else {
-                  Alert.alert(
-                    "No se pudo cancelar la orden",
-                    "En este momento la orden no puede ser cancelada, por favor intente más tarde"
-                  );
-                }
-              } else {
-                Alert.alert(
-                  "Error desconocido",
-                  "Ocurrió un error inesperado, por favor intente más tarde"
-                );
-              }
+              await loadPastOrders();
+            } catch (error) {
+              console.error('Error cancelando orden:', error);
+              Alert.alert('No se pudo cancelar la orden', 'En este momento la orden no puede ser cancelada, por favor intente más tarde');
             }
           },
         },
