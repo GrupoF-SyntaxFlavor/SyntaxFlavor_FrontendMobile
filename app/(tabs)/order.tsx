@@ -19,7 +19,7 @@ const PastOrdersScreen = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
-      await loadPastOrders(1); // TODO: Use the actual customer ID
+      await loadPastOrders();
       setLoading(false);
     };
 
@@ -56,7 +56,7 @@ const PastOrdersScreen = () => {
               console.log('Orden cancelada', 'La orden ha sido cancelada');
               Alert.alert('Orden cancelada', 'La orden ha sido cancelada, apersónate por caja para solicitar un reembolso');
               // Refresh the past orders list
-              await loadPastOrders(1); // TODO: Use the actual customer ID
+              await loadPastOrders();
             } catch (error) {
               console.error('Error cancelando orden:', error);
               Alert.alert('No se pudo cancelar la orden', 'En este momento la orden no puede ser cancelada, por favor intente más tarde');
