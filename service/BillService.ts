@@ -7,7 +7,7 @@ export const createBill = async (bill: Bill) => {
     try {
         // Recuperar el token desde AsyncStorage
         const token = await AsyncStorage.getItem('access_token');
-        console.log("recupera el token", token)
+        // console.log("recupera el token", token)
         
         if (!token) {
         throw new Error('No se encontró un token de acceso');
