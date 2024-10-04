@@ -14,7 +14,7 @@ export const PastOrdersProvider = ({ children }: { children: ReactNode }) => {
   const [pastOrders, setPastOrders] = useState<PastOrder[]>([]);
 
   const loadPastOrders = async (customerId: number) => {
-    const mockId = 1;
+    const mockId = 2;
     try {
       console.log('Loading past orders for customer:', mockId);
       const response = await fetchPastOrders(mockId);

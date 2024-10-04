@@ -1,11 +1,20 @@
 import { BACKEND_URL } from "@/constants/.backend-dir";
 import { Order } from "@/models/Order";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const createOrder = async (order: Order) => {
     try {
-        const response = await fetch(`${BACKEND_URL}/api/v1/order`, {
+        // Recuperar el token desde AsyncStorage
+        const token = await AsyncStorage.getItem('access_token');
+        console.log("recupera el token", token)
+        
+        if (!token) {
+        throw new Error('No se encontró un token de acceso');
+        }
+        const response = await fetch(`${BACKEND_URL}/api/v1/public/order`, {
             method: "POST",
             headers: {
+                Authorization: `Bearer ${token}`,
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
@@ -27,7 +36,7 @@ export const createOrder = async (order: Order) => {
 
 export const fetchPastOrders = async (customerId: number) => {
     try {
-        const response = await fetch(`${BACKEND_URL}/api/v1/order/customer?customerId=${customerId}`);
+        const response = await fetch(`${BACKEND_URL}/api/v1/public/order/customer?customerId=${customerId}`);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -44,7 +53,7 @@ export const fetchPastOrders = async (customerId: number) => {
 
 export const cancelOrder = async (orderId: number) => {
     try {
-        const response = await fetch(`${BACKEND_URL}/api/v1/order/cancel?orderId=${orderId}`, {
+        const response = await fetch(`${BACKEND_URL}/api/v1/public/order/cancel?orderId=${orderId}`, {
             method: "PUT",
             headers: {
                 Accept: "application/json",

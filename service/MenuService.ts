@@ -1,11 +1,20 @@
 // MenuService.ts
 import { BACKEND_URL, IMAGE_URL } from "@/constants/.backend-dir";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const fetchMenuItems = async () => {
   try {
+    // Recuperar el token desde AsyncStorage
+    const token = await AsyncStorage.getItem('access_token');
+    console.log("recupera el token", token)
+    
+    if (!token) {
+      throw new Error('No se encontró un token de acceso');
+    }
     const response = await fetch(`${BACKEND_URL}/api/v1/menu/item`, {
       method: "GET",
       headers: {
+        Authorization: `Bearer ${token}`,
         Accept: "application/json",
       },
     });
