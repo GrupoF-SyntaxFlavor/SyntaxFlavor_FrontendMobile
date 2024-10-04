@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Alert, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { ScrollView } from 'react-native-gesture-handler';
-import { usePastOrders } from '@/contexts/PastOrdersContext';
-import { TouchableOpacity } from 'react-native';
-import { OrderStatusValues, OrderStatusLabels } from '@/constants/OrderStatusValues';
-import { PastOrder } from '@/models/PastOrder';
-import { useCart } from '@/contexts/CartContext';
-import { orderToProducts } from '@/lib/OrderUtils';
-import Loader from '@/components/Loader';
-import { cancelOrder } from '@/service/OrderService';
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, Alert, Image } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { ScrollView } from "react-native-gesture-handler";
+import { usePastOrders } from "@/contexts/PastOrdersContext";
+import { TouchableOpacity } from "react-native";
+import {
+  OrderStatusValues,
+  OrderStatusLabels,
+} from "@/constants/OrderStatusValues";
+import { PastOrder } from "@/models/PastOrder";
+import { useCart } from "@/contexts/CartContext";
+import { orderToProducts } from "@/lib/OrderUtils";
+import Loader from "@/components/Loader";
+import { cancelOrder } from "@/service/OrderService";
 
 const PastOrdersScreen = () => {
   const { pastOrders, loadPastOrders } = usePastOrders();
@@ -29,8 +32,8 @@ const PastOrdersScreen = () => {
   const handleRefreshOrder = (order: PastOrder) => {
     const products = orderToProducts(order);
     // set the products images from the menuItems
-    products.forEach(product => {
-      const menuItem = menuItems.find(item => item.id === product.id);
+    products.forEach((product) => {
+      const menuItem = menuItems.find((item) => item.id === product.id);
       if (menuItem) {
         product.image = menuItem.image;
       }
@@ -38,53 +41,87 @@ const PastOrdersScreen = () => {
     setCartItems(products);
 
     // Show a temporary message (Toast) to indicate that the cart has been updated
-    console.log('Carrito actualizado', 'Los productos de la orden seleccionada han sido añadidos al carrito');
-    Alert.alert('Carrito actualizado', 'Los productos de la orden seleccionada han sido añadidos al carrito');
+    console.log(
+      "Carrito actualizado",
+      "Los productos de la orden seleccionada han sido añadidos al carrito"
+    );
+    Alert.alert(
+      "Carrito actualizado",
+      "Los productos de la orden seleccionada han sido añadidos al carrito"
+    );
   };
 
   const handleCancelOrder = (order: PastOrder) => {
     // Show a confirmation dialog to cancel the order
     Alert.alert(
-      'Cancelar orden',
-      '¿Está seguro que desea cancelar esta orden?',
+      "Cancelar orden",
+      "¿Está seguro que desea cancelar esta orden?",
       [
         {
-          text: 'Sí',
+          text: "Sí",
           onPress: async () => {
             try {
               await cancelOrder(order.orderId);
-              console.log('Orden cancelada', 'La orden ha sido cancelada');
-              Alert.alert('Orden cancelada', 'La orden ha sido cancelada, apersónate por caja para solicitar un reembolso');
+              console.log("Orden cancelada", "La orden ha sido cancelada");
+              Alert.alert(
+                "Orden cancelada",
+                "La orden ha sido cancelada, apersónate por caja para solicitar un reembolso"
+              );
               // Refresh the past orders list
               await loadPastOrders(1); // TODO: Use the actual customer ID
-            } catch (error) {
-              console.error('Error cancelando orden:', error);
-              Alert.alert('No se pudo cancelar la orden', 'En este momento la orden no puede ser cancelada, por favor intente más tarde');
+            } catch (error: any) {
+              console.error("Error cancelando orden:", error);
+
+              // Verifica si el error es un objeto con responseCode
+              if (
+                error &&
+                typeof error === "object" &&
+                "responseCode" in error
+              ) {
+                if (error.responseCode === "ORD-602") {
+                  Alert.alert(
+                    "No se pudo cancelar la orden",
+                    "No se puede cancelar el pedido, ya que cocina marcó el pedido como completado."
+                  );
+                } else {
+                  Alert.alert(
+                    "No se pudo cancelar la orden",
+                    "En este momento la orden no puede ser cancelada, por favor intente más tarde"
+                  );
+                }
+              } else {
+                Alert.alert(
+                  "Error desconocido",
+                  "Ocurrió un error inesperado, por favor intente más tarde"
+                );
+              }
             }
           },
         },
         {
-          text: 'No',
-          style: 'cancel',
+          text: "No",
+          style: "cancel",
         },
       ]
     );
-  }
+  };
 
-  const calculateTotal = (order: PastOrder) => order.orderItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)
-
+  const calculateTotal = (order: PastOrder) =>
+    order.orderItems
+      .reduce((total, item) => total + item.price * item.quantity, 0)
+      .toFixed(2);
 
   if (loading) {
-    return (
-      <Loader />
-    );
+    return <Loader />;
   }
 
   // If no past orders are found, show an empty view with a message
   if (!pastOrders.length) {
     return (
       <View style={styles.noOrdersFound}>
-        <Text style={styles.noOrdersText}>No se encontraron órdenes anteriores</Text>
+        <Text style={styles.noOrdersText}>
+          No se encontraron órdenes anteriores
+        </Text>
       </View>
     );
   }
@@ -101,17 +138,27 @@ const PastOrdersScreen = () => {
               {order.orderStatus === OrderStatusValues.PENDING ? (
                 <View style={styles.statusContainer}>
                   <Ionicons name="time-outline" size={20} color="#FFA500" />
-                  <Text style={styles.pendingStatus}>{OrderStatusLabels.PENDING}</Text>
+                  <Text style={styles.pendingStatus}>
+                    {OrderStatusLabels.PENDING}
+                  </Text>
                 </View>
               ) : order.orderStatus === OrderStatusValues.DELIVERED ? (
                 <View style={styles.statusContainer}>
-                  <Ionicons name="checkmark-done-outline" size={20} color="green" />
-                  <Text style={styles.deliveredStatus}>{OrderStatusLabels.DELIVERED}</Text>
+                  <Ionicons
+                    name="checkmark-done-outline"
+                    size={20}
+                    color="green"
+                  />
+                  <Text style={styles.deliveredStatus}>
+                    {OrderStatusLabels.DELIVERED}
+                  </Text>
                 </View>
               ) : (
                 <View style={styles.statusContainer}>
                   <Ionicons name="close-circle-outline" size={20} color="red" />
-                  <Text style={styles.cancelledStatus}>{OrderStatusLabels.CANCELLED}</Text>
+                  <Text style={styles.cancelledStatus}>
+                    {OrderStatusLabels.CANCELLED}
+                  </Text>
                 </View>
               )}
             </View>
