@@ -12,7 +12,12 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useCart } from "@/contexts/CartContext";
-import { getCustomerProfile, updateCustomerProfile } from "@/service/UserService"; 
+import {
+  getCustomerProfile,
+  updateCustomerProfile,
+} from "@/service/UserService";
+
+//FIXME: Considerar la creacion de un contexto para manejar el estado de la sesion
 
 export default function InvoiceScreen() {
   const router = useRouter();
@@ -22,7 +27,7 @@ export default function InvoiceScreen() {
   const [billName, setBillName] = React.useState(""); // Estado para el nombre de facturación
   const [nit, setNit] = React.useState(""); // Estado para el NIT/CI
   const [originalBillName, setOriginalBillName] = useState(""); // Estado para el nombre original
-  const [originalNit, setOriginalNit] = useState(""); 
+  const [originalNit, setOriginalNit] = useState("");
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -89,7 +94,10 @@ export default function InvoiceScreen() {
       proceedToPayment(); // Proceder al pago después de guardar
     } catch (error) {
       console.error("Error al actualizar los datos de facturación:", error);
-      Alert.alert("Error", "Hubo un problema al actualizar los datos de facturación.");
+      Alert.alert(
+        "Error",
+        "Hubo un problema al actualizar los datos de facturación."
+      );
     }
   };
 

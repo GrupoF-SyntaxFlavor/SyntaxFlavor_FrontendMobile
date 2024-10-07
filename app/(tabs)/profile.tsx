@@ -14,6 +14,8 @@ import {
   updateCustomerProfile,
 } from "@/service/UserService"; // Asegúrate de tener la ruta correcta para importar la función
 
+//FIXME: Considerar la creacion de un contexto para manejar el estado de la sesion
+
 export default function ProfileScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [editField, setEditField] = useState(""); // Estado para controlar qué campo se edita ("name" o "ci")
