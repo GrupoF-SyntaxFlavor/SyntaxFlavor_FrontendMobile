@@ -70,8 +70,11 @@ const PastOrdersScreen = () => {
               // Refresh the past orders list
               await loadPastOrders();
             } catch (error) {
-              console.error('Error cancelando orden:', error);
-              Alert.alert('No se pudo cancelar la orden', 'En este momento la orden no puede ser cancelada, por favor intente más tarde');
+              console.error("Error cancelando orden:", error);
+              Alert.alert(
+                "No se pudo cancelar la orden",
+                "En este momento la orden no puede ser cancelada, por favor intente más tarde"
+              );
             }
           },
         },
@@ -115,6 +118,7 @@ const PastOrdersScreen = () => {
               {order.orderStatus === OrderStatusValues.PENDING ? (
                 <View style={styles.statusContainer}>
                   <Ionicons name="time-outline" size={20} color="#FFA500" />
+                  {/* FIXME: El componente de tiempo se desborda */}
                   <Text style={styles.pendingStatus}>
                     {OrderStatusLabels.PENDING}
                   </Text>

@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Alert,
+} from "react-native";
 import { TextInput, HelperText } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -25,20 +32,33 @@ export default function SignupScreen() {
     if (step < 3) {
       setStep(step + 1);
     } else {
-      try {
+      router.push("/login");
+      /* try {
         const signupData = { name, email, password, nit, billName };
         const response = await signup(signupData);
+        //FIXME: No se puede realizar ingreso al sistema error: 401
         // console.log("signup response in tsx:", response);
-        if (response?.responseCode == 'USR-001') {
+        if (response?.responseCode == "USR-001") {
           // Mostrar mensaje de éxito y redirigir al login
-          Alert.alert('Registro exitoso', '¡Felicidades! Haz creado tu cuenta exitosamente.\nInicie sesión, por favor.');
+          Alert.alert(
+            "Registro exitoso",
+            "¡Felicidades! Haz creado tu cuenta exitosamente.\nInicie sesión, por favor."
+          );
           router.push("/login");
         } else {
-          Alert.alert('Error', 'Los datos ingresados no son válidos, intenta de nuevo.');
+          Alert.alert(
+            //FIXME: Cambiar el mensaje de error dependiendo lo que suceda
+            "Error",
+            "Los datos ingresados no son válidos, intenta de nuevo."
+          );
         }
       } catch (error) {
-        // console.error("Login error:", error);
-        Alert.alert('Error', 'Ocurrió un problema al intentar crear la cuenta.');}
+        //FIXME: Cambiar el mensaje de error dependiendo lo que suceda
+        Alert.alert(
+          "Error",
+          "Ocurrió un problema al intentar crear la cuenta."
+        );
+      } */
     }
   };
 
@@ -73,6 +93,7 @@ export default function SignupScreen() {
           <Text style={styles.firstSubtitle}>
             Para comenzar, necesitamos algunos datos
           </Text>
+          {/* FIXME: Agregar un helper entre los inputs de la vista*/}
           <TextInput
             style={styles.input}
             label="¿Cómo podemos llamarte?"
@@ -126,6 +147,7 @@ export default function SignupScreen() {
             theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
             onChangeText={setBillName}
           />
+          {/* FIXME: El input de NIT permite el ingreso de caracteres aparte de números */}
           <TextInput
             style={styles.input}
             label="Ingresa tu NIT/CI"
@@ -156,6 +178,8 @@ export default function SignupScreen() {
             source={require("../assets/images/cat_cafe.png")}
             style={styles.imageThirdStep}
           />
+          {/* FIXME: Agregar un helper en las contraseñas para notar que debe tener minimo 8 caracteres*/}
+          {/* FIXME: Agregar boton que permita ver y ocular contraseña*/}
           <TextInput
             style={styles.input}
             label="Crea una contraseña"

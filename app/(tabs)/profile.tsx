@@ -6,11 +6,13 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  Alert
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { getCustomerProfile, updateCustomerProfile } from "@/service/UserService"; // Asegúrate de tener la ruta correcta para importar la función
-
+import {
+  getCustomerProfile,
+  updateCustomerProfile,
+} from "@/service/UserService"; // Asegúrate de tener la ruta correcta para importar la función
 
 export default function ProfileScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -22,7 +24,7 @@ export default function ProfileScreen() {
   const [inputValue, setInputValue] = useState(""); // Valor del campo de entrada
   const [originalBillName, setOriginalBillName] = useState(""); // Estado para guardar el billName original
   const [originalCI, setOriginalCI] = useState("");
-  
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -60,7 +62,7 @@ export default function ProfileScreen() {
     try {
       console.log("bill", billName);
       console.log("nit", CI);
-    
+
       // Verifica qué campo se está editando y envía los valores correctos
       if (editField === "billName") {
         await updateCustomerProfile(inputValue, originalCI); // Envía el nuevo billName y el CI original
@@ -71,7 +73,7 @@ export default function ProfileScreen() {
         setCI(inputValue); // Actualiza el estado local de CI
         setOriginalCI(inputValue); // Actualiza el valor original de CI
       }
-    
+
       Alert.alert("Éxito", "Datos de facturación actualizados correctamente.");
       setModalVisible(false);
     } catch (error) {
@@ -155,14 +157,22 @@ export default function ProfileScreen() {
         <Modal visible={isModalVisible} transparent={true} animationType="fade">
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-                {editField === "billName" ? "Editar Nombre de Facturación" : "Editar CI/NIT"}
+              <Text style={styles.modalTitle}>
+                {editField === "billName"
+                  ? "Editar Nombre de Facturación"
+                  : "Editar CI/NIT"}
               </Text>
               <TextInput
                 style={styles.input}
-                placeholder={`Ingrese nuevo ${editField === "billName" ? "nombre" : "CI/NIT"}`}
+                placeholder={`Ingrese nuevo ${
+                  editField === "billName" ? "nombre" : "CI/NIT"
+                }`}
                 value={inputValue}
-                onChangeText={editField === "billName" ? handleBillNameChange : handleCIChange}
+                onChangeText={
+                  editField === "billName"
+                    ? handleBillNameChange
+                    : handleCIChange
+                }
                 keyboardType={editField === "billName" ? "default" : "numeric"} // Teclado numérico para CI/NIT
               />
               <View style={styles.modalButtons}>
@@ -184,6 +194,7 @@ export default function ProfileScreen() {
         </Modal>
       </View>
     </View>
+    /* TODO: Agregar un botón de cerrar sesión */
   );
 }
 

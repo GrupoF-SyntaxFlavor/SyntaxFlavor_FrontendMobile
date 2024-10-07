@@ -8,7 +8,7 @@ import { Colors } from "@/constants/Colors";
 
 import { login } from "@/service/UserService";
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -18,29 +18,52 @@ export default function LoginScreen() {
 
   const handleLoginPress = async () => {
     try {
+      //FIXME: Agregar codigo de error y alert en el caso de que no se haya hecho la verificacion del correo
+
       const loginData = { email, password };
       const response = await login(loginData);
       // console.log("Login response in tsx:", response);
 
       if (response?.payload?.access_token) {
         // Guardar el token en AsyncStorage si la autenticación es exitosa
-        await AsyncStorage.setItem('access_token', response.payload.access_token);
-        await AsyncStorage.setItem('refresh_token', response.payload.refresh_token);
-        await AsyncStorage.setItem('expires_in', response.payload.expires_in.toString());
-        await AsyncStorage.setItem('refresh_expires_in', response.payload.refresh_expires_in.toString());
-        await AsyncStorage.setItem('refresh_token', response.payload.refresh_token);
+        await AsyncStorage.setItem(
+          "access_token",
+          response.payload.access_token
+        );
+        await AsyncStorage.setItem(
+          "refresh_token",
+          response.payload.refresh_token
+        );
+        await AsyncStorage.setItem(
+          "expires_in",
+          response.payload.expires_in.toString()
+        );
+        await AsyncStorage.setItem(
+          "refresh_expires_in",
+          response.payload.refresh_expires_in.toString()
+        );
+        await AsyncStorage.setItem(
+          "refresh_token",
+          response.payload.refresh_token
+        );
         // console.log("Login successful:", response.payload);
-        Alert.alert('Inicio de sesión exitoso', '¡Bienvenido! Has iniciado sesión exitosamente.');
+        Alert.alert(
+          "Inicio de sesión exitoso",
+          "¡Bienvenido! Has iniciado sesión exitosamente."
+        );
         // console.log('getItem', AsyncStorage.getItem);
 
         // Redirigir a la pantalla de menú
         router.push("/(tabs)/menu");
       } else {
-        Alert.alert('Error', 'Las credenciales no son válidas, intenta de nuevo.');
+        Alert.alert(
+          "Error",
+          "Las credenciales no son válidas, intenta de nuevo."
+        );
       }
     } catch (error) {
       console.error("Login error:", error);
-      Alert.alert('Error', 'Ocurrió un problema al intentar iniciar sesión.');
+      Alert.alert("Error", "Ocurrió un problema al intentar iniciar sesión.");
     }
   };
 
@@ -52,6 +75,7 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       {/* Botón de retroceso */}
+      {/* FIXME:  No utilizar routerback, redirigir siempre al index */}
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Ionicons
           name="arrow-back"
