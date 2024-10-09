@@ -113,12 +113,12 @@ const PastOrdersScreen = () => {
           <View key={index} style={styles.card}>
             <View style={styles.orderHeader}>
               <Text style={styles.orderId}>ORD-{order.orderId}</Text>
-              {/* TODOFormat timestamp as MM-DD */}
+              {/* TODO @Oscar Format timestamp as MM-DD */}
               <Text style={styles.orderDate}>{order.orderTimestamp}</Text>
               {order.orderStatus === OrderStatusValues.PENDING ? (
                 <View style={styles.statusContainer}>
                   <Ionicons name="time-outline" size={20} color="#FFA500" />
-                  {/* FIXME: El componente de tiempo se desborda
+                  {/* FIXME: @Oscar El componente de tiempo se desborda
                     De hecho debería ser solo la fecha esta recuperando todo un TimeStamp */}
                   <Text style={styles.pendingStatus}>
                     {OrderStatusLabels.PENDING}

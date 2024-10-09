@@ -36,7 +36,7 @@ export default function SignupScreen() {
       /* try {
         const signupData = { name, email, password, nit, billName };
         const response = await signup(signupData);
-        //FIXME: No se puede realizar ingreso al sistema error: 401
+        //FIXME: @Oscar No se puede realizar ingreso al sistema error: 401
         // console.log("signup response in tsx:", response);
         if (response?.responseCode == "USR-001") {
           // Mostrar mensaje de éxito y redirigir al login
@@ -47,13 +47,13 @@ export default function SignupScreen() {
           router.push("/login");
         } else {
           Alert.alert(
-            //FIXME: Cambiar el mensaje de error dependiendo lo que suceda
+            //FIXME: @Oscar Cambiar el mensaje de error dependiendo lo que suceda
             "Error",
             "Los datos ingresados no son válidos, intenta de nuevo."
           );
         }
       } catch (error) {
-        //FIXME: Cambiar el mensaje de error dependiendo lo que suceda
+        //FIXME: @Oscar Cambiar el mensaje de error dependiendo lo que suceda
         Alert.alert(
           "Error",
           "Ocurrió un problema al intentar crear la cuenta."

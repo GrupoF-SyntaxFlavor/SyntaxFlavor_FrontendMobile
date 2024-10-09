@@ -18,7 +18,7 @@ export default function LoginScreen() {
 
   const handleLoginPress = async () => {
     try {
-      //FIXME: Agregar codigo de error y alert en el caso de que no se haya hecho la verificacion del correo
+      //FIXME: @Oscar Agregar codigo de error y alert en el caso de que no se haya hecho la verificacion del correo
 
       const loginData = { email, password };
       const response = await login(loginData);
@@ -75,7 +75,7 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       {/* Botón de retroceso */}
-      {/* FIXME:  No utilizar routerback, redirigir siempre al index */}
+      {/* FIXME: @Oscar No utilizar routerback, redirigir siempre al index */}
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Ionicons
           name="arrow-back"

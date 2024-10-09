@@ -1,14 +1,16 @@
-import { BACKEND_URL } from "@/constants/.backend-dir"; //FIXME: Cambiar BACKEND_URL por BACKEND_IP y SPRING_PORT
+import { BACKEND_DOMAIN, SPRING_PORT } from "@/constants/.backend-dir"; 
 import { Login } from "@/models/Login";
 import { SignUp } from "../models/SignUp";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const API_URL = `http://${BACKEND_DOMAIN}${SPRING_PORT}` // Cuando pasemos a https cambiar aquí
+
 //TODO: Agregar logs a las funciones de todos los service
 export const login = async (login: Login) => {
   // console.log("Login request:", login);
   try {
-    const response = await fetch(`${BACKEND_URL}/api/v1/public/login`, {
+    const response = await fetch(`${API_URL}/api/v1/public/login`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -33,9 +35,8 @@ export const login = async (login: Login) => {
 export const signup = async (SignUp: SignUp) => {
   console.log("signup request:", SignUp);
   try {
-    //FIXME: El endpoint utilizado para esta función es de inicio de sesión no es el adecuado según documentación del backend
     const response = await fetch(
-      `${BACKEND_URL}/api/v1/user/customer/profile`,
+      `${API_URL}/api/v1/public/signup?type=customer`,
       {
         method: "POST",
         headers: {
@@ -69,7 +70,7 @@ export const getCustomerProfile = async () => {
       throw new Error("No se encontró un token de acceso");
     }
     const response = await fetch(
-      `${BACKEND_URL}/api/v1/user/customer/profile`,
+      `${API_URL}/api/v1/user/customer/profile`,
       {
         method: "GET",
         headers: {
@@ -104,7 +105,7 @@ export const updateCustomerProfile = async (
     if (!token) {
       throw new Error("No se encontró un token de acceso");
     }
-    const response = await fetch(`${BACKEND_URL}/api/v1/user/customer`, {
+    const response = await fetch(`${API_URL}/api/v1/user/customer`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,

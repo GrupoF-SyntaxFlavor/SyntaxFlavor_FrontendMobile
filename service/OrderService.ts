@@ -1,6 +1,8 @@
-import { BACKEND_URL } from "@/constants/.backend-dir"; //FIXME: Cambiar BACKEND_URL por BACKEND_IP y SPRING_PORT
+import { BACKEND_DOMAIN, SPRING_PORT } from "@/constants/.backend-dir"; 
 import { Order } from "@/models/Order";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const API_URL = `http://${BACKEND_DOMAIN}${SPRING_PORT}` // Cuando pasemos a https cambiar aquí
 
 export const createOrder = async (order: Order) => {
     try {
@@ -11,7 +13,7 @@ export const createOrder = async (order: Order) => {
         if (!token) {
         throw new Error('No se encontró un token de acceso');
         }
-        const response = await fetch(`${BACKEND_URL}/api/v1/public/order`, {
+        const response = await fetch(`${API_URL}/api/v1/public/order`, {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -43,7 +45,7 @@ export const fetchPastOrders = async () => {
         if (!token) {
         throw new Error('No se encontró un token de acceso');
         }
-        const response = await fetch(`${BACKEND_URL}/api/v1/public/order/customer`, {
+        const response = await fetch(`${API_URL}/api/v1/public/order/customer`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -66,7 +68,7 @@ export const fetchPastOrders = async () => {
 
 export const cancelOrder = async (orderId: number) => {
     try {
-        const response = await fetch(`${BACKEND_URL}/api/v1/public/order/cancel?orderId=${orderId}`, {
+        const response = await fetch(`${API_URL}/api/v1/public/order/cancel?orderId=${orderId}`, {
             method: "PUT",
             headers: {
                 Accept: "application/json",
