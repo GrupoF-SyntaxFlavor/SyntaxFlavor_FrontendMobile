@@ -62,6 +62,7 @@ export default function SignupScreen() {
     }
   };
 
+  // Auxiliary methods
   const handlePreviousStep = () => {
     if (step === 1) {
       // Si estamos en el primer paso, redirigir a la página de inicio o la página deseada
@@ -71,6 +72,15 @@ export default function SignupScreen() {
       setStep(step - 1);
     }
   };
+
+  const handleNitChange = (text: string) => {
+    // Regular expression to match only numbers and hyphens
+    const regex = /^[0-9-]+$/;
+
+    if (regex.test(text)) {
+      setNit(text);
+    }
+  }
 
   // Validaciones
   const isStepOneValid = name.length > 0 && email.includes("@");
@@ -147,7 +157,6 @@ export default function SignupScreen() {
             theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
             onChangeText={setBillName}
           />
-          {/* FIXME: El input de NIT permite el ingreso de caracteres aparte de números */}
           <TextInput
             style={styles.input}
             label="Ingresa tu NIT/CI"
@@ -155,7 +164,7 @@ export default function SignupScreen() {
             placeholderTextColor="#89898B"
             value={nit}
             theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
-            onChangeText={setNit}
+            onChangeText={handleNitChange}
             keyboardType="numeric"
           />
           <TouchableOpacity
