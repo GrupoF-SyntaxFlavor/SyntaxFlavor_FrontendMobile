@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useRouter } from "expo-router"; // Asegúrate de importar useRouter
 
-//FIXME: Revisar que la pantalla se ajuste en distintos dispositivos
+//TODO: Revisar que la pantalla se ajuste en distintos dispositivos
 
 export default function WelcomeScreen() {
   const router = useRouter();

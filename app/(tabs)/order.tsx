@@ -118,7 +118,8 @@ const PastOrdersScreen = () => {
               {order.orderStatus === OrderStatusValues.PENDING ? (
                 <View style={styles.statusContainer}>
                   <Ionicons name="time-outline" size={20} color="#FFA500" />
-                  {/* FIXME: El componente de tiempo se desborda */}
+                  {/* FIXME: El componente de tiempo se desborda
+                    De hecho debería ser solo la fecha esta recuperando todo un TimeStamp */}
                   <Text style={styles.pendingStatus}>
                     {OrderStatusLabels.PENDING}
                   </Text>

@@ -6,7 +6,7 @@ TODO: Agregar instrucciones para correr el proyecto
 
 ### Configuración del backend
 
-Hay un archivo llamado `.backend-dir.ts` en la carpeta `constants` que contiene la dirección del backend. Por defecto, la dirección es `http://localhost:8080`. Si tienes un backend en otra dirección, cambia la dirección en este archivo. Por ejemplo:
+Hay un archivo llamado `.backend-dir.ts` en la carpeta `constants` que contiene la dirección del backend. Por defecto, la dirección es `http://localhost:8080`. Si tienes un backend en otra dirección, cambia la dirección en este archivo. Por ejemplo: //TODO: Actualizar para usar BACKEND_API, SPRING_PORT, MINIO_PORT
 
 ```typescript	
 // Localhost

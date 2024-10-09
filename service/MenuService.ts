@@ -1,5 +1,5 @@
 // MenuService.ts
-import { BACKEND_URL, IMAGE_URL } from "@/constants/.backend-dir";
+import { BACKEND_URL, IMAGE_URL } from "@/constants/.backend-dir"; //FIXME: Cambiar por BACKEND_IP, SPRING_PORT y MINIO_PORT
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const fetchMenuItems = async () => {

@@ -1,4 +1,4 @@
-import { BACKEND_URL } from "@/constants/.backend-dir";
+import { BACKEND_URL } from "@/constants/.backend-dir"; //FIXME: Cambiar BACKEND_URL por BACKEND_IP y SPRING_PORT
 import { Order } from "@/models/Order";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 

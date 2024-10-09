@@ -42,7 +42,7 @@ export default function SignupScreen() {
           // Mostrar mensaje de éxito y redirigir al login
           Alert.alert(
             "Registro exitoso",
-            "¡Felicidades! Haz creado tu cuenta exitosamente.\nInicie sesión, por favor."
+            "¡Felicidades! Haz creado tu cuenta exitosamente.\nInicie sesión, por favor." // TODO: indicar en un mensaje que debe verificar su correo antes
           );
           router.push("/login");
         } else {
@@ -93,7 +93,7 @@ export default function SignupScreen() {
           <Text style={styles.firstSubtitle}>
             Para comenzar, necesitamos algunos datos
           </Text>
-          {/* FIXME: Agregar un helper entre los inputs de la vista*/}
+          {/* TODO: Agregar un helper entre los inputs de la vista*/}
           <TextInput
             style={styles.input}
             label="¿Cómo podemos llamarte?"
@@ -178,8 +178,8 @@ export default function SignupScreen() {
             source={require("../assets/images/cat_cafe.png")}
             style={styles.imageThirdStep}
           />
-          {/* FIXME: Agregar un helper en las contraseñas para notar que debe tener minimo 8 caracteres*/}
-          {/* FIXME: Agregar boton que permita ver y ocular contraseña*/}
+          {/* TODO: Agregar un helper en las contraseñas para notar que debe tener minimo 8 caracteres*/}
+          {/* TODO: Agregar boton que permita ver y ocultar contraseña*/}
           <TextInput
             style={styles.input}
             label="Crea una contraseña"
