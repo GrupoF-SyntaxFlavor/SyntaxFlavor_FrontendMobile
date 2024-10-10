@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Image,
   Alert,
+  Dimensions,
 } from "react-native";
 import { TextInput, HelperText } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,6 +26,8 @@ export default function SignupScreen() {
   const [nit, setNit] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const router = useRouter();
 
@@ -123,6 +126,7 @@ export default function SignupScreen() {
             onChangeText={setEmail}
             theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
             keyboardType="email-address"
+            autoCapitalize="none" // Evita que la primera letra sea mayúscula
           />
           <TouchableOpacity
             style={[styles.button, !isStepOneValid && styles.buttonDisabled]} // Aplica el estilo de deshabilitado si no es válido
@@ -130,6 +134,12 @@ export default function SignupScreen() {
             disabled={!isStepOneValid} // Habilita/deshabilita el botón
           >
             <Text style={styles.buttonText}>Siguiente ➔</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.backButtonCustom}
+            onPress={handlePreviousStep}
+          >
+            <Text style={styles.buttonText}>Volver Atrás</Text>
           </TouchableOpacity>
           <Image
             source={require("../assets/images/pizza_box.png")}
@@ -174,6 +184,12 @@ export default function SignupScreen() {
           >
             <Text style={styles.buttonText}>Siguiente ➔</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.backButtonCustom}
+            onPress={handlePreviousStep}
+          >
+            <Text style={styles.buttonText}>Volver Atrás</Text>
+          </TouchableOpacity>
         </View>
       )}
 
@@ -187,8 +203,6 @@ export default function SignupScreen() {
             source={require("../assets/images/cat_cafe.png")}
             style={styles.imageThirdStep}
           />
-          {/* TODO: Agregar un helper en las contraseñas para notar que debe tener minimo 8 caracteres*/}
-          {/* TODO: Agregar boton que permita ver y ocultar contraseña*/}
           <TextInput
             style={styles.input}
             label="Crea una contraseña"
@@ -197,8 +211,17 @@ export default function SignupScreen() {
             value={password}
             onChangeText={setPassword}
             theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
-            secureTextEntry
+            secureTextEntry={!showPassword}
+            right={
+              <TextInput.Icon
+                icon={showPassword ? "eye-off" : "eye"}
+                onPress={() => setShowPassword(!showPassword)}
+              />
+            }
           />
+          <HelperText type="info" visible={true}>
+            La contraseña debe tener al menos 8 caracteres.
+          </HelperText>
           <TextInput
             style={styles.input}
             label="Confirma tu contraseña"
@@ -207,8 +230,17 @@ export default function SignupScreen() {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
-            secureTextEntry
+            secureTextEntry={!showConfirmPassword}
+            right={
+              <TextInput.Icon
+                icon={showConfirmPassword ? "eye-off" : "eye"}
+                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+              />
+            }
           />
+          <HelperText type="info" visible={true}>
+            La contraseña debe tener al menos 8 caracteres.
+          </HelperText>
           <TouchableOpacity
             style={[styles.button, !isStepThreeValid && styles.buttonDisabled]} // Aplica el estilo de deshabilitado si no es válido
             onPress={handleNextStep}
@@ -216,16 +248,24 @@ export default function SignupScreen() {
           >
             <Text style={styles.buttonText}>Completar Registro</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.backButtonCustom}
+            onPress={handlePreviousStep}
+          >
+            <Text style={styles.buttonText}>Volver Atrás</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
   );
 }
 
+const { width, height } = Dimensions.get("window");
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: width * 0.05,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#fff",
@@ -233,36 +273,27 @@ const styles = StyleSheet.create({
   stepContainer: {
     width: "100%",
     alignItems: "center",
+    paddingBottom: height * 0.05, // Añadir espacio debajo del botón
   },
+  backButtonCustom: {
+    width: "90%", // Mismo ancho que el botón de "Siguiente"
+    backgroundColor: "#86AB9A", // Mismo color que el botón de "Siguiente"
+    paddingVertical: height * 0.017,
+    borderRadius: 30,
+    marginTop: height * 0.02,
+    alignItems: "center",
+    marginBottom: height * 0.02, // Añade un margen inferior si es necesario
+  },  
   title: {
-    fontSize: 38,
+    fontSize: width * 0.09,
     fontWeight: "bold",
-    marginBottom: 30,
-    textAlign: "center",
-  },
-  thirdTitle: {
-    fontSize: 38,
-    fontWeight: "bold",
-    marginBottom: 30,
-    marginTop: 25,
-    textAlign: "center",
-  },
-  firstSubtitle: {
-    fontSize: 22,
-    marginBottom: 70,
-    marginHorizontal: 20,
+    marginBottom: height * 0.03,
     textAlign: "center",
   },
   secondSubtitle: {
-    fontSize: 22,
-    marginBottom: 30,
-    marginHorizontal: 20,
-    textAlign: "center",
-  },
-  thirdSubtitle: {
-    fontSize: 22,
-    marginBottom: 20,
-    marginHorizontal: 20,
+    fontSize: width * 0.055,
+    marginBottom: height * 0.03,
+    marginHorizontal: width * 0.05,
     textAlign: "center",
   },
   input: {
@@ -270,47 +301,65 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 5,
-    marginBottom: 15,
+    marginBottom: height * 0.015,
     backgroundColor: "#fff",
   },
   button: {
     width: "90%",
     backgroundColor: "#86AB9A",
-    paddingVertical: 17,
+    paddingVertical: height * 0.017,
     borderRadius: 30,
-    marginTop: 20,
-    marginBottom: 0,
+    marginTop: height * 0.02,
     alignItems: "center",
   },
   buttonDisabled: {
-    backgroundColor: "#ccc", // Cambia el color de fondo del botón deshabilitado
+    backgroundColor: "#ccc",
   },
   buttonText: {
     color: "#fff",
-    fontSize: 22,
+    fontSize: width * 0.055,
     fontWeight: "bold",
+  },
+  imageSecondStep: {
+    width: width * 0.9,
+    height: height * 0.3,
+    marginTop: height * 0.02,
+    resizeMode: "contain",
+    marginBottom: height * 0.03,
+  },
+  thirdTitle: {
+    fontSize: width * 0.09,
+    fontWeight: "bold",
+    marginBottom: height * 0.03,
+    marginTop: height * 0.025,
+    textAlign: "center",
+  },
+  firstSubtitle: {
+    fontSize: width * 0.055,
+    marginBottom: height * 0.07,
+    marginHorizontal: width * 0.05,
+    textAlign: "center",
+  },
+  thirdSubtitle: {
+    fontSize: width * 0.055,
+    marginBottom: height * 0.02,
+    marginHorizontal: width * 0.05,
+    textAlign: "center",
   },
   backButton: {
     position: "absolute",
-    top: 50,
-    left: 20,
+    top: height * 0.05,
+    left: width * 0.05,
   },
   imageFirstStep: {
-    width: 375,
-    height: 200,
-    marginTop: 20,
+    width: width * 0.9,
+    height: height * 0.25,
+    marginTop: height * 0.02,
     resizeMode: "contain",
-  },
-  imageSecondStep: {
-    width: 375,
-    height: 250,
-    marginTop: 20,
-    resizeMode: "contain",
-    marginBottom: 30,
   },
   imageThirdStep: {
-    width: 250,
-    height: 250,
+    width: width * 0.6,
+    height: height * 0.3,
     marginTop: 0,
     resizeMode: "contain",
   },
