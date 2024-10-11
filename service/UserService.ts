@@ -86,7 +86,7 @@ export const getCustomerProfile = async () => {
     }
 
     const data = await response.json();
-    return data;
+    return data.payload;
   } catch (error) {
     throw error;
   }

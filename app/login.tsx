@@ -69,7 +69,7 @@ export default function LoginScreen() {
 
   const handleCreateAccountPress = () => {
     // Navegar a la vista de crear cuenta
-    router.push("/singup"); // Asegúrate de tener la vista de registro
+    router.push("/signup"); // Asegúrate de tener la vista de registro
   };
 
   return (

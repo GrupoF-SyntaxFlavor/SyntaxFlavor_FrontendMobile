@@ -11,7 +11,7 @@ export default function WelcomeScreen() {
     router.push("/login"); // Redirige a la pantalla de login
   };
   const handleSingUpPress = () => {
-    router.push("/singup"); // Redirige a la pantalla de login
+    router.push("/signup"); // Redirige a la pantalla de login
   };
   return (
     <View style={styles.container}>
