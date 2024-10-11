@@ -10,8 +10,12 @@ interface UserContextProps {
     temporalBillName: string,
     jwt: string,
     setUserProfile: () => void,
-    updateUserProfile: (inputValue: string,
-        field: "billName" | "ci") => void
+    updateUserProfile: (
+        inputValue: string,
+        field: "billName" | "ci"
+    ) => void
+    setTemporalNIT: (value: string) => void,
+    setTemporalBillName: (value: string) => void,
 }
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
@@ -45,6 +49,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         inputValue: string,
         field: "billName" | "ci"
     ) => {
+        // TODO: this should be a single flow not split in two
         if (field === "billName") {
             await updateCustomerProfile(inputValue, nit); // Envía el nuevo billName y el CI original
             setBillName(inputValue); // Actualiza el estado local de billName
@@ -66,7 +71,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 temporalBillName,
                 // Methods
                 setUserProfile,
-                updateUserProfile
+                updateUserProfile,
+                setTemporalNIT,
+                setTemporalBillName
             }}
         >
             {children}

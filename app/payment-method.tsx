@@ -15,11 +15,13 @@ import { createBill } from "@/service/BillService"; // Importamos el nuevo endpo
 import { makeOrderPayload } from "@/lib/OrderUtils";
 import { useCart } from "@/contexts/CartContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useUser } from "@/contexts/UserContext";
 
 export default function Payment() {
   const { cartItems, updateQuantity, removeFromCart, setCartItems } = useCart();
-  const { billName = "", nit = "", total = "0" } = useLocalSearchParams();
+  const { billName, nit } = useUser();
   const [selectedMethod, setSelectedMethod] = useState("QR"); // Estado para el método de pago seleccionado
+  const { total = "0" } = useLocalSearchParams();
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>

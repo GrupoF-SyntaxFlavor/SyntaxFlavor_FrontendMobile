@@ -21,7 +21,7 @@ export default function LoginScreen() {
       //FIXME: @Oscar Agregar codigo de error y alert en el caso de que no se haya hecho la verificacion del correo
 
       const loginData = { email, password };
-      const response = await login(loginData);
+      const response = await login(loginData); //FIXME: @Oscar Esta lógica no se debería manejar aquí, considerar incorporarla en el UserContext
       // console.log("Login response in tsx:", response);
 
       if (response?.payload?.access_token) {
