@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Dimensions } from "react-native";
 import { TextInput } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons"; // Para el icono de retroceso
@@ -127,57 +127,59 @@ export default function LoginScreen() {
   );
 }
 
+const { width, height } = Dimensions.get("window");
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#fff",
-    paddingHorizontal: 30,
+    paddingHorizontal: width * 0.08,
   },
   backButton: {
     position: "absolute",
-    top: 50,
-    left: 20,
+    top: height * 0.05,
+    left: width * 0.05,
   },
   title: {
-    fontSize: 32,
+    fontSize: width * 0.08,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: height * 0.02,
     textAlign: "center",
   },
   subtitle: {
-    fontSize: 20,
-    marginBottom: 20,
+    fontSize: width * 0.05,
+    marginBottom: height * 0.03,
     textAlign: "center",
   },
   input: {
     width: "100%",
-    height: 60,
+    height: height * 0.08,
     borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 10,
-    paddingHorizontal: 15,
-    marginBottom: 20,
-    fontSize: 16,
+    paddingHorizontal: width * 0.04,
+    marginBottom: height * 0.02,
+    fontSize: width * 0.04,
     backgroundColor: "#fff", // Fondo blanco
   },
   loginButton: {
     backgroundColor: "#86AB9A", // Color verde para el botón
     width: "80%",
-    paddingVertical: 15,
+    paddingVertical: height * 0.02,
     borderRadius: 10,
-    marginTop: 10,
+    marginTop: height * 0.01,
     alignItems: "center",
   },
   loginButtonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: width * 0.045,
     fontWeight: "bold",
   },
   createAccountText: {
-    marginTop: 20,
-    fontSize: 16,
+    marginTop: height * 0.02,
+    fontSize: width * 0.04,
     color: "#333",
   },
   createAccountLink: {
