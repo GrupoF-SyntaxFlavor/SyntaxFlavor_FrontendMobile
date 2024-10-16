@@ -90,13 +90,16 @@ export default function LoginScreen() {
 
       {/* Campo de Correo Electrónico */}
       <TextInput
-        style={styles.input}
-        label="Correo Electrónico"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
-      />
+          style={styles.input}
+          label="Correo electronico"
+          placeholder="Ingresa tu correo"
+          placeholderTextColor="#89898B" // Cambia el color del texto del placeholder
+          value={email}
+          onChangeText={setEmail}
+          theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
+          keyboardType="email-address"
+          autoCapitalize="none" // Evita que la primera letra sea mayúscula
+        />
 
       {/* Campo de Contraseña */}
       <TextInput

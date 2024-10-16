@@ -36,7 +36,7 @@ export default function SignupScreen() {
       setStep(step + 1);
     } else {
       router.push("/login");
-      /* try {
+      try {
         const signupData = { name, email, password, nit, billName };
         const response = await signup(signupData);
         //FIXME: @Oscar No se puede realizar ingreso al sistema error: 401
@@ -61,7 +61,7 @@ export default function SignupScreen() {
           "Error",
           "Ocurrió un problema al intentar crear la cuenta."
         );
-      } */
+      }
     }
   };
 
