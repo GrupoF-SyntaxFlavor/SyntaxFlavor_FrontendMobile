@@ -16,6 +16,7 @@ import {
   getCustomerProfile,
   updateCustomerProfile,
 } from "@/service/UserService";
+import { useUser } from "@/contexts/UserContext";
 
 //FIXME: Considerar la creacion de un contexto para manejar el estado de la sesion
 
@@ -23,39 +24,30 @@ export default function InvoiceScreen() {
   const router = useRouter();
   const [visible, setVisible] = React.useState(false);
   const { cartItems } = useCart();
-  const [products, setProducts] = useState(cartItems); //Productos seleccionados
-  const [billName, setBillName] = React.useState(""); // Estado para el nombre de facturación
-  const [nit, setNit] = React.useState(""); // Estado para el NIT/CI
-  const [originalBillName, setOriginalBillName] = useState(""); // Estado para el nombre original
-  const [originalNit, setOriginalNit] = useState("");
+  const { billName, nit, temporalBillName, temporalNIT, setTemporalNIT, setTemporalBillName, updateUserProfile } = useUser();
+  const [shouldUpdate, setShouldUpdate] = useState(false);
 
   useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        const profileData = await getCustomerProfile(); // Llama al servicio
-        setBillName(profileData.payload.billName); // Establece el nombre de facturación
-        setNit(profileData.payload.nit); // Establece el NIT/CI
-        setOriginalBillName(profileData.payload.billName); // Guarda el nombre original
-        setOriginalNit(profileData.payload.nit); // Guarda el NIT original
-      } catch (error) {
-        console.error("Error fetching profile data:", error);
-        Alert.alert("Error", "No se pudieron cargar los datos de facturación.");
-      }
-    };
-
-    fetchProfileData(); // Llama a la función cuando se monta el componente
-  }, []);
+    setTemporalBillName(billName);
+    setTemporalNIT(nit);
+  }, [billName, nit, setTemporalBillName, setTemporalNIT]);
 
   //Funciones para el nombre de la factura
-  const onChangeBillName = (billName: React.SetStateAction<string>) =>
-    setBillName(billName); // Actualiza el estado del nombre de la factura
+  const onChangeBillName = (billName: string) =>{
+    setShouldUpdate(true); // Indica que los datos han sido modificados
+    setTemporalBillName(billName); // Actualiza el estado del nombre de la factura
+  }
+    
 
   const hasErrorsBillName = () => {
     return !/^[a-zA-Z\s]+$/.test(billName); // Permite letras y espacios
   };
 
   //Funciones para el NIT o CI de la factura
-  const onChangeNit = (nit: React.SetStateAction<string>) => setNit(nit);
+  const onChangeNit = (nit: string) => {
+    setShouldUpdate(true); // Indica que los datos han sido modificados
+    setTemporalNIT(nit); // Actualiza el estado del NIT
+  }
   const hasErrorsNit = () => {
     return !/^\d+$/.test(nit); // Retorna true si hay caracteres no numéricos
   };
@@ -67,7 +59,7 @@ export default function InvoiceScreen() {
       setVisible(true); // Mostrar modal si hay errores
     } else {
       // Verificar si los datos han sido modificados
-      if (billName !== originalBillName || nit !== originalNit) {
+      if (shouldUpdate) {
         Alert.alert(
           "Guardar Datos", // <-- Título del Alert
           "¿Desea guardar los nuevos datos como predeterminados?",
@@ -89,7 +81,8 @@ export default function InvoiceScreen() {
   const saveAndProceed = async () => {
     try {
       // Llamar al servicio para actualizar los datos de facturación
-      await updateCustomerProfile(billName, nit); // Guarda los nuevos datos en el backend
+      updateUserProfile(temporalBillName, "billName");
+      updateUserProfile(temporalNIT, "ci");
       Alert.alert("Éxito", "Datos de facturación actualizados correctamente.");
       proceedToPayment(); // Proceder al pago después de guardar
     } catch (error) {
@@ -115,7 +108,7 @@ export default function InvoiceScreen() {
 
   // Calcular el total por producto (cantidad * precio)
   const calculateTotal = (): number => {
-    const total = products.reduce(
+    const total = cartItems.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     );
@@ -135,7 +128,7 @@ export default function InvoiceScreen() {
             <DataTable.Title numeric>Cantidad</DataTable.Title>
             <DataTable.Title numeric>Total</DataTable.Title>
           </DataTable.Header>
-          {products.map((item) => (
+          {cartItems.map((item) => (
             <DataTable.Row key={item.id}>
               <DataTable.Cell style={{ flex: 2 }}>
                 <Text style={{ flexShrink: 1 }}>{item.name}</Text>
@@ -164,7 +157,7 @@ export default function InvoiceScreen() {
       <View>
         <TextInput
           label="Nombre/ Razón Social"
-          value={billName}
+          value={temporalBillName}
           onChangeText={onChangeBillName}
           theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
           style={styles.input} // Aplica el estilo desde el StyleSheet
@@ -178,7 +171,7 @@ export default function InvoiceScreen() {
       <View>
         <TextInput
           label="NIT/ CI"
-          value={nit}
+          value={temporalNIT}
           onChangeText={onChangeNit}
           theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
           style={styles.input} // Aplica el estilo desde el StyleSheet
