@@ -19,7 +19,7 @@ import { signup } from "@/service/UserService";
 export default function SignupScreen() {
   const colorScheme = useColorScheme();
 
-  const [step, setStep] = useState(1); // Controla el paso actual
+  const [step, setStep] = useState(1);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [billName, setBillName] = useState("");
@@ -30,33 +30,23 @@ export default function SignupScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const router = useRouter();
-
+  
   const handleNextStep = async () => {
     if (step < 3) {
       setStep(step + 1);
     } else {
-      router.push("/login");
       try {
         const signupData = { name, email, password, nit, billName };
         const response = await signup(signupData);
-        //FIXME: @Oscar No se puede realizar ingreso al sistema error: 401
-        // console.log("signup response in tsx:", response);
         if (response?.responseCode == "USR-001") {
-          // Mostrar mensaje de éxito y redirigir al login
-          Alert.alert(
-            "Registro exitoso",
-            "¡Felicidades! Haz creado tu cuenta exitosamente.\nInicie sesión, por favor." // TODO: indicar en un mensaje que debe verificar su correo antes
-          );
-          router.push("/login");
+          setStep(4); // Avanzar al paso 4 si el registro es exitoso
         } else {
           Alert.alert(
-            //FIXME: @Oscar Cambiar el mensaje de error dependiendo lo que suceda
             "Error",
             "Los datos ingresados no son válidos, intenta de nuevo."
           );
         }
       } catch (error) {
-        //FIXME: @Oscar Cambiar el mensaje de error dependiendo lo que suceda
         Alert.alert(
           "Error",
           "Ocurrió un problema al intentar crear la cuenta."
@@ -65,86 +55,70 @@ export default function SignupScreen() {
     }
   };
 
-  // Auxiliary methods
   const handlePreviousStep = () => {
     if (step === 1) {
-      // Si estamos en el primer paso, redirigir a la página de inicio o la página deseada
       router.push("/");
     } else {
-      // Si estamos en cualquier otro paso, disminuir el contador del paso
       setStep(step - 1);
     }
   };
 
   const handleNitChange = (text: string) => {
-    // Regular expression to match only numbers and hyphens
     const regex = /^[0-9-]+$/;
-
     if (regex.test(text)) {
       setNit(text);
     }
-  }
+  };
 
-  // Validaciones
   const isStepOneValid = name.length > 0 && email.includes("@");
   const isStepTwoValid = billName.length > 0 && nit.length > 0;
   const isStepThreeValid = password.length >= 8 && password === confirmPassword;
 
   return (
     <View style={styles.container}>
-      {/* Botón de retroceso */}
-      <TouchableOpacity style={styles.backButton} onPress={handlePreviousStep}>
-        <Ionicons
-          name="arrow-back"
-          size={30}
-          color={Colors[colorScheme ?? "light"].tint}
-        />
-      </TouchableOpacity>
+      {step < 4 && (
+        <TouchableOpacity style={styles.backButton} onPress={handlePreviousStep}>
+          <Ionicons
+            name="arrow-back"
+            size={30}
+            color={Colors[colorScheme ?? "light"].tint}
+          />
+        </TouchableOpacity>
+      )}
+
       {step === 1 && (
         <View style={styles.stepContainer}>
           <Text style={styles.title}>¡Empecemos!</Text>
           <Text style={styles.firstSubtitle}>
             Para comenzar, necesitamos algunos datos
           </Text>
-          {/* TODO: Agregar un helper entre los inputs de la vista*/}
           <TextInput
             style={styles.input}
             label="¿Cómo podemos llamarte?"
             placeholder="Ingresa tu nombre"
-            placeholderTextColor="#89898B" // Cambia el color del texto del placeholder
+            placeholderTextColor="#89898B"
             value={name}
-            theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
+            theme={{ colors: { primary: "#86AB9A" } }}
             onChangeText={setName}
           />
-
           <TextInput
             style={styles.input}
-            label="Correo electronico"
+            label="Correo electrónico"
             placeholder="Ingresa tu correo"
-            placeholderTextColor="#89898B" // Cambia el color del texto del placeholder
+            placeholderTextColor="#89898B"
             value={email}
             onChangeText={setEmail}
-            theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
+            theme={{ colors: { primary: "#86AB9A" } }}
             keyboardType="email-address"
-            autoCapitalize="none" // Evita que la primera letra sea mayúscula
+            autoCapitalize="none"
           />
           <TouchableOpacity
-            style={[styles.button, !isStepOneValid && styles.buttonDisabled]} // Aplica el estilo de deshabilitado si no es válido
+            style={[styles.button, !isStepOneValid && styles.buttonDisabled]}
             onPress={handleNextStep}
-            disabled={!isStepOneValid} // Habilita/deshabilita el botón
+            disabled={!isStepOneValid}
           >
             <Text style={styles.buttonText}>Siguiente ➔</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.backButtonCustom}
-            onPress={handlePreviousStep}
-          >
-            <Text style={styles.buttonText}>Volver Atrás</Text>
-          </TouchableOpacity>
-          <Image
-            source={require("../assets/images/pizza_box.png")}
-            style={styles.imageFirstStep}
-          />
         </View>
       )}
 
@@ -164,7 +138,7 @@ export default function SignupScreen() {
             placeholder="Nombre o Razón Social"
             placeholderTextColor="#89898B"
             value={billName}
-            theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
+            theme={{ colors: { primary: "#86AB9A" } }}
             onChangeText={setBillName}
           />
           <TextInput
@@ -173,7 +147,7 @@ export default function SignupScreen() {
             placeholder="NIT/CI"
             placeholderTextColor="#89898B"
             value={nit}
-            theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
+            theme={{ colors: { primary: "#86AB9A" } }}
             onChangeText={handleNitChange}
             keyboardType="numeric"
           />
@@ -183,12 +157,6 @@ export default function SignupScreen() {
             disabled={!isStepTwoValid}
           >
             <Text style={styles.buttonText}>Siguiente ➔</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.backButtonCustom}
-            onPress={handlePreviousStep}
-          >
-            <Text style={styles.buttonText}>Volver Atrás</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -210,7 +178,7 @@ export default function SignupScreen() {
             placeholderTextColor="#89898B"
             value={password}
             onChangeText={setPassword}
-            theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
+            theme={{ colors: { primary: "#86AB9A" } }}
             secureTextEntry={!showPassword}
             right={
               <TextInput.Icon
@@ -229,7 +197,7 @@ export default function SignupScreen() {
             placeholderTextColor="#89898B"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
-            theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
+            theme={{ colors: { primary: "#86AB9A" } }}
             secureTextEntry={!showConfirmPassword}
             right={
               <TextInput.Icon
@@ -242,20 +210,34 @@ export default function SignupScreen() {
             La contraseña debe tener al menos 8 caracteres.
           </HelperText>
           <TouchableOpacity
-            style={[styles.button, !isStepThreeValid && styles.buttonDisabled]} // Aplica el estilo de deshabilitado si no es válido
+            style={[styles.button, !isStepThreeValid && styles.buttonDisabled]}
             onPress={handleNextStep}
             disabled={!isStepThreeValid}
           >
             <Text style={styles.buttonText}>Completar Registro</Text>
           </TouchableOpacity>
+        </View>
+      )}
+
+      {step === 4 && (
+        <View style={styles.stepContainer}>
+          <Text style={styles.title}>Revisa tu correo</Text>
+          <Text style={styles.secondSubtitle}>
+            Te hemos enviado un enlace para confirmar tu cuenta. Por favor, revisa tu correo electrónico.
+          </Text>
+          <Image
+            source={require("../assets/images/check-mail.png")}
+            style={styles.imageThirdStep}
+          />
           <TouchableOpacity
-            style={styles.backButtonCustom}
-            onPress={handlePreviousStep}
+            style={styles.button}
+            onPress={() => router.push("/login")} // Navegar al inicio de sesión
           >
-            <Text style={styles.buttonText}>Volver Atrás</Text>
+            <Text style={styles.buttonText}>Ir al inicio de sesión</Text>
           </TouchableOpacity>
         </View>
       )}
+
     </View>
   );
 }
