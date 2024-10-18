@@ -227,7 +227,7 @@ export default function SignupScreen() {
           </Text>
           <Image
             source={require("../assets/images/check-mail.png")}
-            style={styles.imageThirdStep}
+            style={[styles.imageThirdStep, { width: 100, height: 100 }]}
           />
           <TouchableOpacity
             style={styles.button}
