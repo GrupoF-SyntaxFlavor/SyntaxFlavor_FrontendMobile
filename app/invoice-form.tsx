@@ -9,6 +9,7 @@ import {
   Modal,
   Button,
   Alert,
+  Switch,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useCart } from "@/contexts/CartContext";
@@ -18,12 +19,14 @@ export default function InvoiceScreen() {
   const router = useRouter();
   const [visible, setVisible] = React.useState(false);
   const { cartItems } = useCart();
-  const [products, setProducts] = useState(cartItems); //Productos seleccionados
+  const [products] = useState(cartItems); //Productos seleccionados
   const [billName, setBillName] = React.useState(""); // Estado para el nombre de facturación
   const [nit, setNit] = React.useState(""); // Estado para el NIT/CI
   const [originalBillName, setOriginalBillName] = useState(""); // Estado para el nombre original
   const [originalNit, setOriginalNit] = useState(""); 
-
+  const [isTakeaway, setIsTakeaway] = useState(true); // Estado de para llevar
+  const [tableNumber, setTableNumber] = useState(""); // Estado para el número de mesa
+  
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -179,6 +182,30 @@ export default function InvoiceScreen() {
           El NIT/ CI debe contener sólo números
         </HelperText>
       </View>
+      {/* Switch para "Para llevar" */}
+      <View style={styles.switchContainer}>
+        <Text style={styles.subtitle}>¿Para llevar?</Text>
+        <Switch
+          value={isTakeaway}
+          onValueChange={setIsTakeaway}
+          trackColor={{ false: "#e0e0e0", true: "#D1E4DE" }} // Color de la pista
+          thumbColor={isTakeaway ? "#86AB9A" : "#ccc"} // Color del botón
+        />
+      </View>
+
+      {/* Input para el número de mesa (se muestra solo si no es para llevar) */}
+      {!isTakeaway && (
+        <View>
+          <TextInput
+            label="Número de Mesa"
+            value={tableNumber}
+            onChangeText={setTableNumber}
+            theme={{ colors: { primary: "#86AB9A" } }}
+            style={styles.input}
+            keyboardType="numeric"
+          />
+        </View>
+      )}
       <Divider />
       <TouchableOpacity
         style={styles.submitButton}
@@ -206,7 +233,7 @@ export default function InvoiceScreen() {
           </View>
         </View>
       </Modal>
-      <View style={{ marginBottom: 30 }}></View>
+      <View style={{ marginBottom: 20 }}></View>
     </ScrollView>
   );
 }
@@ -265,6 +292,13 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: "#fff", // Fondo blanco
+  },
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+    
   },
   centeredView: {
     flex: 1,
