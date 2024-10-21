@@ -1,5 +1,9 @@
-import { getCustomerProfile, updateCustomerProfile } from "@/service/UserService";
-import { createContext, ReactNode, useContext, useEffect, useState } from "react"
+import { getCustomerProfile, updateCustomerProfile, login as loginService } from "@/service/UserService";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
+import { Alert } from "react-native";
+import { AxiosError } from 'axios';
 
 interface UserContextProps {
     name: string,
@@ -9,17 +13,18 @@ interface UserContextProps {
     billName: string,
     temporalBillName: string,
     jwt: string,
+    login: (email: string, password: string) => Promise<void>,
     setUserProfile: () => void,
     updateUserProfile: (
         inputValue: string,
         field: "billName" | "ci"
-    ) => void
+    ) => void,
     setTemporalNIT: (value: string) => void,
     setTemporalBillName: (value: string) => void,
+    logout: () => void,
 }
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
-
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [name, setName] = useState<string>('');
@@ -30,34 +35,89 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [temporalBillName, setTemporalBillName] = useState('');
     const [jwt, setJWT] = useState<string>('');
 
-    // TODO: @AleCar set UseEffect to retireve JWT if valid
+    const login = async (email: string, password: string) => {
+        try {
+            const loginData = { email, password };
+            const response = await loginService(loginData);
+    
+            if (response?.payload?.access_token) {
+                // Save tokens to AsyncStorage
+                await AsyncStorage.setItem("access_token", response.payload.access_token);
+                await AsyncStorage.setItem("refresh_token", response.payload.refresh_token);
+                await AsyncStorage.setItem("expires_in", response.payload.expires_in.toString());
+                await AsyncStorage.setItem("refresh_expires_in", response.payload.refresh_expires_in.toString());
+    
+                setJWT(response.payload.access_token);
+    
+                Alert.alert("Inicio de sesión exitoso", "¡Bienvenido! Has iniciado sesión exitosamente.");
+                router.push("/(tabs)/menu");
+            } else {
+                throw new Error("Credenciales no válidas");
+            }
+        } catch (error: any) {
+            console.error("Login error:", error);
+    
+            let errorMessage = "Ocurrió un problema al intentar iniciar sesión.";
+    
+            if (isAxiosError(error)) {
+                // Type guard for Axios error
+                const serverMessage = (error.response?.data as { message?: string; error?: string })?.message || (error.response?.data as { message?: string; error?: string })?.error || "Error desconocido en el servidor.";
+                errorMessage = `Error del servidor: ${serverMessage}`;
+    
+                if (error.response?.status === 401) {
+                    errorMessage = "Acceso no autorizado. Verifica tus credenciales.";
+                } else if (error.response?.status === 500) {
+                    errorMessage = "Error del servidor. Por favor, intenta más tarde.";
+                }
+            } else if (error instanceof Error && error.message.includes("Network")) {
+                errorMessage = "No se pudo conectar al servidor. Verifica tu conexión a Internet.";
+            }
+    
+            // Mostrar mensaje de error personalizado
+            Alert.alert("Error", errorMessage);
+        }
+    };
+    
+    // Helper function to check if the error is an Axios error
+    function isAxiosError(error: any): error is AxiosError {
+        return error.isAxiosError === true;
+    }
+    
 
-    // TODO: Methods
     const setUserProfile = async () => {
         try {
-            const data = await getCustomerProfile(); // Llama al endpoint
-            setName(data.user.name); // Establece el nombre del usuario
-            setEmail(data.user.email); // Establece el correo
-            setBillName(data.billName); // Establece el billName
-            setNIT(data.nit); // Establece el CI/NIT
+            const data = await getCustomerProfile();
+            setName(data.user.name);
+            setEmail(data.user.email);
+            setBillName(data.billName);
+            setNIT(data.nit);
         } catch (error) {
             console.error("Error fetching profile data:", error);
         }
-    }
+    };
 
     const updateUserProfile = async (
         inputValue: string,
         field: "billName" | "ci"
     ) => {
-        // TODO: this should be a single flow not split in two
         if (field === "billName") {
-            await updateCustomerProfile(inputValue, nit); // Envía el nuevo billName y el CI original
-            setBillName(inputValue); // Actualiza el estado local de billName
+            await updateCustomerProfile(inputValue, nit);
+            setBillName(inputValue);
         } else if (field === "ci") {
-            await updateCustomerProfile(billName, inputValue); // Envía el billName original y el nuevo CI
-            setNIT(inputValue); // Actualiza el estado local de CI
+            await updateCustomerProfile(billName, inputValue);
+            setNIT(inputValue);
         }
-    }
+    };
+
+    const logout = async () => {
+        await AsyncStorage.clear();
+        setName('');
+        setEmail('');
+        setNIT('');
+        setBillName('');
+        setJWT('');
+        router.push("/login");
+    };
 
     return (
         <UserContext.Provider
@@ -69,11 +129,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 jwt,
                 temporalNIT,
                 temporalBillName,
-                // Methods
+                login,
                 setUserProfile,
                 updateUserProfile,
                 setTemporalNIT,
-                setTemporalBillName
+                setTemporalBillName,
+                logout,
             }}
         >
             {children}
@@ -87,4 +148,4 @@ export const useUser = () => {
         throw new Error("useUser must be used within a UserProvider");
     }
     return context;
-}
+};

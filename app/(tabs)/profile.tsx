@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  Alert,
+  ScrollView,
+  Dimensions
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -15,10 +16,9 @@ import {
 } from "@/service/UserService"; // Asegúrate de tener la ruta correcta para importar la función
 import { useUser } from "@/contexts/UserContext";
 
-//FIXME: Considerar la creacion de un contexto para manejar el estado de la sesion
 
 export default function ProfileScreen() {
-  const { name, email, billName, jwt, nit, setUserProfile, updateUserProfile } = useUser();
+  const { name, email, billName, jwt, nit, setUserProfile, updateUserProfile, logout } = useUser();
   const [inputValue, setInputValue] = useState("");
   const [editField, setEditField] = useState("");
   const [isModalVisible, setModalVisible] = useState(false);
@@ -65,7 +65,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.scrollViewContent}>
       {/* Sección de la foto y nombre del usuario */}
       <View style={styles.profileHeader}>
         <Ionicons name="person-circle" size={150} color="#86AB9A" />
@@ -82,9 +82,6 @@ export default function ProfileScreen() {
           </View>
           <View style={styles.userInfoContainer}>
             <Text style={styles.userInfo}>{email}</Text>
-            {/* <TouchableOpacity>
-              <Text style={styles.editText}>Editar</Text>
-            </TouchableOpacity> */}
           </View>
         </View>
 
@@ -160,23 +157,33 @@ export default function ProfileScreen() {
           </View>
         </Modal>
       </View>
-    </View>
+      <TouchableOpacity onPress={logout} style={styles.logoutButton}>
+        <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
+      </TouchableOpacity>
+    </ScrollView>
     /* TODO: Agregar un botón de cerrar sesión */
   );
 }
 
+const { width, height } = Dimensions.get("window");
+
 const styles = StyleSheet.create({
+  scrollViewContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+  },
   container: {
     flex: 1,
     backgroundColor: "#f7f7f7",
-    padding: 20,
+    paddingHorizontal: width * 0.05,
+    paddingVertical: height * 0.02,
   },
   profileHeader: {
     alignItems: "center",
     backgroundColor: "#D1E4DE",
-    paddingVertical: 30,
+    paddingVertical: height * 0.04,
     borderRadius: 20,
-    marginBottom: 20,
+    marginBottom: height * 0.03,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 1,
@@ -184,46 +191,46 @@ const styles = StyleSheet.create({
   },
   profileName: {
     marginTop: 10,
-    fontSize: 30,
+    fontSize: width * 0.08,
     fontWeight: "bold",
     color: "#333",
   },
   infoContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 10,
+    paddingVertical: height * 0.02,
+    paddingHorizontal: width * 0.04,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 2,
   },
   fieldContainer: {
-    paddingVertical: 20,
+    paddingVertical: height * 0.025, 
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
   },
   lastFieldContainer: {
-    paddingVertical: 20,
+    paddingVertical: height * 0.025,
   },
   userInfoContainer: {
-    flexDirection: "row", // Colocar la info del cliente y el botón en una fila
-    justifyContent: "space-between", // Distribuir espacio entre el texto y el botón
-    alignItems: "center", // Centrar verticalmente los elementos
-    marginTop: 5, // Separar un poco del título
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: height * 0.01,
   },
   iconAndLabelContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
   fieldLabel: {
-    fontSize: 18,
+    fontSize: width * 0.045,
     fontWeight: "bold",
     marginLeft: 10,
     color: "#333",
   },
   userInfo: {
-    fontSize: 16,
+    fontSize: width * 0.04, 
     color: "#333",
     paddingVertical: 5,
     marginLeft: 36,
@@ -231,13 +238,13 @@ const styles = StyleSheet.create({
   editText: {
     color: "#60A6A5",
     textDecorationLine: "underline",
-    fontSize: 16,
+    fontSize: width * 0.04,
     fontWeight: "bold",
     marginRight: 10,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo semitransparente
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -249,14 +256,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: width * 0.045,
     fontWeight: "bold",
     marginBottom: 20,
   },
   input: {
     width: "100%",
     padding: 15,
-    fontSize: 16,
+    fontSize: width * 0.04,
     borderColor: "#ddd",
     borderWidth: 2,
     borderRadius: 10,
@@ -269,7 +276,7 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: width * 0.05,
     backgroundColor: "#86AB9A",
     borderRadius: 5,
     marginHorizontal: 10,
@@ -277,6 +284,21 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
-    fontSize: 15,
+    fontSize: width * 0.04, 
+  },
+  logoutButton: {
+    backgroundColor: "#FF6347", // Color rojo para el botón de cerrar sesión
+    width: "80%",
+    paddingVertical: "2%",
+    borderRadius: 10,
+    marginTop: "5%",
+    marginBottom: "5%",
+    alignItems: "center",
+    alignSelf: "center",
+  },
+  logoutButtonText: {
+    color: "#fff",
+    fontSize: width * 0.045,
+    fontWeight: "bold",
   },
 });
