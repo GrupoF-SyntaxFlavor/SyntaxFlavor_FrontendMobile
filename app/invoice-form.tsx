@@ -10,6 +10,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Switch,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useCart } from "@/contexts/CartContext";
@@ -270,6 +271,13 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: "#fff", // Fondo blanco
+  },
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+    
   },
   centeredView: {
     flex: 1,
