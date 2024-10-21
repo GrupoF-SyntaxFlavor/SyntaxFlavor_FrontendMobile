@@ -1,107 +1,79 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { KeyboardAvoidingView, Platform, View, Text, StyleSheet, TouchableOpacity, Alert, Dimensions } from "react-native";
 import { TextInput } from "react-native-paper";
 import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons"; // Para el icono de retroceso
+import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-
-import { login } from "@/service/UserService";
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from "@/contexts/UserContext";
 
 export default function LoginScreen() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const colorScheme = useColorScheme();
+    const router = useRouter();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const colorScheme = useColorScheme();
+    const { login } = useUser();
 
-  const handleLoginPress = async () => {
-    try {
-      const loginData = { email, password };
-      const response = await login(loginData);
-      // console.log("Login response in tsx:", response);
+    const handleLoginPress = () => {
+        login(email, password);
+    };
 
-      if (response?.payload?.access_token) {
-        // Guardar el token en AsyncStorage si la autenticación es exitosa
-        await AsyncStorage.setItem('access_token', response.payload.access_token);
-        await AsyncStorage.setItem('refresh_token', response.payload.refresh_token);
-        await AsyncStorage.setItem('expires_in', response.payload.expires_in.toString());
-        await AsyncStorage.setItem('refresh_expires_in', response.payload.refresh_expires_in.toString());
-        await AsyncStorage.setItem('refresh_token', response.payload.refresh_token);
-        // console.log("Login successful:", response.payload);
-        Alert.alert('Inicio de sesión exitoso', '¡Bienvenido! Has iniciado sesión exitosamente.');
-        // console.log('getItem', AsyncStorage.getItem);
+    const handleCreateAccountPress = () => {
+        router.push("/signup");
+    };
 
-        // Redirigir a la pantalla de menú
-        router.push("/(tabs)/menu");
-      } else {
-        Alert.alert('Error', 'Las credenciales no son válidas, intenta de nuevo.');
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      Alert.alert('Error', 'Ocurrió un problema al intentar iniciar sesión.');
-    }
-  };
-
-  const handleCreateAccountPress = () => {
-    // Navegar a la vista de crear cuenta
-    router.push("/singup"); // Asegúrate de tener la vista de registro
-  };
-
-  return (
-    <View style={styles.container}>
-      {/* Botón de retroceso */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Ionicons
-          name="arrow-back"
-          size={30}
-          color={Colors[colorScheme ?? "light"].tint}
-        />
-      </TouchableOpacity>
-
-      {/* Título y subtítulo */}
-      <Text style={styles.title}>Syntax Flavor</Text>
-      <Text style={styles.subtitle}>Inicia Sesión</Text>
-
-      {/* Campo de Correo Electrónico */}
-      <TextInput
-        style={styles.input}
-        label="Correo Electrónico"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
-      />
-
-      {/* Campo de Contraseña */}
-      <TextInput
-        style={styles.input}
-        label="Contraseña"
-        value={password}
-        onChangeText={setPassword}
-        theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
-        secureTextEntry
-      />
-
-      {/* Botón de Iniciar Sesión */}
-      <TouchableOpacity onPress={handleLoginPress} style={styles.loginButton}>
-        <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
-      </TouchableOpacity>
-
-      {/* Texto de Crear Cuenta */}
-      <Text style={styles.createAccountText}>
-        ¿No tienes cuenta?{" "}
-        <Text
-          style={styles.createAccountLink}
-          onPress={handleCreateAccountPress}
-        >
-          Crea una Cuenta
-        </Text>
-      </Text>
-    </View>
-  );
+    return (
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }} // Ensure the KeyboardAvoidingView takes full height
+      >
+        <View style={styles.container}>
+            <TouchableOpacity style={styles.backButton} onPress={() => router.push('/')}>
+              <Ionicons
+                name="arrow-back"
+                size={30}
+                color={Colors[colorScheme ?? "light"].tint}
+              />
+            </TouchableOpacity>
+            <Text style={styles.title}>Syntax Flavor</Text>
+            <Text style={styles.subtitle}>Inicia Sesión</Text>
+            <TextInput
+                style={styles.input}
+                label="Correo electronico"
+                placeholder="Ingresa tu correo"
+                placeholderTextColor="#89898B"
+                value={email}
+                onChangeText={setEmail}
+                theme={{ colors: { primary: "#86AB9A" } }}
+                keyboardType="email-address"
+                autoCapitalize="none"
+            />
+            <TextInput
+                style={styles.input}
+                label="Contraseña"
+                value={password}
+                onChangeText={setPassword}
+                theme={{ colors: { primary: "#86AB9A" } }}
+                secureTextEntry
+            />
+            <TouchableOpacity onPress={handleLoginPress} style={styles.loginButton}>
+                <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+            </TouchableOpacity>
+            <Text style={styles.createAccountText}>
+                ¿No tienes cuenta?{" "}
+                <Text
+                    style={styles.createAccountLink}
+                    onPress={handleCreateAccountPress}
+                >
+                    Crea una Cuenta
+                </Text>
+            </Text>
+        </View>
+      </KeyboardAvoidingView>
+    );
 }
+
+const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {
@@ -109,51 +81,51 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#fff",
-    paddingHorizontal: 30,
+    paddingHorizontal: width * 0.08,
   },
   backButton: {
     position: "absolute",
-    top: 50,
-    left: 20,
+    top: height * 0.05,
+    left: width * 0.05,
   },
   title: {
-    fontSize: 32,
+    fontSize: width * 0.08,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: height * 0.02,
     textAlign: "center",
   },
   subtitle: {
-    fontSize: 20,
-    marginBottom: 20,
+    fontSize: width * 0.05,
+    marginBottom: height * 0.03,
     textAlign: "center",
   },
   input: {
     width: "100%",
-    height: 60,
+    height: height * 0.08,
     borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 10,
-    paddingHorizontal: 15,
-    marginBottom: 20,
-    fontSize: 16,
+    paddingHorizontal: width * 0.04,
+    marginBottom: height * 0.02,
+    fontSize: width * 0.04,
     backgroundColor: "#fff", // Fondo blanco
   },
   loginButton: {
     backgroundColor: "#86AB9A", // Color verde para el botón
     width: "80%",
-    paddingVertical: 15,
+    paddingVertical: height * 0.02,
     borderRadius: 10,
-    marginTop: 10,
+    marginTop: height * 0.01,
     alignItems: "center",
   },
   loginButtonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: width * 0.045,
     fontWeight: "bold",
   },
   createAccountText: {
-    marginTop: 20,
-    fontSize: 16,
+    marginTop: height * 0.02,
+    fontSize: width * 0.04,
     color: "#333",
   },
   createAccountLink: {

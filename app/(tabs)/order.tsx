@@ -70,8 +70,11 @@ const PastOrdersScreen = () => {
               // Refresh the past orders list
               await loadPastOrders();
             } catch (error) {
-              console.error('Error cancelando orden:', error);
-              Alert.alert('No se pudo cancelar la orden', 'En este momento la orden no puede ser cancelada, por favor intente más tarde');
+              console.error("Error cancelando orden:", error);
+              Alert.alert(
+                "No se pudo cancelar la orden",
+                "En este momento la orden no puede ser cancelada, por favor intente más tarde"
+              );
             }
           },
         },
@@ -110,8 +113,13 @@ const PastOrdersScreen = () => {
           <View key={index} style={styles.card}>
             <View style={styles.orderHeader}>
               <Text style={styles.orderId}>ORD-{order.orderId}</Text>
-              {/* TODOFormat timestamp as MM-DD */}
-              <Text style={styles.orderDate}>{order.orderTimestamp}</Text>
+              <Text style={styles.orderDate}>
+                {new Date(order.orderTimestamp).toLocaleDateString('en-US', {
+                  month: '2-digit',
+                  day: '2-digit',
+                  year: 'numeric',
+                })}
+              </Text>
               {order.orderStatus === OrderStatusValues.PENDING ? (
                 <View style={styles.statusContainer}>
                   <Ionicons name="time-outline" size={20} color="#FFA500" />
@@ -139,7 +147,7 @@ const PastOrdersScreen = () => {
                 </View>
               )}
             </View>
-
+  
             <View style={styles.orderItems}>
               {order.orderItems.map((item, idx) => (
                 <Text key={idx} style={styles.itemText}>
@@ -148,7 +156,7 @@ const PastOrdersScreen = () => {
               ))}
             </View>
             <Text style={styles.total}>Total: Bs. {calculateTotal(order)}</Text>
-
+  
             {order.orderStatus !== OrderStatusValues.PENDING ? (
               <TouchableOpacity
                 style={styles.refreshButton}

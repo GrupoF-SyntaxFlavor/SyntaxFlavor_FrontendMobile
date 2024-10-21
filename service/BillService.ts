@@ -1,7 +1,9 @@
-import { BACKEND_URL } from "@/constants/.backend-dir";
+import { BACKEND_DOMAIN, SPRING_PORT } from "@/constants/.backend-dir"; 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Bill } from "@/models/Bill";
+
+const API_URL = `http://${BACKEND_DOMAIN}${SPRING_PORT}` // Cuando pasemos a https cambiar aquí
 
 export const createBill = async (bill: Bill) => {
     try {
@@ -12,7 +14,7 @@ export const createBill = async (bill: Bill) => {
         if (!token) {
         throw new Error('No se encontró un token de acceso');
         }
-        const response = await fetch(`${BACKEND_URL}/api/v1/bill`, {
+        const response = await fetch(`${API_URL}/api/v1/bill`, {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${token}`,

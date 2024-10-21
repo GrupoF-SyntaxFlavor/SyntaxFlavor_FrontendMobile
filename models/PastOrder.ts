@@ -1,5 +1,3 @@
-import { Product } from "./Product";
-
 export interface PastOrder {
     orderId: number;
     customerName: string;

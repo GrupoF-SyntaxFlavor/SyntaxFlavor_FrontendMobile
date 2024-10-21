@@ -16,6 +16,9 @@ import { useCart } from "@/contexts/CartContext";
 import { router } from "expo-router";
 import { Product } from "@/models/Product";
 
+//TODO: Pintar de un color distinto los productos que ya están en el carrito
+//TODO: Agregar un buscador para filtrar los productos por nombre
+
 export default function Menu() {
   var [fetchedProducts, setProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("Menú");
@@ -31,7 +34,6 @@ export default function Menu() {
         fetchedProducts = await fetchMenuItems();
         console.log("fetchedProducts", fetchedProducts);
         setMenuItems(fetchedProducts); // Products should match the backend DTO
-        
       } catch (error) {
         console.error("Error loading menu items:", error);
       } finally {
@@ -111,7 +113,7 @@ export default function Menu() {
                       <Text style={styles.price}>Bs. {product.price}</Text>
                     </View>
                     <Image
-                      source={{ uri: product.image }}
+                      source={{ uri: product.image || '' }}
                       style={styles.image}
                     />
                   </View>
