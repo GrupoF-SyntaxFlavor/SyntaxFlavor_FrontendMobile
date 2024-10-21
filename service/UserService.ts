@@ -33,7 +33,7 @@ export const login = async (login: Login) => {
 };
 
 export const signup = async (SignUp: SignUp) => {
-  console.log("signup request:", SignUp);
+  console.log("signup request received");
   try {
     const response = await fetch(
       `${API_URL}/api/v1/public/signup?type=customer`,
@@ -47,13 +47,13 @@ export const signup = async (SignUp: SignUp) => {
       }
     );
 
-    console.log("signup response:", response);
+    console.log("signup response status:", response.status);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log("signup:", data);
+    console.log("signup response received");
     return data;
   } catch (error) {
     throw error;
