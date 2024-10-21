@@ -7,6 +7,8 @@ import {
   Image,
   Alert,
   Dimensions,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { TextInput, HelperText } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
@@ -75,170 +77,192 @@ export default function SignupScreen() {
   const isStepThreeValid = password.length >= 8 && password === confirmPassword;
 
   return (
-    <View style={styles.container}>
-      {step < 4 && (
-        <TouchableOpacity style={styles.backButton} onPress={handlePreviousStep}>
-          <Ionicons
-            name="arrow-back"
-            size={30}
-            color={Colors[colorScheme ?? "light"].tint}
-          />
-        </TouchableOpacity>
-      )}
-
-      {step === 1 && (
-        <View style={styles.stepContainer}>
-          <Text style={styles.title}>¡Empecemos!</Text>
-          <Text style={styles.firstSubtitle}>
-            Para comenzar, necesitamos algunos datos
-          </Text>
-          <TextInput
-            style={styles.input}
-            label="¿Cómo podemos llamarte?"
-            placeholder="Ingresa tu nombre"
-            placeholderTextColor="#89898B"
-            value={name}
-            theme={{ colors: { primary: "#86AB9A" } }}
-            onChangeText={setName}
-          />
-          <TextInput
-            style={styles.input}
-            label="Correo electrónico"
-            placeholder="Ingresa tu correo"
-            placeholderTextColor="#89898B"
-            value={email}
-            onChangeText={setEmail}
-            theme={{ colors: { primary: "#86AB9A" } }}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-          <TouchableOpacity
-            style={[styles.button, !isStepOneValid && styles.buttonDisabled]}
-            onPress={handleNextStep}
-            disabled={!isStepOneValid}
-          >
-            <Text style={styles.buttonText}>Siguiente ➔</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <View style={styles.container}>
+        {step < 4 && (
+          <TouchableOpacity style={styles.backButton} onPress={handlePreviousStep}>
+            <Ionicons
+              name="arrow-back"
+              size={30}
+              color={Colors[colorScheme ?? "light"].tint}
+            />
           </TouchableOpacity>
-        </View>
-      )}
-
-      {step === 2 && (
-        <View style={styles.stepContainer}>
-          <Image
-            source={require("../assets/images/book_coffee.gif")}
-            style={styles.imageSecondStep}
-          />
-          <Text style={styles.title}>Facturación</Text>
-          <Text style={styles.secondSubtitle}>
-            Proporciónanos tu nombre o razón social y NIT/CI
-          </Text>
-          <TextInput
-            style={styles.input}
-            label="Nombre de facturación"
-            placeholder="Nombre o Razón Social"
-            placeholderTextColor="#89898B"
-            value={billName}
-            theme={{ colors: { primary: "#86AB9A" } }}
-            onChangeText={setBillName}
-          />
-          <TextInput
-            style={styles.input}
-            label="Ingresa tu NIT/CI"
-            placeholder="NIT/CI"
-            placeholderTextColor="#89898B"
-            value={nit}
-            theme={{ colors: { primary: "#86AB9A" } }}
-            onChangeText={handleNitChange}
-            keyboardType="numeric"
-          />
-          <TouchableOpacity
-            style={[styles.button, !isStepTwoValid && styles.buttonDisabled]}
-            onPress={handleNextStep}
-            disabled={!isStepTwoValid}
-          >
-            <Text style={styles.buttonText}>Siguiente ➔</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {step === 3 && (
-        <View style={styles.stepContainer}>
-          <Text style={styles.thirdTitle}>Asegura tu cuenta</Text>
-          <Text style={styles.thirdSubtitle}>
-            Crea una contraseña segura, asegúrate de usar al menos 8 caracteres
-          </Text>
-          <Image
-            source={require("../assets/images/cat_cafe.png")}
-            style={styles.imageThirdStep}
-          />
-          <TextInput
-            style={styles.input}
-            label="Crea una contraseña"
-            placeholder="Contraseña"
-            placeholderTextColor="#89898B"
-            value={password}
-            onChangeText={setPassword}
-            theme={{ colors: { primary: "#86AB9A" } }}
-            secureTextEntry={!showPassword}
-            right={
-              <TextInput.Icon
-                icon={showPassword ? "eye-off" : "eye"}
-                onPress={() => setShowPassword(!showPassword)}
-              />
-            }
-          />
-          <HelperText type="info" visible={true}>
-            La contraseña debe tener al menos 8 caracteres.
-          </HelperText>
-          <TextInput
-            style={styles.input}
-            label="Confirma tu contraseña"
-            placeholder="Contraseña"
-            placeholderTextColor="#89898B"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            theme={{ colors: { primary: "#86AB9A" } }}
-            secureTextEntry={!showConfirmPassword}
-            right={
-              <TextInput.Icon
-                icon={showConfirmPassword ? "eye-off" : "eye"}
-                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-              />
-            }
-          />
-          <HelperText type="info" visible={true}>
-            La contraseña debe tener al menos 8 caracteres.
-          </HelperText>
-          <TouchableOpacity
-            style={[styles.button, !isStepThreeValid && styles.buttonDisabled]}
-            onPress={handleNextStep}
-            disabled={!isStepThreeValid}
-          >
-            <Text style={styles.buttonText}>Completar Registro</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {step === 4 && (
-        <View style={styles.stepContainer}>
-          <Text style={styles.title}>Revisa tu correo</Text>
-          <Text style={styles.secondSubtitle}>
-            Te hemos enviado un enlace para confirmar tu cuenta. Por favor, revisa tu correo electrónico.
-          </Text>
-          <Image
-            source={require("../assets/images/check-mail.png")}
-            style={[styles.imageThirdStep, { width: 100, height: 100 }]}
-          />
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => router.push("/login")} // Navegar al inicio de sesión
-          >
-            <Text style={styles.buttonText}>Ir al inicio de sesión</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-    </View>
+        )}
+    
+        {step === 1 && (
+          <View style={styles.stepContainer}>
+            <Text style={styles.title}>¡Empecemos!</Text>
+            <Text style={styles.firstSubtitle}>
+              Para comenzar, necesitamos algunos datos
+            </Text>
+            <TextInput
+              style={styles.input}
+              label="¿Cómo podemos llamarte?"
+              placeholder="Ingresa tu nombre"
+              placeholderTextColor="#89898B"
+              value={name}
+              theme={{ colors: { primary: "#86AB9A" } }}
+              onChangeText={setName}
+            />
+            <TextInput
+              style={styles.input}
+              label="Correo electrónico"
+              placeholder="Ingresa tu correo"
+              placeholderTextColor="#89898B"
+              value={email}
+              onChangeText={setEmail}
+              theme={{ colors: { primary: "#86AB9A" } }}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <TouchableOpacity
+              style={[styles.button, !isStepOneValid && styles.buttonDisabled]}
+              onPress={handleNextStep}
+              disabled={!isStepOneValid}
+            >
+              <Text style={styles.buttonText}>Siguiente ➔</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.backButtonCustom}
+              onPress={handlePreviousStep}
+            >
+              <Text style={styles.buttonText}>Volver Atrás</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+    
+        {step === 2 && (
+          <View style={styles.stepContainer}>
+            <Image
+              source={require("../assets/images/book_coffee.gif")}
+              style={styles.imageSecondStep}
+            />
+            <Text style={styles.title}>Facturación</Text>
+            <Text style={styles.secondSubtitle}>
+              Proporciónanos tu nombre o razón social y NIT/CI
+            </Text>
+            <TextInput
+              style={styles.input}
+              label="Nombre de facturación"
+              placeholder="Nombre o Razón Social"
+              placeholderTextColor="#89898B"
+              value={billName}
+              theme={{ colors: { primary: "#86AB9A" } }}
+              onChangeText={setBillName}
+            />
+            <TextInput
+              style={styles.input}
+              label="Ingresa tu NIT/CI"
+              placeholder="NIT/CI"
+              placeholderTextColor="#89898B"
+              value={nit}
+              theme={{ colors: { primary: "#86AB9A" } }}
+              onChangeText={handleNitChange}
+              keyboardType="numeric"
+            />
+            <TouchableOpacity
+              style={[styles.button, !isStepTwoValid && styles.buttonDisabled]}
+              onPress={handleNextStep}
+              disabled={!isStepTwoValid}
+            >
+              <Text style={styles.buttonText}>Siguiente ➔</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.backButtonCustom}
+              onPress={handlePreviousStep}
+            >
+              <Text style={styles.buttonText}>Volver Atrás</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+    
+        {step === 3 && (
+          <View style={styles.stepContainer}>
+            <Text style={styles.thirdTitle}>Asegura tu cuenta</Text>
+            <Text style={styles.thirdSubtitle}>
+              Crea una contraseña segura, asegúrate de usar al menos 8 caracteres
+            </Text>
+            <Image
+              source={require("../assets/images/cat_cafe.png")}
+              style={styles.imageThirdStep}
+            />
+            <TextInput
+              style={styles.input}
+              label="Crea una contraseña"
+              placeholder="Contraseña"
+              placeholderTextColor="#89898B"
+              value={password}
+              onChangeText={setPassword}
+              theme={{ colors: { primary: "#86AB9A" } }}
+              secureTextEntry={!showPassword}
+              right={
+                <TextInput.Icon
+                  icon={showPassword ? "eye-off" : "eye"}
+                  onPress={() => setShowPassword(!showPassword)}
+                />
+              }
+            />
+            <HelperText type="info" visible={true}>
+              La contraseña debe tener al menos 8 caracteres.
+            </HelperText>
+            <TextInput
+              style={styles.input}
+              label="Confirma tu contraseña"
+              placeholder="Contraseña"
+              placeholderTextColor="#89898B"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              theme={{ colors: { primary: "#86AB9A" } }}
+              secureTextEntry={!showConfirmPassword}
+              right={
+                <TextInput.Icon
+                  icon={showConfirmPassword ? "eye-off" : "eye"}
+                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                />
+              }
+            />
+            <HelperText type="info" visible={true}>
+              La contraseña debe tener al menos 8 caracteres.
+            </HelperText>
+            <TouchableOpacity
+              style={[styles.button, !isStepThreeValid && styles.buttonDisabled]}
+              onPress={handleNextStep}
+              disabled={!isStepThreeValid}
+            >
+              <Text style={styles.buttonText}>Completar Registro</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.backButtonCustom}
+              onPress={handlePreviousStep}
+            >
+              <Text style={styles.buttonText}>Volver Atrás</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+    
+        {step === 4 && (
+          <View style={styles.stepContainer}>
+            <Text style={styles.title}>Revisa tu correo</Text>
+            <Text style={styles.secondSubtitle}>
+              Te hemos enviado un enlace para confirmar tu cuenta. Por favor, revisa tu correo electrónico.
+            </Text>
+            <Image
+              source={require("../assets/images/check-mail.png")}
+              style={[styles.imageThirdStep, { width: 100, height: 100 }]}
+            />
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => router.push("/login")} // Navegar al inicio de sesión
+            >
+              <Text style={styles.buttonText}>Ir al inicio de sesión</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 

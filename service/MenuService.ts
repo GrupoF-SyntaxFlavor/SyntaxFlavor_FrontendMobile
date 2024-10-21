@@ -27,12 +27,15 @@ export const fetchMenuItems = async () => {
     }
 
     const data = await response.json();
-    console.log("Menu items:", data.payload);
-    return formatImages(data.payload); // Retornamos los datos del menú
+    console.log("Menu items:", data);
+
+    if (!Array.isArray(data.payload.content)) {
+      throw new Error('Expected payload.content to be an array');
+    }
+
+    return formatImages(data.payload.content); // Retornamos los datos del menú
   } catch (error) {
     console.error("Error fetching menu items:", error);
     throw error;
   }
 };
-
-

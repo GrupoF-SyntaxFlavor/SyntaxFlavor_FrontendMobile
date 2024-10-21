@@ -2,7 +2,6 @@ import { getCustomerProfile, updateCustomerProfile, login as loginService } from
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import { Alert } from "react-native";
 import { AxiosError } from 'axios';
 
 interface UserContextProps {
@@ -14,11 +13,11 @@ interface UserContextProps {
     temporalBillName: string,
     jwt: string,
     login: (email: string, password: string) => Promise<void>,
-    setUserProfile: () => void,
+    setUserProfile: () => Promise<void>,
     updateUserProfile: (
         inputValue: string,
         field: "billName" | "ci"
-    ) => void,
+    ) => Promise<void>,
     setTemporalNIT: (value: string) => void,
     setTemporalBillName: (value: string) => void,
     logout: () => void,
@@ -35,62 +34,54 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [temporalBillName, setTemporalBillName] = useState('');
     const [jwt, setJWT] = useState<string>('');
 
+    useEffect(() => {
+        const loadBillingData = async () => {
+            const storedBillName = await AsyncStorage.getItem('billName');
+            const storedNIT = await AsyncStorage.getItem('nit');
+            if (storedBillName) setBillName(storedBillName);
+            if (storedNIT) setNIT(storedNIT);
+        };
+        loadBillingData();
+    }, []);
+
     const login = async (email: string, password: string) => {
         try {
             const loginData = { email, password };
             const response = await loginService(loginData);
     
             if (response?.payload?.access_token) {
-                // Save tokens to AsyncStorage
                 await AsyncStorage.setItem("access_token", response.payload.access_token);
                 await AsyncStorage.setItem("refresh_token", response.payload.refresh_token);
                 await AsyncStorage.setItem("expires_in", response.payload.expires_in.toString());
                 await AsyncStorage.setItem("refresh_expires_in", response.payload.refresh_expires_in.toString());
     
                 setJWT(response.payload.access_token);
-    
-                Alert.alert("Inicio de sesión exitoso", "¡Bienvenido! Has iniciado sesión exitosamente.");
                 router.push("/(tabs)/menu");
             } else {
                 throw new Error("Credenciales no válidas");
             }
         } catch (error: any) {
             console.error("Login error:", error);
-    
-            let errorMessage = "Ocurrió un problema al intentar iniciar sesión.";
-    
-            if (isAxiosError(error)) {
-                // Type guard for Axios error
-                const serverMessage = (error.response?.data as { message?: string; error?: string })?.message || (error.response?.data as { message?: string; error?: string })?.error || "Error desconocido en el servidor.";
-                errorMessage = `Error del servidor: ${serverMessage}`;
-    
-                if (error.response?.status === 401) {
-                    errorMessage = "Acceso no autorizado. Verifica tus credenciales.";
-                } else if (error.response?.status === 500) {
-                    errorMessage = "Error del servidor. Por favor, intenta más tarde.";
-                }
-            } else if (error instanceof Error && error.message.includes("Network")) {
-                errorMessage = "No se pudo conectar al servidor. Verifica tu conexión a Internet.";
-            }
-    
-            // Mostrar mensaje de error personalizado
-            Alert.alert("Error", errorMessage);
         }
     };
     
-    // Helper function to check if the error is an Axios error
     function isAxiosError(error: any): error is AxiosError {
         return error.isAxiosError === true;
     }
     
-
     const setUserProfile = async () => {
+        if (!jwt) {
+            console.warn("User is not logged in; cannot fetch profile data.");
+            return;
+        }
         try {
             const data = await getCustomerProfile();
             setName(data.user.name);
             setEmail(data.user.email);
             setBillName(data.billName);
             setNIT(data.nit);
+            await AsyncStorage.setItem('billName', data.billName);
+            await AsyncStorage.setItem('nit', data.nit);
         } catch (error) {
             console.error("Error fetching profile data:", error);
         }
@@ -100,12 +91,22 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         inputValue: string,
         field: "billName" | "ci"
     ) => {
-        if (field === "billName") {
-            await updateCustomerProfile(inputValue, nit);
-            setBillName(inputValue);
-        } else if (field === "ci") {
-            await updateCustomerProfile(billName, inputValue);
-            setNIT(inputValue);
+        if (!jwt) {
+            console.warn("User is not logged in; cannot update profile data.");
+            return;
+        }
+        try {
+            if (field === "billName") {
+                await updateCustomerProfile(inputValue, nit);
+                setBillName(inputValue);
+                await AsyncStorage.setItem('billName', inputValue);
+            } else if (field === "ci") {
+                await updateCustomerProfile(billName, inputValue);
+                setNIT(inputValue);
+                await AsyncStorage.setItem('nit', inputValue);
+            }
+        } catch (error) {
+            console.error("Error updating profile data:", error);
         }
     };
 

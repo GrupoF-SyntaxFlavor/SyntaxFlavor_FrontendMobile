@@ -48,9 +48,9 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <CartProvider>
-        <PastOrdersProvider>
-          <UserProvider>
+      <UserProvider>
+        <CartProvider>
+          <PastOrdersProvider>
             <ThemeProvider
               value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
             >
@@ -74,9 +74,9 @@ export default function RootLayout() {
                 </Stack>
               </View>
             </ThemeProvider>
-          </UserProvider>
-        </PastOrdersProvider>
-      </CartProvider>
+          </PastOrdersProvider>
+        </CartProvider>
+      </UserProvider>
     </GestureHandlerRootView>
   );
 }

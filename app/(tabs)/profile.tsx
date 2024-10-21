@@ -7,7 +7,9 @@ import {
   Modal,
   TextInput,
   ScrollView,
-  Dimensions
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -65,103 +67,107 @@ export default function ProfileScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollViewContent}>
-      {/* Sección de la foto y nombre del usuario */}
-      <View style={styles.profileHeader}>
-        <Ionicons name="person-circle" size={150} color="#86AB9A" />
-        <Text style={styles.profileName}>{name}</Text>
-      </View>
-
-      {/* Información de Facturación */}
-      <View style={styles.infoContainer}>
-        {/* Correo de facturación */}
-        <View style={styles.fieldContainer}>
-          <View style={styles.iconAndLabelContainer}>
-            <Ionicons name="mail-outline" size={26} color="#86AB9A" />
-            <Text style={styles.fieldLabel}>Correo Electrónico</Text>
-          </View>
-          <View style={styles.userInfoContainer}>
-            <Text style={styles.userInfo}>{email}</Text>
-          </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }} // Ensure the KeyboardAvoidingView takes full height
+    >
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        {/* Sección de la foto y nombre del usuario */}
+        <View style={styles.profileHeader}>
+          <Ionicons name="person-circle" size={150} color="#86AB9A" />
+          <Text style={styles.profileName}>{name}</Text>
         </View>
-
-        {/* Nombre de facturación */}
-        <View style={styles.fieldContainer}>
-          <View style={styles.iconAndLabelContainer}>
-            <Ionicons
-              name="information-circle-outline"
-              size={26}
-              color="#86AB9A"
-            />
-            <Text style={styles.fieldLabel}>Nombre de Facturación</Text>
-          </View>
-          <View style={styles.userInfoContainer}>
-            <Text style={styles.userInfo}>{billName}</Text>
-            <TouchableOpacity onPress={() => handleEditPress("billName")}>
-              <Text style={styles.editText}>Editar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* CI/NIT */}
-        <View style={styles.lastFieldContainer}>
-          <View style={styles.iconAndLabelContainer}>
-            <Ionicons name="pricetag-outline" size={26} color="#86AB9A" />
-            <Text style={styles.fieldLabel}>CI/NIT</Text>
-          </View>
-          <View style={styles.userInfoContainer}>
-            <Text style={styles.userInfo}>{nit}</Text>
-            <TouchableOpacity onPress={() => handleEditPress("ci")}>
-              <Text style={styles.editText}>Editar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Modal para editar el nombre o CI/NIT */}
-        <Modal visible={isModalVisible} transparent={true} animationType="fade">
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>
-                {editField === "billName"
-                  ? "Editar Nombre de Facturación"
-                  : "Editar CI/NIT"}
-              </Text>
-              <TextInput
-                style={styles.input}
-                placeholder={`Ingrese nuevo ${
-                  editField === "billName" ? "nombre" : "CI/NIT"
-                }`}
-                value={inputValue}
-                onChangeText={
-                  editField === "billName"
-                    ? handleBillNameChange
-                    : handleCIChange
-                }
-                keyboardType={editField === "billName" ? "default" : "numeric"} // Teclado numérico para CI/NIT
-              />
-              <View style={styles.modalButtons}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={handleCancelPress}
-                >
-                  <Text style={styles.buttonText}>Cancelar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={handleSavePress}
-                >
-                  <Text style={styles.buttonText}>Guardar</Text>
-                </TouchableOpacity>
-              </View>
+    
+        {/* Información de Facturación */}
+        <View style={styles.infoContainer}>
+          {/* Correo de facturación */}
+          <View style={styles.fieldContainer}>
+            <View style={styles.iconAndLabelContainer}>
+              <Ionicons name="mail-outline" size={26} color="#86AB9A" />
+              <Text style={styles.fieldLabel}>Correo Electrónico</Text>
+            </View>
+            <View style={styles.userInfoContainer}>
+              <Text style={styles.userInfo}>{email}</Text>
             </View>
           </View>
-        </Modal>
-      </View>
-      <TouchableOpacity onPress={logout} style={styles.logoutButton}>
-        <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
-      </TouchableOpacity>
-    </ScrollView>
-    /* TODO: Agregar un botón de cerrar sesión */
+    
+          {/* Nombre de facturación */}
+          <View style={styles.fieldContainer}>
+            <View style={styles.iconAndLabelContainer}>
+              <Ionicons
+                name="information-circle-outline"
+                size={26}
+                color="#86AB9A"
+              />
+              <Text style={styles.fieldLabel}>Nombre de Facturación</Text>
+            </View>
+            <View style={styles.userInfoContainer}>
+              <Text style={styles.userInfo}>{billName}</Text>
+              <TouchableOpacity onPress={() => handleEditPress("billName")}>
+                <Text style={styles.editText}>Editar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+    
+          {/* CI/NIT */}
+          <View style={styles.lastFieldContainer}>
+            <View style={styles.iconAndLabelContainer}>
+              <Ionicons name="pricetag-outline" size={26} color="#86AB9A" />
+              <Text style={styles.fieldLabel}>CI/NIT</Text>
+            </View>
+            <View style={styles.userInfoContainer}>
+              <Text style={styles.userInfo}>{nit}</Text>
+              <TouchableOpacity onPress={() => handleEditPress("ci")}>
+                <Text style={styles.editText}>Editar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+    
+          {/* Modal para editar el nombre o CI/NIT */}
+          <Modal visible={isModalVisible} transparent={true} animationType="fade">
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>
+                  {editField === "billName"
+                    ? "Editar Nombre de Facturación"
+                    : "Editar CI/NIT"}
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder={`Ingrese nuevo ${
+                    editField === "billName" ? "nombre" : "CI/NIT"
+                  }`}
+                  value={inputValue}
+                  onChangeText={
+                    editField === "billName"
+                      ? handleBillNameChange
+                      : handleCIChange
+                  }
+                  keyboardType={editField === "billName" ? "default" : "numeric"} // Teclado numérico para CI/NIT
+                />
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={handleCancelPress}
+                  >
+                    <Text style={styles.buttonText}>Cancelar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={handleSavePress}
+                  >
+                    <Text style={styles.buttonText}>Guardar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        </View>
+        <TouchableOpacity onPress={logout} style={styles.logoutButton}>
+          <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

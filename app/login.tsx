@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Dimensions } from "react-native";
+import { KeyboardAvoidingView, Platform, View, Text, StyleSheet, TouchableOpacity, Alert, Dimensions } from "react-native";
 import { TextInput } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,13 +23,17 @@ export default function LoginScreen() {
     };
 
     return (
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }} // Ensure the KeyboardAvoidingView takes full height
+      >
         <View style={styles.container}>
-            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                <Ionicons
-                    name="arrow-back"
-                    size={30}
-                    color={Colors[colorScheme ?? "light"].tint}
-                />
+            <TouchableOpacity style={styles.backButton} onPress={() => router.push('/')}>
+              <Ionicons
+                name="arrow-back"
+                size={30}
+                color={Colors[colorScheme ?? "light"].tint}
+              />
             </TouchableOpacity>
             <Text style={styles.title}>Syntax Flavor</Text>
             <Text style={styles.subtitle}>Inicia Sesión</Text>
@@ -65,6 +69,7 @@ export default function LoginScreen() {
                 </Text>
             </Text>
         </View>
+      </KeyboardAvoidingView>
     );
 }
 
