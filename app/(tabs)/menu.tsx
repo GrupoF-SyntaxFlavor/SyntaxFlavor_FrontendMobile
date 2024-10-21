@@ -113,7 +113,7 @@ export default function Menu() {
                       <Text style={styles.price}>Bs. {product.price}</Text>
                     </View>
                     <Image
-                      source={{ uri: product.image }}
+                      source={{ uri: product.image || '' }}
                       style={styles.image}
                     />
                   </View>

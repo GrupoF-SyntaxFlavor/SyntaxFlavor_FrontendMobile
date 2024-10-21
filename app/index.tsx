@@ -66,9 +66,9 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: "space-between", // Espacio entre el contenido superior y los botones
-    backgroundColor: "#fff", // Fondo blanco para la pantalla
-    paddingVertical: height * 0.05, // Aseguramos un poco de margen vertical
+    justifyContent: "space-between",
+    backgroundColor: "#fff",
+    paddingVertical: height * 0.05,
   },
   topContainer: {
     alignItems: "center",

@@ -18,8 +18,6 @@ import {
 } from "@/service/UserService";
 import { useUser } from "@/contexts/UserContext";
 
-//FIXME: Considerar la creacion de un contexto para manejar el estado de la sesion
-
 export default function InvoiceScreen() {
   const router = useRouter();
   const [visible, setVisible] = React.useState(false);
