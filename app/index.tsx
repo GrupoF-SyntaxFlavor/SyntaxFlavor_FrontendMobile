@@ -117,12 +117,15 @@ const styles = StyleSheet.create({
     marginTop: height * 0.03,
     marginBottom: height * 0.02,
     width: "70%",
+    minWidth: 200,
+    alignItems: "center",
   },
   buttonText: {
     color: "#fff",
     fontSize: width * 0.06,
     fontWeight: "bold",
     textAlign: "center",
+    flexShrink: 1,
   },
   loginButton: {
     paddingVertical: height * 0.01,
