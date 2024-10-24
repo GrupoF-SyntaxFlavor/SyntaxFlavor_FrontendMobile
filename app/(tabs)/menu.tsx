@@ -4,36 +4,46 @@ import { fetchMenuItems } from "@/service/MenuService";
 import Loader from "@/components/Loader";
 import {
   View,
-  ActivityIndicator,
   Text,
   StyleSheet,
   ScrollView,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useCart } from "@/contexts/CartContext";
 import { router } from "expo-router";
 import { Product } from "@/models/Product";
-
-//TODO: Pintar de un color distinto los productos que ya están en el carrito
-//TODO: Agregar un buscador para filtrar los productos por nombre
+import Slider from "@react-native-community/slider";
 
 export default function Menu() {
-  var [fetchedProducts, setProducts] = useState<Product[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState("Menú");
+  const [fetchedProducts, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const { cartItems, addToCart } = useCart();
-  var { menuItems, setMenuItems } = useCart();
+  const [loadingMore, setLoadingMore] = useState(false);
+  const { cartItems, addToCart, menuItems, setMenuItems } = useCart();
   const navigation = useNavigation();
 
+  // Parameters for fetching menu items
+  const [minPrice, setMinPrice] = useState(10);
+  const [maxPrice, setMaxPrice] = useState(20);
+  const [pageNumber, setPageNumber] = useState(0);
+  const [pageSize, setPageSize] = useState(20);
+  const [sortAscending, setSortAscending] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("Menú");
+
+  // Temporary state for sliders
+  const [tempMinPrice, setTempMinPrice] = useState(minPrice);
+  const [tempMaxPrice, setTempMaxPrice] = useState(maxPrice);
+
+  // Load menu items on component mount
   useEffect(() => {
     const loadMenuItems = async () => {
       try {
         setLoading(true);
-        fetchedProducts = await fetchMenuItems();
-        console.log("fetchedProducts", fetchedProducts);
-        setMenuItems(fetchedProducts); // Products should match the backend DTO
+        const items = await fetchMenuItems(minPrice, maxPrice, pageNumber, pageSize, sortAscending);
+        console.log("Fetched products:", items);
+        setMenuItems(items); // Set the fetched menu items in the cart context
       } catch (error) {
         console.error("Error loading menu items:", error);
       } finally {
@@ -42,21 +52,9 @@ export default function Menu() {
     };
 
     loadMenuItems();
-
-    // Retorno vacío para evitar el error
-    return undefined;
-  }, []);
-
-  const categories = [
-    { label: "Menú", icon: "restaurant" },
-    { label: "Más vendidos" },
-    { label: "Precio más bajo primero" },
-    { label: "Vegano" },
-    { label: "Sin gluten" },
-  ];
+  }, [minPrice, maxPrice, pageNumber, pageSize, sortAscending]);
 
   const handleProductPress = (product: Product) => {
-    // Navegamos a 'menu-item' y pasamos los datos del producto como query params
     router.push({
       pathname: "/menu-item",
       params: {
@@ -69,33 +67,85 @@ export default function Menu() {
     });
   };
 
+  const toggleSortOrder = () => {
+    setSortAscending((prev) => !prev);
+  };
+
+  const applyPriceFilter = () => {
+    setMinPrice(tempMinPrice);
+    setMaxPrice(tempMaxPrice);
+    setPageNumber(0); // Reset to the first page
+  };
+
+  const loadMoreItems = async (nextPage) => {
+    if (loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const items = await fetchMenuItems(minPrice, maxPrice, nextPage, pageSize, sortAscending);
+      setMenuItems(items);
+      setPageNumber(nextPage);
+    } catch (error) {
+      console.error("Error loading more menu items:", error);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  const handleNextPage = () => {
+    loadMoreItems(pageNumber + 1);
+  };
+
+  const handlePreviousPage = () => {
+    if (pageNumber > 0) {
+      loadMoreItems(pageNumber - 1);
+    }
+  };
+
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       {loading ? (
-        // Si está cargando, muestra el ActivityIndicator
         <Loader />
       ) : (
-        // Si ya no está cargando, muestra el contenido
         <>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.categoryBar}
-          >
-            {categories.map((category, index) => (
-              <TouchableOpacity key={index} style={styles.categoryButton}>
-                {category.icon && (
-                  <Ionicons
-                    name={category.icon as any}
-                    size={10}
-                    color="#666"
-                    style={{ marginRight: 5 }}
-                  />
-                )}
-                <Text style={styles.categoryText}>{category.label}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          <View style={styles.filterContainer}>
+            <TouchableOpacity onPress={toggleSortOrder} style={styles.sortButton}>
+              <Ionicons
+                name={sortAscending ? "arrow-up" : "arrow-down"}
+                size={24}
+                color="#666"
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.sliderContainer}>
+            <Text style={styles.sliderLabel}>Precio mínimo: {tempMinPrice}</Text>
+            <Slider
+              style={styles.slider}
+              minimumValue={0}
+              maximumValue={50}
+              step={1}
+              value={tempMinPrice}
+              onValueChange={setTempMinPrice}
+              minimumTrackTintColor="#86AB9A"
+              maximumTrackTintColor="#000000"
+              thumbTintColor="#86AB9A"
+            />
+            <Text style={styles.sliderLabel}>Precio máximo: {tempMaxPrice}</Text>
+            <Slider
+              style={styles.slider}
+              minimumValue={0}
+              maximumValue={50}
+              step={1}
+              value={tempMaxPrice}
+              onValueChange={setTempMaxPrice}
+              minimumTrackTintColor="#86AB9A"
+              maximumTrackTintColor="#000000"
+              thumbTintColor="#86AB9A"
+            />
+            <TouchableOpacity onPress={applyPriceFilter} style={styles.applyButton}>
+              <Text style={styles.applyButtonText}>Aplicar filtros de precio</Text>
+            </TouchableOpacity>
+          </View>
 
           <ScrollView>
             {menuItems.map((product, index) => (
@@ -119,15 +169,28 @@ export default function Menu() {
                   </View>
                   <TouchableOpacity
                     style={styles.addButton}
-                    onPress={() => product.quantity > 0 && addToCart(product)}
-                    disabled={product.quantity <= 0}
+                    onPress={() => addToCart(product)}
                   >
                     <Text style={styles.addButtonText}>+</Text>
                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
             ))}
+            {loadingMore && <ActivityIndicator size="large" color="#86AB9A" />}
           </ScrollView>
+
+          <View style={styles.paginationContainer}>
+            <TouchableOpacity
+              onPress={handlePreviousPage}
+              style={[styles.paginationButton, pageNumber === 0 && styles.disabledButton]}
+              disabled={pageNumber === 0}
+            >
+              <Text style={styles.paginationButtonText}>Anterior</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleNextPage} style={styles.paginationButton}>
+              <Text style={styles.paginationButtonText}>Siguiente</Text>
+            </TouchableOpacity>
+          </View>
         </>
       )}
     </View>
@@ -137,8 +200,7 @@ export default function Menu() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
-    backgroundColor: "#f7f7f7",
+    backgroundColor: "#fff", // Set the background color to white
   },
   card: {
     backgroundColor: "#fff",
@@ -198,40 +260,76 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
   },
-  // categorias
-  categoryBar: {
+  filterContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 8,
     paddingHorizontal: 8,
     backgroundColor: "#f9f9f9",
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
-    maxHeight: "13%",
-    flexWrap: "wrap",
-    marginBottom: 10, // Agrega un margen inferior para crear espacio entre las categorías y el contenido del menú
+    marginBottom: 10,
   },
-  categoryButton: {
-    flexDirection: "row",
+  sortButton: {
+    justifyContent: "center",
     alignItems: "center",
     paddingVertical: 10,
     paddingHorizontal: 20,
     backgroundColor: "#fff",
     borderRadius: 20,
-    marginRight: 10,
     borderWidth: 1,
     borderColor: "#ddd",
-    minHeight: 40,
-    flexWrap: "wrap",
+    marginLeft: 10,
   },
-  selectedCategoryButton: {
-    backgroundColor: "#d1e4de",
-    borderColor: "#000",
+  sliderContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    marginBottom: 10,
   },
-  categoryText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  selectedCategoryText: {
+  sliderLabel: {
+    fontSize: 16,
     fontWeight: "bold",
-    color: "#000",
+    marginBottom: 5,
+  },
+  slider: {
+    width: "100%",
+    height: 40,
+  },
+  applyButton: {
+    backgroundColor: "#86AB9A",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  applyButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 10,
+    backgroundColor: "#fff",
+  },
+  paginationButton: {
+    backgroundColor: "#86AB9A",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  paginationButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  disabledButton: {
+    backgroundColor: "#ccc",
   },
 });
+
+export default Menu;

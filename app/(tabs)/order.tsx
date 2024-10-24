@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Alert, Image } from "react-native";
+import { View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { ScrollView } from "react-native-gesture-handler";
-import { usePastOrders } from "@/contexts/PastOrdersContext";
-import { TouchableOpacity } from "react-native";
+import { usePastOrders, PastOrderFilters } from "@/contexts/PastOrdersContext";
 import {
   OrderStatusValues,
   OrderStatusLabels,
@@ -18,20 +16,33 @@ const PastOrdersScreen = () => {
   const { pastOrders, loadPastOrders } = usePastOrders();
   const { setCartItems, menuItems } = useCart();
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [filters, setFilters] = useState<PastOrderFilters>({ sortAscending: false });
+  const [selectedCategory, setSelectedCategory] = useState("Pendiente");
+  const [pageNumber, setPageNumber] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
-      await loadPastOrders();
+      await loadPastOrders({ ...filters, pageNumber, pageSize });
       setLoading(false);
     };
 
     fetchOrders();
-  }, []);
+  }, [filters, pageNumber, pageSize]);
+
+  const toggleSortOrder = () => {
+    setFilters((prev) => ({ ...prev, sortAscending: !prev.sortAscending }));
+  };
+
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+    setFilters((prev) => ({ ...prev, status: category }));
+  };
 
   const handleRefreshOrder = (order: PastOrder) => {
     const products = orderToProducts(order);
-    // set the products images from the menuItems
     products.forEach((product) => {
       const menuItem = menuItems.find((item) => item.id === product.id);
       if (menuItem) {
@@ -40,11 +51,6 @@ const PastOrdersScreen = () => {
     });
     setCartItems(products);
 
-    // Show a temporary message (Toast) to indicate that the cart has been updated
-    console.log(
-      "Carrito actualizado",
-      "Los productos de la orden seleccionada han sido añadidos al carrito"
-    );
     Alert.alert(
       "Carrito actualizado",
       "Los productos de la orden seleccionada han sido añadidos al carrito"
@@ -52,7 +58,6 @@ const PastOrdersScreen = () => {
   };
 
   const handleCancelOrder = (order: PastOrder) => {
-    // Show a confirmation dialog to cancel the order
     Alert.alert(
       "Cancelar orden",
       "¿Está seguro que desea cancelar esta orden?",
@@ -62,15 +67,12 @@ const PastOrdersScreen = () => {
           onPress: async () => {
             try {
               await cancelOrder(order.orderId);
-              console.log("Orden cancelada", "La orden ha sido cancelada");
               Alert.alert(
                 "Orden cancelada",
                 "La orden ha sido cancelada, apersónate por caja para solicitar un reembolso"
               );
-              // Refresh the past orders list
-              await loadPastOrders();
+              await loadPastOrders(filters);
             } catch (error) {
-              console.error("Error cancelando orden:", error);
               Alert.alert(
                 "No se pudo cancelar la orden",
                 "En este momento la orden no puede ser cancelada, por favor intente más tarde"
@@ -91,90 +93,150 @@ const PastOrdersScreen = () => {
       .reduce((total, item) => total + item.price * item.quantity, 0)
       .toFixed(2);
 
+  const handleNextPage = () => {
+    setPageNumber((prevPageNumber) => prevPageNumber + 1);
+  };
+
+  const handlePreviousPage = () => {
+    if (pageNumber > 0) {
+      setPageNumber((prevPageNumber) => prevPageNumber - 1);
+    }
+  };
+
   if (loading) {
     return <Loader />;
   }
 
-  // If no past orders are found, show an empty view with a message
-  if (!pastOrders.length) {
-    return (
-      <View style={styles.noOrdersFound}>
-        <Text style={styles.noOrdersText}>
-          No se encontraron órdenes anteriores
-        </Text>
-      </View>
-    );
-  }
+  const categories = [
+    { label: "Pendiente", value: "Pendiente" },
+    { label: "Entregado", value: "Entregado" },
+    { label: "Cancelado", value: "Cancelado" },
+  ];
 
   return (
     <View style={styles.container}>
-      <ScrollView>
-        {pastOrders.map((order, index) => (
-          <View key={index} style={styles.card}>
-            <View style={styles.orderHeader}>
-              <Text style={styles.orderId}>ORD-{order.orderId}</Text>
-              <Text style={styles.orderDate}>
-                {new Date(order.orderTimestamp).toLocaleDateString('en-US', {
-                  month: '2-digit',
-                  day: '2-digit',
-                  year: 'numeric',
-                })}
-              </Text>
-              {order.orderStatus === OrderStatusValues.PENDING ? (
-                <View style={styles.statusContainer}>
-                  <Ionicons name="time-outline" size={20} color="#FFA500" />
-                  <Text style={styles.pendingStatus}>
-                    {OrderStatusLabels.PENDING}
-                  </Text>
-                </View>
-              ) : order.orderStatus === OrderStatusValues.DELIVERED ? (
-                <View style={styles.statusContainer}>
-                  <Ionicons
-                    name="checkmark-done-outline"
-                    size={20}
-                    color="green"
-                  />
-                  <Text style={styles.deliveredStatus}>
-                    {OrderStatusLabels.DELIVERED}
-                  </Text>
-                </View>
-              ) : (
-                <View style={styles.statusContainer}>
-                  <Ionicons name="close-circle-outline" size={20} color="red" />
-                  <Text style={styles.cancelledStatus}>
-                    {OrderStatusLabels.CANCELLED}
-                  </Text>
-                </View>
-              )}
-            </View>
-  
-            <View style={styles.orderItems}>
-              {order.orderItems.map((item, idx) => (
-                <Text key={idx} style={styles.itemText}>
-                  {item.quantity} x {item.menuItemName}
-                </Text>
-              ))}
-            </View>
-            <Text style={styles.total}>Total: Bs. {calculateTotal(order)}</Text>
-  
-            {order.orderStatus !== OrderStatusValues.PENDING ? (
-              <TouchableOpacity
-                style={styles.refreshButton}
-                onPress={() => handleRefreshOrder(order)}
-              >
-                <Ionicons name="refresh-outline" size={20} color="#000" />
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={styles.refreshButton}
-                onPress={() => handleCancelOrder(order)}
-              >
-                <Ionicons name="close-outline" size={20} color="red" />
-              </TouchableOpacity>
-            )}
-          </View>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.categoryBar}
+      >
+        <TouchableOpacity onPress={toggleSortOrder} style={styles.sortButton}>
+          <Ionicons
+            name={filters.sortAscending ? "arrow-up" : "arrow-down"}
+            size={24}
+            color="#666"
+          />
+        </TouchableOpacity>
+        {categories.map((category, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[
+              styles.categoryButton,
+              selectedCategory === category.value && styles.selectedCategoryButton,
+            ]}
+            onPress={() => handleCategorySelect(category.value)}
+          >
+            <Text
+              style={[
+                styles.categoryText,
+                selectedCategory === category.value && styles.selectedCategoryText,
+              ]}
+            >
+              {category.label}
+            </Text>
+          </TouchableOpacity>
         ))}
       </ScrollView>
+
+      {pastOrders.length === 0 ? (
+        <View style={styles.noOrdersFound}>
+          <Text style={styles.noOrdersText}>
+            No se encontraron órdenes
+          </Text>
+        </View>
+      ) : (
+        <ScrollView>
+          {pastOrders.map((order, index) => (
+            <View key={index} style={styles.card}>
+              <View style={styles.orderHeader}>
+                <Text style={styles.orderId}>ORD-{order.orderId}</Text>
+                <Text style={styles.orderDate}>
+                  {new Date(order.orderTimestamp).toLocaleDateString('en-US', {
+                    month: '2-digit',
+                    day: '2-digit',
+                    year: 'numeric',
+                  })}
+                </Text>
+                {order.orderStatus === OrderStatusValues.PENDING ? (
+                  <View style={styles.statusContainer}>
+                    <Ionicons name="time-outline" size={20} color="#FFA500" />
+                    <Text style={styles.pendingStatus}>
+                      {OrderStatusLabels.PENDING}
+                    </Text>
+                  </View>
+                ) : order.orderStatus === OrderStatusValues.DELIVERED ? (
+                  <View style={styles.statusContainer}>
+                    <Ionicons
+                      name="checkmark-done-outline"
+                      size={20}
+                      color="green"
+                    />
+                    <Text style={styles.deliveredStatus}>
+                      {OrderStatusLabels.DELIVERED}
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={styles.statusContainer}>
+                    <Ionicons name="close-circle-outline" size={20} color="red" />
+                    <Text style={styles.cancelledStatus}>
+                      {OrderStatusLabels.CANCELLED}
+                    </Text>
+                  </View>
+                )}
+              </View>
+    
+              <View style={styles.orderItems}>
+                {order.orderItems.map((item, idx) => (
+                  <Text key={idx} style={styles.itemText}>
+                    {item.quantity} x {item.menuItemName}
+                  </Text>
+                ))}
+              </View>
+              <Text style={styles.total}>Total: Bs. {calculateTotal(order)}</Text>
+    
+              {order.orderStatus !== OrderStatusValues.PENDING ? (
+                <TouchableOpacity
+                  style={styles.refreshButton}
+                  onPress={() => handleRefreshOrder(order)}
+                >
+                  <Ionicons name="refresh-outline" size={20} color="#000" />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.refreshButton}
+                  onPress={() => handleCancelOrder(order)}
+                >
+                  <Ionicons name="close-outline" size={20} color="red" />
+                </TouchableOpacity>
+              )}
+            </View>
+          ))}
+          {loadingMore && <ActivityIndicator size="large" color="#86AB9A" />}
+        </ScrollView>
+      )}
+
+      <View style={styles.paginationContainer}>
+        <TouchableOpacity
+          onPress={handlePreviousPage}
+          style={[styles.paginationButton, pageNumber === 0 && styles.disabledButton]}
+          disabled={pageNumber === 0}
+        >
+          <Text style={styles.paginationButtonText}>Anterior</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleNextPage} style={styles.paginationButton}>
+          <Text style={styles.paginationButtonText}>Siguiente</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -184,6 +246,52 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     backgroundColor: "#f7f7f7",
+  },
+  categoryBar: {
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    backgroundColor: "#f9f9f9",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    maxHeight: "13%",
+    flexWrap: "wrap",
+    marginBottom: 10,
+  },
+  categoryButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    minHeight: 40,
+    flexWrap: "wrap",
+  },
+  selectedCategoryButton: {
+    backgroundColor: "#d1e4de",
+    borderColor: "#000",
+  },
+  categoryText: {
+    fontSize: 14,
+    color: "#666",
+  },
+  selectedCategoryText: {
+    fontWeight: "bold",
+    color: "#000",
+  },
+  sortButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    marginRight: 10,
   },
   card: {
     backgroundColor: "#fff",
@@ -260,6 +368,27 @@ const styles = StyleSheet.create({
   noOrdersText: {
     fontSize: 18,
     fontWeight: "bold",
+  },
+  paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 10,
+    backgroundColor: "#fff",
+  },
+  paginationButton: {
+    backgroundColor: "#86AB9A",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  paginationButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  disabledButton: {
+    backgroundColor: "#ccc",
   },
 });
 

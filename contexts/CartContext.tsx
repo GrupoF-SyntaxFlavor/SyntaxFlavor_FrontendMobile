@@ -15,7 +15,7 @@ interface CartContextProps {
   addToCart: (product: Product) => void;
   updateQuantity: (id: number, delta: number) => void;
   removeFromCart: (id: number) => void;
-  setMenuItems: (items: Product[]) => void;
+  setMenuItems: React.Dispatch<React.SetStateAction<Product[]>>;
   setCartItems: (items: Product[]) => void; // Añadido
 }
 

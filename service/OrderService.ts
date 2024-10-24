@@ -36,39 +36,40 @@ export const createOrder = async (orderData: any) => {
     }
 }
 
-export const fetchPastOrders = async () => {
+export const fetchPastOrders = async (status = 'Pendiente', pageNumber = 0, pageSize = 10, sortAscending = false) => {
     try {
-      // Recuperar el token desde AsyncStorage
-      const token = await AsyncStorage.getItem('access_token');
-      console.log("recupera el token", token);
-      
-      if (!token) {
-        throw new Error('No se encontró un token de acceso');
-      }
-  
-      const url = `${API_URL}/api/v1/order/customer`;
-      console.log("Fetching past orders from URL:", url);
-  
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-  
-      const data = await response.json();
-      console.log("Past orders:", data);
-      return data;
+        // Recuperar el token desde AsyncStorage
+        const token = await AsyncStorage.getItem('access_token');
+        console.log("recupera el token", token);
+        
+        if (!token) {
+            throw new Error('No se encontró un token de acceso');
+        }
+
+        const url = `${API_URL}/api/v1/order/customer?status=${status}&pageNumber=${pageNumber}&pageSize=${pageSize}&sortAscending=${sortAscending}`;
+        console.log("Fetching past orders from URL:", url);
+
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Past orders:", data);
+        return data;
     } catch (error) {
-      console.error("Error fetching past orders:", error);
-      throw error;
+        console.error("Error fetching past orders:", error);
+        throw error;
     }
-}
+};
+
 
 export const cancelOrder = async (orderId: number) => {
     try {

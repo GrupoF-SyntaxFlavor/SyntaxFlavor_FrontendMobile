@@ -11,7 +11,14 @@ import { useUser } from "@/contexts/UserContext";
 
 interface PastOrdersContextProps {
   pastOrders: PastOrder[];
-  loadPastOrders: () => void;
+  loadPastOrders: (filters?: PastOrderFilters) => void;
+}
+
+export interface PastOrderFilters {
+  status?: string;       // Filter by order status (e.g., pending, delivered, canceled)
+  pageNumber?: number;   // Pagination: page number
+  pageSize?: number;     // Pagination: page size
+  sortAscending?: boolean; // Sorting: ascending or descending
 }
 
 const PastOrdersContext = createContext<PastOrdersContextProps | undefined>(
@@ -22,26 +29,27 @@ export const PastOrdersProvider = ({ children }: { children: ReactNode }) => {
   const { jwt } = useUser(); // Use your user context to get the JWT token
   const [pastOrders, setPastOrders] = useState<PastOrder[]>([]);
 
-  const loadPastOrders = async () => {
-    if (!jwt) {
-      // User is not logged in, no need to load past orders
-      return;
-    }
-
+    const loadPastOrders = async (filters?: PastOrderFilters) => {
+    if (!jwt) return;
+  
+    const {
+      status = 'Pendiente',
+      pageNumber = 0,
+      pageSize = 10,
+      sortAscending = false,
+    } = filters || {};
+  
     try {
-      const response = await fetchPastOrders();
-      if (response && response.payload) {
-        setPastOrders(response.payload as PastOrder[]);
+      const response = await fetchPastOrders(status, pageNumber, pageSize, sortAscending);
+      if (response && response.payload && response.payload.content) {
+        setPastOrders(response.payload.content as PastOrder[]);
       }
     } catch (error) {
-      // Show error message only if user is logged in
       if (jwt) {
         console.error("Error loading past orders:", error);
-
       }
     }
   };
-
   useEffect(() => {
     loadPastOrders();
   }, [jwt]); // Dependency on jwt, so it re-fetches when the user logs in/out
