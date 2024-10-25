@@ -40,8 +40,8 @@ export default function Menu() {
   useEffect(() => {
     const loadMenuItems = async () => {
       try {
-        setLoading(true);
-        const items = await fetchMenuItems(minPrice, maxPrice, pageNumber, pageSize, sortAscending);
+        // setLoading(true);
+        const items = await fetchMenuItems(tempMinPrice, tempMaxPrice, pageNumber, pageSize, sortAscending);
         console.log("Fetched products:", items);
         setMenuItems(items); // Set the fetched menu items in the cart context
       } catch (error) {
@@ -52,6 +52,12 @@ export default function Menu() {
     };
 
     loadMenuItems();
+    const intervalId = setInterval(() => {
+      loadMenuItems(); // Reload items every X milliseconds
+    }, 5000); // 5000 ms = 5 seconds
+
+    // Clear the interval on component unmount
+    return () => clearInterval(intervalId);
   }, [minPrice, maxPrice, pageNumber, pageSize, sortAscending]);
 
   const handleProductPress = (product: Product) => {
