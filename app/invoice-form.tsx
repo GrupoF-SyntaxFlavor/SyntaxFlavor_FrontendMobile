@@ -19,13 +19,14 @@ export default function InvoiceScreen() {
   const router = useRouter();
   const [visible, setVisible] = React.useState(false);
   const { cartItems } = useCart();
+  // TODO: Restaurar a un estado global UseUser
   const [products] = useState(cartItems); //Productos seleccionados
   const [billName, setBillName] = React.useState(""); // Estado para el nombre de facturación
   const [nit, setNit] = React.useState(""); // Estado para el NIT/CI
   const [originalBillName, setOriginalBillName] = useState(""); // Estado para el nombre original
   const [originalNit, setOriginalNit] = useState(""); 
   const [isTakeaway, setIsTakeaway] = useState(true); // Estado de para llevar
-  const [tableNumber, setTableNumber] = useState(""); // Estado para el número de mesa
+  const { tableCode, setTableCode } = useCart(); // Estado para el número de mesa
   
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -198,8 +199,8 @@ export default function InvoiceScreen() {
         <View>
           <TextInput
             label="Número de Mesa"
-            value={tableNumber}
-            onChangeText={setTableNumber}
+            value={tableCode}
+            onChangeText={setTableCode}
             theme={{ colors: { primary: "#86AB9A" } }}
             style={styles.input}
             keyboardType="numeric"
