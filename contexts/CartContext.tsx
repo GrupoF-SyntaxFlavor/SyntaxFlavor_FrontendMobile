@@ -17,6 +17,8 @@ interface CartContextProps {
   removeFromCart: (id: number) => void;
   setMenuItems: React.Dispatch<React.SetStateAction<Product[]>>;
   setCartItems: (items: Product[]) => void; // Añadido
+  tableCode: string;
+  setTableCode: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const CartContext = createContext<CartContextProps | undefined>(undefined);
@@ -25,6 +27,7 @@ const CartContext = createContext<CartContextProps | undefined>(undefined);
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<Product[]>([]);
   const [menuItems, setMenuItems] = useState<Product[]>([]);
+  const [tableCode, setTableCode] = useState<string>("");
 
   useEffect(() => {
     const loadCart = async () => {
@@ -151,6 +154,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         removeFromCart,
         setMenuItems,
         setCartItems,
+        tableCode,
+        setTableCode,
       }}
     >
       {children}

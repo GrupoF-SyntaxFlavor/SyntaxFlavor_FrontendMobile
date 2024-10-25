@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const API_URL = `http://${BACKEND_DOMAIN}${SPRING_PORT}` // Cuando pasemos a https cambiar aquí
 
-export const createOrder = async (orderData: any) => {
+export const createOrder = async (orderData: Order) => {
     try {
       // Recuperar el token desde AsyncStorage
       const token = await AsyncStorage.getItem('access_token');
@@ -12,6 +12,8 @@ export const createOrder = async (orderData: any) => {
       if (!token) {
         throw new Error('No se encontró un token de acceso');
       }
+
+      console.log("Creating order with data:", orderData);
   
       const response = await fetch(`${API_URL}/api/v1/order`, {
         method: "POST",
@@ -73,9 +75,17 @@ export const fetchPastOrders = async (status = 'Pendiente', pageNumber = 0, page
 
 export const cancelOrder = async (orderId: number) => {
     try {
-        const response = await fetch(`${API_URL}/api/v1/public/order/cancel?orderId=${orderId}`, {
+        // Recuperar el token desde AsyncStorage
+        const token = await AsyncStorage.getItem('access_token');
+        
+        if (!token) {
+            throw new Error('No se encontró un token de acceso');
+        }
+
+        const response = await fetch(`${API_URL}/api/v1/order/cancel?orderId=${orderId}`, {
             method: "PUT",
             headers: {
+                Authorization: `Bearer ${token}`,
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },

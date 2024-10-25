@@ -7,49 +7,56 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
+  Button,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   Switch,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useCart } from "@/contexts/CartContext";
-import { useUser } from "@/contexts/UserContext";
+import { getCustomerProfile, updateCustomerProfile } from "@/service/UserService"; 
 
 export default function InvoiceScreen() {
   const router = useRouter();
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = React.useState(false);
   const { cartItems } = useCart();
-  const { billName, nit, temporalBillName, temporalNIT, setTemporalNIT, setTemporalBillName, updateUserProfile, setUserProfile } = useUser();
-  const [shouldUpdate, setShouldUpdate] = useState(false);
-
+  // TODO: Restaurar a un estado global UseUser
+  const [products] = useState(cartItems); //Productos seleccionados
+  const [billName, setBillName] = React.useState(""); // Estado para el nombre de facturación
+  const [nit, setNit] = React.useState(""); // Estado para el NIT/CI
+  const [originalBillName, setOriginalBillName] = useState(""); // Estado para el nombre original
+  const [originalNit, setOriginalNit] = useState(""); 
+  const [isTakeaway, setIsTakeaway] = useState(true); // Estado de para llevar
+  const { tableCode, setTableCode } = useCart(); // Estado para el número de mesa
+  
   useEffect(() => {
-    // Fetch and set user profile data when the component mounts
-    setUserProfile();
-  }, [setUserProfile]);
+    const fetchProfileData = async () => {
+      try {
+        const profileData = await getCustomerProfile(); // Llama al servicio
+        setBillName(profileData.billName); // Establece el nombre de facturación
+        setNit(profileData.nit); // Establece el NIT/CI
+        setOriginalBillName(profileData.billName); // Guarda el nombre original
+        setOriginalNit(profileData.nit); // Guarda el NIT original
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+        Alert.alert("Error", "No se pudieron cargar los datos de facturación.");
+      }
+    };
 
-  useEffect(() => {
-    setTemporalBillName(billName);
-    setTemporalNIT(nit);
-  }, [billName, nit, setTemporalBillName, setTemporalNIT]);
+    fetchProfileData(); // Llama a la función cuando se monta el componente
+  }, []);
 
   //Funciones para el nombre de la factura
-  const onChangeBillName = (billName: string) => {
-    setShouldUpdate(true); // Indica que los datos han sido modificados
-    setTemporalBillName(billName); // Actualiza el estado del nombre de la factura
-  }
+  const onChangeBillName = (billName: React.SetStateAction<string>) =>
+    setBillName(billName); // Actualiza el estado del nombre de la factura
 
   const hasErrorsBillName = () => {
-    return !/^[a-zA-Z\s]+$/.test(temporalBillName); // Permite letras y espacios
+    return !/^[a-zA-Z\s]+$/.test(billName); // Permite letras y espacios
   };
 
   //Funciones para el NIT o CI de la factura
-  const onChangeNit = (nit: string) => {
-    setShouldUpdate(true); // Indica que los datos han sido modificados
-    setTemporalNIT(nit); // Actualiza el estado del NIT
-  }
+  const onChangeNit = (nit: React.SetStateAction<string>) => setNit(nit);
   const hasErrorsNit = () => {
-    return !/^\d+$/.test(temporalNIT); // Retorna true si hay caracteres no numéricos
+    return !/^\d+$/.test(nit); // Retorna true si hay caracteres no numéricos
   };
 
   const hideDialog = () => setVisible(false);
@@ -59,7 +66,7 @@ export default function InvoiceScreen() {
       setVisible(true); // Mostrar modal si hay errores
     } else {
       // Verificar si los datos han sido modificados
-      if (shouldUpdate) {
+      if (billName !== originalBillName || nit !== originalNit) {
         Alert.alert(
           "Guardar Datos", // <-- Título del Alert
           "¿Desea guardar los nuevos datos como predeterminados?",
@@ -81,16 +88,12 @@ export default function InvoiceScreen() {
   const saveAndProceed = async () => {
     try {
       // Llamar al servicio para actualizar los datos de facturación
-      await updateUserProfile(temporalBillName, "billName");
-      await updateUserProfile(temporalNIT, "ci");
+      await updateCustomerProfile(billName, nit); // Guarda los nuevos datos en el backend
       Alert.alert("Éxito", "Datos de facturación actualizados correctamente.");
       proceedToPayment(); // Proceder al pago después de guardar
     } catch (error) {
       console.error("Error al actualizar los datos de facturación:", error);
-      Alert.alert(
-        "Error",
-        "Hubo un problema al actualizar los datos de facturación."
-      );
+      Alert.alert("Error", "Hubo un problema al actualizar los datos de facturación.");
     }
   };
 
@@ -99,8 +102,8 @@ export default function InvoiceScreen() {
     router.push({
       pathname: "/payment-method",
       params: {
-        billName: temporalBillName,
-        nit: temporalNIT,
+        billName: billName,
+        nit: nit,
         total: total.toString(),
       },
     });
@@ -108,7 +111,7 @@ export default function InvoiceScreen() {
 
   // Calcular el total por producto (cantidad * precio)
   const calculateTotal = (): number => {
-    const total = cartItems.reduce(
+    const total = products.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     );
@@ -116,104 +119,123 @@ export default function InvoiceScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }} // Ensure the KeyboardAvoidingView takes full height
-    >
-      <ScrollView style={styles.container}>
-        {/* Título de la página */}
-        {/* Tabla de productos seleccionados */}
-        <View style={styles.card}>
-          <Text style={styles.title}>Resumen</Text>
-  
-          <DataTable>
-            <DataTable.Header>
-              <DataTable.Title>Producto</DataTable.Title>
-              <DataTable.Title numeric>Cantidad</DataTable.Title>
-              <DataTable.Title numeric>Total</DataTable.Title>
-            </DataTable.Header>
-            {cartItems.map((item) => (
-              <DataTable.Row key={item.id}>
-                <DataTable.Cell style={{ flex: 2 }}>
-                  <Text style={{ flexShrink: 1 }}>{item.name}</Text>
-                </DataTable.Cell>
-  
-                <DataTable.Cell numeric>{item.quantity}</DataTable.Cell>
-                <DataTable.Cell numeric>
-                  {item.price * item.quantity}
-                </DataTable.Cell>
-              </DataTable.Row>
-            ))}
-          </DataTable>
-          <Text style={styles.priceTotal}>Total: {calculateTotal()}</Text>
-        </View>
-  
-        {/* Total de la compra */}
-  
-        {/* Espacio entre la tabla y el divisor */}
-        <View style={{ marginBottom: 10 }}></View>
-        <Divider />
-        <View style={{ marginBottom: 10 }}></View>
-  
-        <Text style={styles.subtitle}>Datos de facturación</Text>
-  
-        {/* Nombre en la factura o razón social */}
+    <ScrollView style={styles.container}>
+      {/* Título de la página */}
+      {/* Tabla de productos seleccionados */}
+      <View style={styles.card}>
+        <Text style={styles.title}>Resumen</Text>
+
+        <DataTable>
+          <DataTable.Header>
+            <DataTable.Title>Producto</DataTable.Title>
+            <DataTable.Title numeric>Cantidad</DataTable.Title>
+            <DataTable.Title numeric>Total</DataTable.Title>
+          </DataTable.Header>
+          {products.map((item) => (
+            <DataTable.Row key={item.id}>
+              <DataTable.Cell style={{ flex: 2 }}>
+                <Text style={{ flexShrink: 1 }}>{item.name}</Text>
+              </DataTable.Cell>
+
+              <DataTable.Cell numeric>{item.quantity}</DataTable.Cell>
+              <DataTable.Cell numeric>
+                {item.price * item.quantity}
+              </DataTable.Cell>
+            </DataTable.Row>
+          ))}
+        </DataTable>
+        <Text style={styles.priceTotal}>Total: {calculateTotal()}</Text>
+      </View>
+
+      {/* Total de la compra */}
+
+      {/* Espacio entre la tabla y el divisor */}
+      <View style={{ marginBottom: 10 }}></View>
+      <Divider />
+      <View style={{ marginBottom: 10 }}></View>
+
+      <Text style={styles.subtitle}>Datos de facturación</Text>
+
+      {/* Nombre en la factura o razón social */}
+      <View>
+        <TextInput
+          label="Nombre/ Razón Social"
+          value={billName}
+          onChangeText={onChangeBillName}
+          theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
+          style={styles.input} // Aplica el estilo desde el StyleSheet
+        />
+
+        <HelperText type="error" visible={hasErrorsBillName()}>
+          El nombre debe contener sólo letras
+        </HelperText>
+      </View>
+      {/* NIT o CI para la factura */}
+      <View>
+        <TextInput
+          label="NIT/ CI"
+          value={nit}
+          onChangeText={onChangeNit}
+          theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
+          style={styles.input} // Aplica el estilo desde el StyleSheet
+        />
+        <HelperText type="error" visible={hasErrorsNit()}>
+          El NIT/ CI debe contener sólo números
+        </HelperText>
+      </View>
+      {/* Switch para "Para llevar" */}
+      <View style={styles.switchContainer}>
+        <Text style={styles.subtitle}>¿Para llevar?</Text>
+        <Switch
+          value={isTakeaway}
+          onValueChange={setIsTakeaway}
+          trackColor={{ false: "#e0e0e0", true: "#D1E4DE" }} // Color de la pista
+          thumbColor={isTakeaway ? "#86AB9A" : "#ccc"} // Color del botón
+        />
+      </View>
+
+      {/* Input para el número de mesa (se muestra solo si no es para llevar) */}
+      {!isTakeaway && (
         <View>
           <TextInput
-            label="Nombre/ Razón Social"
-            value={temporalBillName}
-            onChangeText={onChangeBillName}
-            theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
-            style={styles.input} // Aplica el estilo desde el StyleSheet
+            label="Número de Mesa"
+            value={tableCode}
+            onChangeText={setTableCode}
+            theme={{ colors: { primary: "#86AB9A" } }}
+            style={styles.input}
+            keyboardType="numeric"
           />
-  
-          <HelperText type="error" visible={hasErrorsBillName()}>
-            El nombre debe contener sólo letras
-          </HelperText>
         </View>
-        {/* NIT o CI para la factura */}
-        <View>
-          <TextInput
-            label="NIT/ CI"
-            value={temporalNIT}
-            onChangeText={onChangeNit}
-            theme={{ colors: { primary: "#86AB9A" } }} // Color verde para el borde y el foco
-            style={styles.input} // Aplica el estilo desde el StyleSheet
-          />
-          <HelperText type="error" visible={hasErrorsNit()}>
-            El NIT/ CI debe contener sólo números
-          </HelperText>
-        </View>
-        <Divider />
-        <TouchableOpacity
-          style={styles.submitButton}
-          onPress={handlePaymentPress}
-        >
-          <Text style={styles.submitButtonText}>Método de Pago</Text>
-        </TouchableOpacity>
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={visible}
-          onRequestClose={() => {
-            setVisible(!visible);
-          }}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.subtitle}>Datos no válidos</Text>
-              <Text style={styles.modalText}>
-                Por favor, revise los datos ingresados
-              </Text>
-              <TouchableOpacity style={styles.modalButton} onPress={hideDialog}>
-                <Text style={styles.modalButtonText}> Cerrar </Text>
-              </TouchableOpacity>
-            </View>
+      )}
+      <Divider />
+      <TouchableOpacity
+        style={styles.submitButton}
+        onPress={handlePaymentPress}
+      >
+        <Text style={styles.submitButtonText}>Método de Pago</Text>
+      </TouchableOpacity>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={visible}
+        onRequestClose={() => {
+          setVisible(!visible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.subtitle}>Datos no válidos</Text>
+            <Text style={styles.modalText}>
+              Por favor, revise los datos ingresados
+            </Text>
+            <TouchableOpacity style={styles.modalButton} onPress={hideDialog}>
+              <Text style={styles.modalButtonText}> Cerrar </Text>
+            </TouchableOpacity>
           </View>
-        </Modal>
-        <View style={{ marginBottom: 30 }}></View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </View>
+      </Modal>
+      <View style={{ marginBottom: 20 }}></View>
+    </ScrollView>
   );
 }
 

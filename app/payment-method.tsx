@@ -18,7 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUser } from "@/contexts/UserContext";
 
 export default function Payment() {
-  const { cartItems, updateQuantity, removeFromCart, setCartItems } = useCart();
+  const { cartItems, updateQuantity, removeFromCart, setCartItems, tableCode } = useCart();
   const { billName, nit } = useUser();
   const [selectedMethod, setSelectedMethod] = useState("QR"); // Estado para el método de pago seleccionado
   const { total = "0" } = useLocalSearchParams();
@@ -104,7 +104,7 @@ export default function Payment() {
                   onPress: async () => {
                     console.log("cartitems", cartItems);
                     // Create the order
-                    const orderPayload = makeOrderPayload( cartItems);
+                    const orderPayload = makeOrderPayload(cartItems, tableCode);
                     console.log("makeorderpayload", orderPayload);
                     try {
                       // Create the order

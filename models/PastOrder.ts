@@ -10,6 +10,7 @@ export interface PastOrder {
 export interface OrderItemModel {
     menuItemId: number;
     menuItemName: string;
+    image: string;
     price: number;
     quantity: number;
 }

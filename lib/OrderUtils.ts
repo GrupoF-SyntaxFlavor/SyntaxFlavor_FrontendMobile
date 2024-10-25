@@ -3,7 +3,7 @@ import { Order } from '../models/Order';
 import { PastOrder } from '@/models/PastOrder';
 
 // This function is used to create the payload for the order request
-export const makeOrderPayload = (products: Product[]): Order => {
+export const makeOrderPayload = (products: Product[], tableCode: string): Order => {
     const itemIdQuantityMap: Record<number, number> = products.reduce((map, product) => {
         if (product.quantity > 0) {
             map[product.id] = product.quantity;
@@ -13,6 +13,7 @@ export const makeOrderPayload = (products: Product[]): Order => {
 
     return {
         itemIdQuantityMap,
+        tableCode
     };
 }
 // This function is used to turn a PastOrder model into a set of products for the cart
@@ -24,7 +25,7 @@ export const orderToProducts = (pastOrder : PastOrder) : Product[] => {
             name: item.menuItemName,
             description: null,
             price: item.price,
-            image: null,
+            image: item.image,
             quantity: item.quantity
         };
     });
