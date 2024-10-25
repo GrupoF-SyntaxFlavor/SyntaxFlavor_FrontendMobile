@@ -40,8 +40,8 @@ export default function Menu() {
   useEffect(() => {
     const loadMenuItems = async () => {
       try {
-        setLoading(true);
-        const items = await fetchMenuItems(minPrice, maxPrice, pageNumber, pageSize, sortAscending);
+        // setLoading(true);
+        const items = await fetchMenuItems(tempMinPrice, tempMaxPrice, pageNumber, pageSize, sortAscending);
         console.log("Fetched products:", items);
         setMenuItems(items); // Set the fetched menu items in the cart context
       } catch (error) {
@@ -52,6 +52,12 @@ export default function Menu() {
     };
 
     loadMenuItems();
+    const intervalId = setInterval(() => {
+      loadMenuItems(); // Reload items every X milliseconds
+    }, 5000); // 5000 ms = 5 seconds
+
+    // Clear the interval on component unmount
+    return () => clearInterval(intervalId);
   }, [minPrice, maxPrice, pageNumber, pageSize, sortAscending]);
 
   const handleProductPress = (product: Product) => {
@@ -151,9 +157,14 @@ export default function Menu() {
             {menuItems.map((product, index) => (
               <TouchableOpacity
                 key={index}
-                onPress={() => handleProductPress(product)}
+                onPress={() => {
+                  if (product.status) {
+                    handleProductPress(product); // Solo llama a la función si el producto está disponible
+                  }
+                }}
+                disabled={!product.status}
               >
-                <View style={styles.card}>
+                <View style={[styles.card, !product.status && styles.disabledCard]}>
                   <View style={styles.cardContent}>
                     <View style={styles.textContainer}>
                       <Text style={styles.title}>{product.name}</Text>
@@ -169,7 +180,12 @@ export default function Menu() {
                   </View>
                   <TouchableOpacity
                     style={styles.addButton}
-                    onPress={() => addToCart(product)}
+                    onPress={() => {
+                      if (product.status) {
+                        addToCart(product); // Solo llama a la función si el producto está disponible
+                      }
+                    }}
+                    disabled={!product.status}
                   >
                     <Text style={styles.addButtonText}>+</Text>
                   </TouchableOpacity>
@@ -213,6 +229,19 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 2,
     position: "relative", // Para que el botón se posicione dentro de la tarjeta
+  },
+  disabledCard: {
+    borderRadius: 10,
+    padding: 15,
+    marginVertical: 5,
+    marginHorizontal: 5,
+    shadowColor: "#0000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
+    position: "relative",
+    backgroundColor: '#D3D3D3', // Color gris
+    opacity: 0.6, // Opacidad
   },
   cardContent: {
     flexDirection: "row",
