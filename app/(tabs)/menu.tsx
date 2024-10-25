@@ -15,7 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useCart } from "@/contexts/CartContext";
 import { router } from "expo-router";
 import { Product } from "@/models/Product";
-import Slider from "@react-native-community/slider";
+import MultiSlider from '@ptomasroos/react-native-multi-slider';
 
 export default function Menu() {
   const [fetchedProducts, setProducts] = useState<Product[]>([]);
@@ -27,6 +27,8 @@ export default function Menu() {
   // Parameters for fetching menu items
   const [minPrice, setMinPrice] = useState(10);
   const [maxPrice, setMaxPrice] = useState(20);
+  const [priceRange, setPriceRange] = useState([0, 50]);
+
   const [pageNumber, setPageNumber] = useState(0);
   const [pageSize, setPageSize] = useState(20);
   const [sortAscending, setSortAscending] = useState(false);
@@ -36,14 +38,17 @@ export default function Menu() {
   const [tempMinPrice, setTempMinPrice] = useState(minPrice);
   const [tempMaxPrice, setTempMaxPrice] = useState(maxPrice);
 
+  // Pagination state
+  const [totalPages, setTotalPages] = useState(0);
+
   // Load menu items on component mount
   useEffect(() => {
     const loadMenuItems = async () => {
       try {
-        // setLoading(true);
-        const items = await fetchMenuItems(tempMinPrice, tempMaxPrice, pageNumber, pageSize, sortAscending);
-        console.log("Fetched products:", items);
-        setMenuItems(items); // Set the fetched menu items in the cart context
+        const data = await fetchMenuItems(minPrice, maxPrice, pageNumber, pageSize, sortAscending);
+        console.log("Fetched products:", data);
+        setMenuItems(data.content); // Set the fetched menu items in the cart context
+        setTotalPages(data.totalPages); // Set the total pages for pagination
       } catch (error) {
         console.error("Error loading menu items:", error);
       } finally {
@@ -58,7 +63,13 @@ export default function Menu() {
 
     // Clear the interval on component unmount
     return () => clearInterval(intervalId);
-  }, [minPrice, maxPrice, pageNumber, pageSize, sortAscending]);
+  }, [priceRange, minPrice, maxPrice, pageNumber, pageSize, sortAscending]);
+
+  const handleValuesChange = (values: number[]) => {
+    setPriceRange(values);
+    setMinPrice(minPrice);
+    setMaxPrice(maxPrice);
+  };
 
   const handleProductPress = (product: Product) => {
     router.push({
@@ -78,18 +89,20 @@ export default function Menu() {
   };
 
   const applyPriceFilter = () => {
-    setMinPrice(tempMinPrice);
-    setMaxPrice(tempMaxPrice);
+    const [minPrice, maxPrice] = priceRange;
+    setMinPrice(minPrice);
+    setMaxPrice(maxPrice);
     setPageNumber(0); // Reset to the first page
   };
 
-  const loadMoreItems = async (nextPage) => {
+  const loadMoreItems = async (nextPage: number) => {
     if (loadingMore) return;
     setLoadingMore(true);
     try {
-      const items = await fetchMenuItems(minPrice, maxPrice, nextPage, pageSize, sortAscending);
-      setMenuItems(items);
+      const data = await fetchMenuItems(minPrice, maxPrice, nextPage, pageSize, sortAscending);
+      setMenuItems(data.content);
       setPageNumber(nextPage);
+      setTotalPages(data.totalPages); // Update total pages
     } catch (error) {
       console.error("Error loading more menu items:", error);
     } finally {
@@ -98,7 +111,9 @@ export default function Menu() {
   };
 
   const handleNextPage = () => {
-    loadMoreItems(pageNumber + 1);
+    if (pageNumber < totalPages - 1) {
+      loadMoreItems(pageNumber + 1);
+    }
   };
 
   const handlePreviousPage = () => {
@@ -124,35 +139,24 @@ export default function Menu() {
           </View>
 
           <View style={styles.sliderContainer}>
-            <Text style={styles.sliderLabel}>Precio mínimo: {tempMinPrice}</Text>
-            <Slider
-              style={styles.slider}
-              minimumValue={0}
-              maximumValue={50}
+            <Text style={styles.sliderLabel}>
+              Precio: {priceRange[0]} - {priceRange[1]}
+            </Text>
+            <MultiSlider
+              values={priceRange}
+              min={0}
+              max={50}
               step={1}
-              value={tempMinPrice}
-              onValueChange={setTempMinPrice}
-              minimumTrackTintColor="#86AB9A"
-              maximumTrackTintColor="#000000"
-              thumbTintColor="#86AB9A"
-            />
-            <Text style={styles.sliderLabel}>Precio máximo: {tempMaxPrice}</Text>
-            <Slider
-              style={styles.slider}
-              minimumValue={0}
-              maximumValue={50}
-              step={1}
-              value={tempMaxPrice}
-              onValueChange={setTempMaxPrice}
-              minimumTrackTintColor="#86AB9A"
-              maximumTrackTintColor="#000000"
-              thumbTintColor="#86AB9A"
+              onValuesChange={handleValuesChange}
+              selectedStyle={{ backgroundColor: '#86AB9A' }}
+              unselectedStyle={{ backgroundColor: '#000000' }}
+              markerStyle={{ backgroundColor: '#86AB9A', height: 30, width: 30 }}
             />
             <TouchableOpacity onPress={applyPriceFilter} style={styles.applyButton}>
               <Text style={styles.applyButtonText}>Aplicar filtros de precio</Text>
             </TouchableOpacity>
           </View>
-
+          <View style={styles.divider} />
           <ScrollView>
             {menuItems.map((product, index) => (
               <TouchableOpacity
@@ -203,7 +207,11 @@ export default function Menu() {
             >
               <Text style={styles.paginationButtonText}>Anterior</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleNextPage} style={styles.paginationButton}>
+            <TouchableOpacity
+              onPress={handleNextPage}
+              style={[styles.paginationButton, pageNumber >= totalPages - 1 && styles.disabledButton]}
+              disabled={pageNumber >= totalPages - 1}
+            >
               <Text style={styles.paginationButtonText}>Siguiente</Text>
             </TouchableOpacity>
           </View>
@@ -218,6 +226,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff", // Set the background color to white
   },
+  divider: {
+    height: 1, // Ajusta el grosor de la línea
+    backgroundColor: '#C0C0C0', // Color de la línea
+    marginVertical: 15, // Espaciado alrededor de la línea
+  },  
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -293,12 +306,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 8,
+    paddingVertical: 2,
     paddingHorizontal: 8,
     backgroundColor: "#f9f9f9",
-    borderBottomWidth: 1,
     borderBottomColor: "#ddd",
-    marginBottom: 10,
+    marginBottom: 3,
   },
   sortButton: {
     justifyContent: "center",
@@ -312,11 +324,14 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   sliderContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingVertical: 10,
     backgroundColor: "#fff",
     borderRadius: 10,
     marginBottom: 10,
+    marginHorizontal: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   sliderLabel: {
     fontSize: 16,
@@ -360,5 +375,3 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
   },
 });
-
-export default Menu;
