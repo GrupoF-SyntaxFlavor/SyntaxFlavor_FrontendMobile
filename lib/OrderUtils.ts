@@ -25,7 +25,7 @@ export const orderToProducts = (pastOrder : PastOrder) : Product[] => {
             name: item.menuItemName,
             description: null,
             price: item.price,
-            image: null,
+            image: item.image,
             quantity: item.quantity
         };
     });

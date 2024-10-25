@@ -11,6 +11,7 @@ import { useCart } from "@/contexts/CartContext";
 import { orderToProducts } from "@/lib/OrderUtils";
 import Loader from "@/components/Loader";
 import { cancelOrder } from "@/service/OrderService";
+import { formatImages } from "@/lib/ImageUtils";
 
 const PastOrdersScreen = () => {
   const { pastOrders, loadPastOrders } = usePastOrders();
@@ -42,13 +43,7 @@ const PastOrdersScreen = () => {
   };
 
   const handleRefreshOrder = (order: PastOrder) => {
-    const products = orderToProducts(order);
-    products.forEach((product) => {
-      const menuItem = menuItems.find((item) => item.id === product.id);
-      if (menuItem) {
-        product.image = menuItem.image;
-      }
-    });
+    const products = formatImages(orderToProducts(order));
     setCartItems(products);
 
     Alert.alert(
