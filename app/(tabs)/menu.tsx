@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
+import { DataTable } from 'react-native-paper';
 import { fetchMenuItems } from "@/service/MenuService";
 import Loader from "@/components/Loader";
 import {
@@ -110,16 +111,8 @@ export default function Menu() {
     }
   };
 
-  const handleNextPage = () => {
-    if (pageNumber < totalPages - 1) {
-      loadMoreItems(pageNumber + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (pageNumber > 0) {
-      loadMoreItems(pageNumber - 1);
-    }
+  const handlePageChange = (page: number) => {
+    setPageNumber(page);
   };
 
   return (
@@ -200,20 +193,14 @@ export default function Menu() {
           </ScrollView>
 
           <View style={styles.paginationContainer}>
-            <TouchableOpacity
-              onPress={handlePreviousPage}
-              style={[styles.paginationButton, pageNumber === 0 && styles.disabledButton]}
-              disabled={pageNumber === 0}
-            >
-              <Text style={styles.paginationButtonText}>Anterior</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleNextPage}
-              style={[styles.paginationButton, pageNumber >= totalPages - 1 && styles.disabledButton]}
-              disabled={pageNumber >= totalPages - 1}
-            >
-              <Text style={styles.paginationButtonText}>Siguiente</Text>
-            </TouchableOpacity>
+            <DataTable>
+              <DataTable.Pagination
+                page={pageNumber}
+                numberOfPages={totalPages}
+                onPageChange={handlePageChange}
+                label={`${pageNumber +1} de ${totalPages}`}
+              />
+            </DataTable>
           </View>
         </>
       )}

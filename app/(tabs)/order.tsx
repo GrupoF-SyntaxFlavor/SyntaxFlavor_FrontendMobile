@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import { DataTable } from 'react-native-paper';
 import { Ionicons } from "@expo/vector-icons";
 import { usePastOrders, PastOrderFilters } from "@/contexts/PastOrdersContext";
 import {
@@ -89,14 +90,8 @@ const PastOrdersScreen = () => {
       .reduce((total, item) => total + item.price * item.quantity, 0)
       .toFixed(2);
 
-  const handleNextPage = () => {
-    setPageNumber((prevPageNumber) => prevPageNumber + 1);
-  };
-
-  const handlePreviousPage = () => {
-    if (pageNumber > 0) {
-      setPageNumber((prevPageNumber) => prevPageNumber - 1);
-    }
+  const handlePageChange = (page: number) => {
+    setPageNumber(page);
   };
 
   if (loading) {
@@ -222,20 +217,14 @@ const PastOrdersScreen = () => {
       )}
 
       <View style={styles.paginationContainer}>
-        <TouchableOpacity
-          onPress={handlePreviousPage}
-          style={[styles.paginationButton, pageNumber === 0 && styles.disabledButton]}
-          disabled={pageNumber === 0}
-        >
-          <Text style={styles.paginationButtonText}>Anterior</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-              onPress={handleNextPage}
-              style={[styles.paginationButton, pageNumber >= totalPages - 1 && styles.disabledButton]}
-              disabled={pageNumber >= totalPages - 1}
-            >
-              <Text style={styles.paginationButtonText}>Siguiente</Text>
-            </TouchableOpacity>
+        <DataTable>
+          <DataTable.Pagination
+            page={pageNumber}
+            numberOfPages={totalPages}
+            onPageChange={handlePageChange}
+            label={`${pageNumber +1} de ${totalPages}`}
+          />
+        </DataTable>
       </View>
     </View>
   );
