@@ -2,6 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { DataTable } from 'react-native-paper';
 import { fetchMenuItems } from "@/service/MenuService";
+import { FontAwesome } from '@expo/vector-icons';
+
 import Loader from "@/components/Loader";
 import {
   View,
@@ -121,15 +123,7 @@ export default function Menu() {
         <Loader />
       ) : (
         <>
-          <View style={styles.filterContainer}>
-            <TouchableOpacity onPress={toggleSortOrder} style={styles.sortButton}>
-              <Ionicons
-                name={sortAscending ? "arrow-up" : "arrow-down"}
-                size={24}
-                color="#666"
-              />
-            </TouchableOpacity>
-          </View>
+          
 
           <View style={styles.sliderContainer}>
             <Text style={styles.sliderLabel}>
@@ -145,9 +139,20 @@ export default function Menu() {
               unselectedStyle={{ backgroundColor: '#000000' }}
               markerStyle={{ backgroundColor: '#86AB9A', height: 30, width: 30 }}
             />
-            <TouchableOpacity onPress={applyPriceFilter} style={styles.applyButton}>
-              <Text style={styles.applyButtonText}>Aplicar filtros de precio</Text>
-            </TouchableOpacity>
+            <View style={styles.buttonRowContainer}>
+              <TouchableOpacity onPress={applyPriceFilter} style={styles.applyButton}>
+                <Text style={styles.applyButtonText}>Aplicar filtro</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity onPress={toggleSortOrder} style={styles.sortButton}>
+              <FontAwesome
+                name={sortAscending ? "sort-alpha-asc" : "sort-alpha-desc"}
+                size={24}
+                color="#666"
+              />
+              </TouchableOpacity>
+            </View>
+
           </View>
           <View style={styles.divider} />
           <ScrollView>
@@ -298,6 +303,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     borderBottomColor: "#ddd",
     marginBottom: 3,
+  },
+  buttonRowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10, // opcional, para añadir un poco de espacio interno
+    marginVertical: 10,    // opcional, para espaciar verticalmente el contenedor
   },
   sortButton: {
     justifyContent: "center",
