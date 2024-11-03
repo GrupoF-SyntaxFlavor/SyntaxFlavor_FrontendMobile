@@ -14,7 +14,7 @@ import { cancelOrder } from "@/service/OrderService";
 import { formatImages } from "@/lib/ImageUtils";
 
 const PastOrdersScreen = () => {
-  const { pastOrders, loadPastOrders } = usePastOrders();
+  const { pastOrders, loadPastOrders, totalPages } = usePastOrders();
   const { setCartItems, menuItems } = useCart();
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -26,7 +26,8 @@ const PastOrdersScreen = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
-      await loadPastOrders({ ...filters, pageNumber, pageSize });
+      
+      const data = await loadPastOrders({ ...filters, pageNumber, pageSize });
       setLoading(false);
     };
 
@@ -228,9 +229,13 @@ const PastOrdersScreen = () => {
         >
           <Text style={styles.paginationButtonText}>Anterior</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleNextPage} style={styles.paginationButton}>
-          <Text style={styles.paginationButtonText}>Siguiente</Text>
-        </TouchableOpacity>
+        <TouchableOpacity
+              onPress={handleNextPage}
+              style={[styles.paginationButton, pageNumber >= totalPages - 1 && styles.disabledButton]}
+              disabled={pageNumber >= totalPages - 1}
+            >
+              <Text style={styles.paginationButtonText}>Siguiente</Text>
+            </TouchableOpacity>
       </View>
     </View>
   );

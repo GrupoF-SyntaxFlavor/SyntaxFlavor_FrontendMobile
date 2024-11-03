@@ -12,6 +12,7 @@ import { useUser } from "@/contexts/UserContext";
 interface PastOrdersContextProps {
   pastOrders: PastOrder[];
   loadPastOrders: (filters?: PastOrderFilters) => void;
+  totalPages: number;
 }
 
 export interface PastOrderFilters {
@@ -28,6 +29,7 @@ const PastOrdersContext = createContext<PastOrdersContextProps | undefined>(
 export const PastOrdersProvider = ({ children }: { children: ReactNode }) => {
   const { jwt } = useUser(); // Use your user context to get the JWT token
   const [pastOrders, setPastOrders] = useState<PastOrder[]>([]);
+  const [totalPages, setTotalPages] = useState<number>(0);
 
     const loadPastOrders = async (filters?: PastOrderFilters) => {
     if (!jwt) return;
@@ -43,6 +45,7 @@ export const PastOrdersProvider = ({ children }: { children: ReactNode }) => {
       const response = await fetchPastOrders(status, pageNumber, pageSize, sortAscending);
       if (response && response.payload && response.payload.content) {
         setPastOrders(response.payload.content as PastOrder[]);
+        setTotalPages(response.payload.totalPages as number); // Actualizar totalPages
       }
     } catch (error) {
       if (jwt) {
@@ -55,7 +58,7 @@ export const PastOrdersProvider = ({ children }: { children: ReactNode }) => {
   }, [jwt]); // Dependency on jwt, so it re-fetches when the user logs in/out
 
   return (
-    <PastOrdersContext.Provider value={{ pastOrders, loadPastOrders }}>
+    <PastOrdersContext.Provider value={{ pastOrders, loadPastOrders, totalPages }}>
       {children}
     </PastOrdersContext.Provider>
   );
