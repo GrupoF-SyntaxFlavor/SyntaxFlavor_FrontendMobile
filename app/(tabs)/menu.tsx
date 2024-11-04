@@ -52,12 +52,12 @@ export default function Menu() {
     };
 
     loadMenuItems();
-    const intervalId = setInterval(() => {
-      loadMenuItems(); // Reload items every X milliseconds
-    }, 5000); // 5000 ms = 5 seconds
+    // const intervalId = setInterval(() => {
+    //   loadMenuItems(); // Reload items every X milliseconds
+    // }, 5000); // 5000 ms = 5 seconds
 
     // Clear the interval on component unmount
-    return () => clearInterval(intervalId);
+    // return () => clearInterval(intervalId);
   }, [minPrice, maxPrice, pageNumber, pageSize, sortAscending]);
 
   const handleProductPress = (product: Product) => {
