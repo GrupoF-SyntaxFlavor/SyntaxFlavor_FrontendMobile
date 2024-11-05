@@ -1,121 +1,33 @@
-import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import React, { useState, useCallback } from 'react';
+import { RefreshControl, ScrollView, View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { DataTable } from 'react-native-paper';
 import { fetchMenuItems } from "@/service/MenuService";
-import { FontAwesome } from '@expo/vector-icons';
-
 import Loader from "@/components/Loader";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { useCart } from "@/contexts/CartContext";
-import { router } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
 import { Product } from "@/models/Product";
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 
 export default function Menu() {
+  const [refreshing, setRefreshing] = useState(false);
   const [fetchedProducts, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const { cartItems, addToCart, menuItems, setMenuItems } = useCart();
   const navigation = useNavigation();
 
-  // Parameters for fetching menu items
-  const [minPrice, setMinPrice] = useState(10);
-  const [maxPrice, setMaxPrice] = useState(20);
-  const [priceRange, setPriceRange] = useState([0, 50]);
-
-  const [pageNumber, setPageNumber] = useState(0);
-  const [pageSize, setPageSize] = useState(20);
-  const [sortAscending, setSortAscending] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("Menú");
-
-  // Temporary state for sliders
-  const [tempMinPrice, setTempMinPrice] = useState(minPrice);
-  const [tempMaxPrice, setTempMaxPrice] = useState(maxPrice);
-
-  // Pagination state
-  const [totalPages, setTotalPages] = useState(0);
-
-  // Load menu items on component mount
-  useEffect(() => {
-    const loadMenuItems = async () => {
-      try {
-        const data = await fetchMenuItems(minPrice, maxPrice, pageNumber, pageSize, sortAscending);
-        console.log("Fetched products:", data);
-        setMenuItems(data.content); // Set the fetched menu items in the cart context
-        setTotalPages(data.totalPages); // Set the total pages for pagination
-      } catch (error) {
-        console.error("Error loading menu items:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadMenuItems();
-    const intervalId = setInterval(() => {
-      loadMenuItems(); // Reload items every X milliseconds
-    }, 5000); // 5000 ms = 5 seconds
-
-    // Clear the interval on component unmount
-    return () => clearInterval(intervalId);
-  }, [priceRange, minPrice, maxPrice, pageNumber, pageSize, sortAscending]);
-
-  const handleValuesChange = (values: number[]) => {
-    setPriceRange(values);
-    setMinPrice(minPrice);
-    setMaxPrice(maxPrice);
-  };
-
-  const handleProductPress = (product: Product) => {
-    router.push({
-      pathname: "/menu-item",
-      params: {
-        productId: product.id,
-        productName: product.name,
-        productPrice: product.price,
-        productImage: product.image,
-        productDescription: product.description,
-      },
-    });
-  };
-
-  const toggleSortOrder = () => {
-    setSortAscending((prev) => !prev);
-  };
-
-  const applyPriceFilter = () => {
-    const [minPrice, maxPrice] = priceRange;
-    setMinPrice(minPrice);
-    setMaxPrice(maxPrice);
-    setPageNumber(0); // Reset to the first page
-  };
-
-  const loadMoreItems = async (nextPage: number) => {
-    if (loadingMore) return;
-    setLoadingMore(true);
+  // Refresh control handler
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
     try {
-      const data = await fetchMenuItems(minPrice, maxPrice, nextPage, pageSize, sortAscending);
-      setMenuItems(data.content);
-      setPageNumber(nextPage);
-      setTotalPages(data.totalPages); // Update total pages
+      // Here you can place the logic to fetch or refresh the menu items
+      const data = await fetchMenuItems(minPrice, maxPrice, pageNumber, pageSize, sortAscending);
+      setMenuItems(data.content); // Update your state with the new items
     } catch (error) {
-      console.error("Error loading more menu items:", error);
-    } finally {
-      setLoadingMore(false);
+      console.error('Failed to refresh menu items:', error);
     }
-  };
-
-  const handlePageChange = (page: number) => {
-    setPageNumber(page);
-  };
+    setRefreshing(false);
+  }, [minPrice, maxPrice, pageNumber, pageSize, sortAscending]);
 
   return (
     <View style={styles.container}>
@@ -123,8 +35,6 @@ export default function Menu() {
         <Loader />
       ) : (
         <>
-          
-
           <View style={styles.sliderContainer}>
             <Text style={styles.sliderLabel}>
               Precio: {priceRange[0]} - {priceRange[1]}
@@ -143,25 +53,31 @@ export default function Menu() {
               <TouchableOpacity onPress={applyPriceFilter} style={styles.applyButton}>
                 <Text style={styles.applyButtonText}>Aplicar filtro</Text>
               </TouchableOpacity>
-              
               <TouchableOpacity onPress={toggleSortOrder} style={styles.sortButton}>
-              <FontAwesome
-                name={sortAscending ? "sort-alpha-asc" : "sort-alpha-desc"}
-                size={24}
-                color="#666"
-              />
+                <FontAwesome
+                  name={sortAscending ? "sort-alpha-asc" : "sort-alpha-desc"}
+                  size={24}
+                  color="#666"
+                />
               </TouchableOpacity>
             </View>
-
           </View>
           <View style={styles.divider} />
-          <ScrollView>
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor="#86AB9A" // You can customize the color of the refresh indicator
+              />
+            }
+          >
             {menuItems.map((product, index) => (
               <TouchableOpacity
                 key={index}
                 onPress={() => {
                   if (product.status) {
-                    handleProductPress(product); // Solo llama a la función si el producto está disponible
+                    handleProductPress(product);
                   }
                 }}
                 disabled={!product.status}
@@ -170,9 +86,7 @@ export default function Menu() {
                   <View style={styles.cardContent}>
                     <View style={styles.textContainer}>
                       <Text style={styles.title}>{product.name}</Text>
-                      <Text style={styles.description}>
-                        {product.description}
-                      </Text>
+                      <Text style={styles.description}>{product.description}</Text>
                       <Text style={styles.price}>Bs. {product.price}</Text>
                     </View>
                     <Image
@@ -184,7 +98,7 @@ export default function Menu() {
                     style={styles.addButton}
                     onPress={() => {
                       if (product.status) {
-                        addToCart(product); // Solo llama a la función si el producto está disponible
+                        addToCart(product);
                       }
                     }}
                     disabled={!product.status}
@@ -203,7 +117,7 @@ export default function Menu() {
                 page={pageNumber}
                 numberOfPages={totalPages}
                 onPageChange={handlePageChange}
-                label={`${pageNumber +1} de ${totalPages}`}
+                label={`${pageNumber + 1} de ${totalPages}`}
               />
             </DataTable>
           </View>
@@ -212,165 +126,3 @@ export default function Menu() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff", // Set the background color to white
-  },
-  divider: {
-    height: 1, // Ajusta el grosor de la línea
-    backgroundColor: '#C0C0C0', // Color de la línea
-    marginVertical: 15, // Espaciado alrededor de la línea
-  },  
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 15,
-    marginVertical: 5,
-    marginHorizontal: 5,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 2,
-    position: "relative", // Para que el botón se posicione dentro de la tarjeta
-  },
-  disabledCard: {
-    borderRadius: 10,
-    padding: 15,
-    marginVertical: 5,
-    marginHorizontal: 5,
-    shadowColor: "#0000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 2,
-    position: "relative",
-    backgroundColor: '#D3D3D3', // Color gris
-    opacity: 0.6, // Opacidad
-  },
-  cardContent: {
-    flexDirection: "row",
-    flex: 1,
-    alignItems: "center",
-  },
-  textContainer: {
-    flex: 3,
-    marginRight: 10,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  description: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 10,
-  },
-  price: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  image: {
-    width: 100, // Aumenta el tamaño de la imagen
-    height: 100, // Aumenta el tamaño de la imagen
-    borderRadius: 50, // Sigue siendo redonda
-  },
-  addButton: {
-    position: "absolute",
-    top: 10, // Posiciona el botón en la parte superior
-    right: 10, // Posiciona el botón en la esquina derecha
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#86AB9A",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  addButtonText: {
-    color: "#fff",
-    top: 2,
-    left: 1,
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  filterContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 2,
-    paddingHorizontal: 8,
-    backgroundColor: "#f9f9f9",
-    borderBottomColor: "#ddd",
-    marginBottom: 3,
-  },
-  buttonRowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 10, // opcional, para añadir un poco de espacio interno
-    marginVertical: 10,    // opcional, para espaciar verticalmente el contenedor
-  },
-  sortButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    marginLeft: 10,
-  },
-  sliderContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    marginBottom: 10,
-    marginHorizontal: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  sliderLabel: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  slider: {
-    width: "100%",
-    height: 40,
-  },
-  applyButton: {
-    backgroundColor: "#86AB9A",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  applyButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  paginationContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 10,
-    backgroundColor: "#fff",
-  },
-  paginationButton: {
-    backgroundColor: "#86AB9A",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    flex: 1,
-    marginHorizontal: 5,
-  },
-  paginationButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  disabledButton: {
-    backgroundColor: "#ccc",
-  },
-});
