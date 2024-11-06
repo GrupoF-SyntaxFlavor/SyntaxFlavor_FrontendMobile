@@ -49,6 +49,10 @@ export default function Menu() {
   //Estado de actualizacion
   const [refreshing, setRefreshing] = useState(false);
 
+  //ocultar slider
+  const [showPriceSlider, setShowPriceSlider] = useState(false);
+
+
   // Load menu items on component mount and on pull to refresh
   const loadMenuItems = useCallback(async () => {
     // setLoading(true);
@@ -106,12 +110,15 @@ export default function Menu() {
   };
 
   const applyPriceFilter = () => {
-    const [minPrice, maxPrice] = priceRange;
-    setMinPrice(minPrice);
-    setMaxPrice(maxPrice);
-    setPageNumber(0); // Reset to the first page
-    setSelectedCategory("Todo");
+    if (showPriceSlider) {
+      const [min, max] = priceRange;
+      setMinPrice(min);
+      setMaxPrice(max);
+      setPageNumber(0); // Reset to the first page
+      setShowPriceSlider(false); // Optional: Hide the slider after applying the filter
+    }
   };
+  
 
   const loadMoreItems = async (nextPage: number) => {
     if (loadingMore) return;
@@ -139,7 +146,17 @@ export default function Menu() {
 
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
+    if (category === "Precio") {
+      setShowPriceSlider(!showPriceSlider);  // Toggle the visibility of the price slider
+    } else if (category === "Todo") {
+      setShowPriceSlider(false);  // Toggle the visibility of the price slider
+      setMinPrice(0);
+      setMaxPrice(100);
+    } else{
+      setShowPriceSlider(false);  // Hide the slider if another category is selected
+    }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -182,7 +199,7 @@ export default function Menu() {
             ))}
           </ScrollView>
           
-          {selectedCategory === "Precio" && (
+          {showPriceSlider && (
             <View style={styles.sliderContainer}>
               <Text style={styles.sliderLabel}>
                 Precio: {priceRange[0]} - {priceRange[1]}
