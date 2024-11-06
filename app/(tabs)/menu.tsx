@@ -51,7 +51,7 @@ export default function Menu() {
 
   // Load menu items on component mount and on pull to refresh
   const loadMenuItems = useCallback(async () => {
-    setLoading(true);
+    // setLoading(true);
     try {
       const data = await fetchMenuItems(minPrice, maxPrice, pageNumber, pageSize, sortAscending);
       setMenuItems(formatImages(data.content)); // Set the fetched menu items in the cart context
@@ -74,8 +74,10 @@ export default function Menu() {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
+    // setLoading(true);
     await loadMenuItems();
     setRefreshing(false);
+    // setLoading(false);
   }, [loadMenuItems]);
   
 
