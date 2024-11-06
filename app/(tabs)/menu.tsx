@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { DataTable } from 'react-native-paper';
 import { fetchMenuItems } from "@/service/MenuService";
 import { FontAwesome } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
+  RefreshControl
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useCart } from "@/contexts/CartContext";
@@ -45,29 +46,38 @@ export default function Menu() {
   // Pagination state
   const [totalPages, setTotalPages] = useState(0);
 
-  // Load menu items on component mount
-  useEffect(() => {
-    const loadMenuItems = async () => {
-      try {
-        const data = await fetchMenuItems(minPrice, maxPrice, pageNumber, pageSize, sortAscending);
-        console.log("Fetched products:", data);
-        setMenuItems(formatImages(data.content)); // Set the fetched menu items in the cart context
-        setTotalPages(data.totalPages); // Set the total pages for pagination
-      } catch (error) {
-        console.error("Error loading menu items:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //Estado de actualizacion
+  const [refreshing, setRefreshing] = useState(false);
 
+  // Load menu items on component mount and on pull to refresh
+  const loadMenuItems = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchMenuItems(minPrice, maxPrice, pageNumber, pageSize, sortAscending);
+      setMenuItems(formatImages(data.content)); // Set the fetched menu items in the cart context
+      setTotalPages(data.totalPages); // Set the total pages for pagination
+    } catch (error) {
+      console.error("Error loading menu items:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [minPrice, maxPrice, pageNumber, pageSize, sortAscending]);
+
+  useEffect(() => {
     loadMenuItems();
     const intervalId = setInterval(() => {
       loadMenuItems(); // Reload items every X milliseconds
     }, 5000); // 5000 ms = 5 seconds
 
-    // Clear the interval on component unmount
     return () => clearInterval(intervalId);
-  }, [priceRange, minPrice, maxPrice, pageNumber, pageSize, sortAscending]);
+  }, [loadMenuItems]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadMenuItems();
+    setRefreshing(false);
+  }, [loadMenuItems]);
+  
 
   const handleValuesChange = (values: number[]) => {
     setPriceRange(values);
@@ -156,7 +166,11 @@ export default function Menu() {
 
           </View>
           <View style={styles.divider} />
-          <ScrollView>
+          <ScrollView
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          >
             {menuItems.map((product, index) => (
               <TouchableOpacity
                 key={index}
