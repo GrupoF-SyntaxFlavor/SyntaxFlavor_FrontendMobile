@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     maxHeight: "10%",
     minHeight: "9%",
     flexWrap: "wrap",
-    marginBottom: 10,
+    // marginBottom: 10,
   },
   categoryButton: {
     flexDirection: "row",
@@ -285,7 +285,8 @@ const styles = StyleSheet.create({
   },
 
   containerCard: {
-  paddingHorizontal: 10,
+    padding: 10,
+    
   },
 
   card: {
@@ -367,7 +368,7 @@ const styles = StyleSheet.create({
   paginationContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 10,
+    // padding: 10,
     backgroundColor: "#fff",
   },
   paginationButton: {

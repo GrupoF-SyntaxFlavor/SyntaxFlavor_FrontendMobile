@@ -234,12 +234,12 @@ export default function Menu() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff", // Set the background color to white
+    backgroundColor: "#f7f7f7", // Set the background color to white
   },
   divider: {
     height: 1, // Ajusta el grosor de la línea
     backgroundColor: '#C0C0C0', // Color de la línea
-    marginVertical: 15, // Espaciado alrededor de la línea
+    // marginVertical: 15, // Espaciado alrededor de la línea
   },  
   card: {
     backgroundColor: "#fff",
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
   paginationContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 10,
+    // padding: 10,
     backgroundColor: "#fff",
   },
   paginationButton: {
@@ -390,5 +390,53 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     backgroundColor: "#ccc",
+  },
+
+  categoryBar: {
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    backgroundColor: "#f9f9f9",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    maxHeight: "10%",
+    minHeight: "9%",
+    flexWrap: "wrap",
+    marginBottom: 10,
+  },
+  categoryButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    minHeight: 40,
+    flexWrap: "wrap",
+  },
+  selectedCategoryButton: {
+    backgroundColor: "#d1e4de",
+    borderColor: "#000",
+  },
+  categoryText: {
+    fontSize: 14,
+    color: "#666",
+  },
+  selectedCategoryText: {
+    fontWeight: "bold",
+    color: "#000",
+  },
+  sortButtonCategory: {
+    justifyContent: "center",
+    alignItems: "center",
+    // paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    marginRight: 10,
   },
 });
