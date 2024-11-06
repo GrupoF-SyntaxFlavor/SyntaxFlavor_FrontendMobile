@@ -30,9 +30,9 @@ export default function Menu() {
   const navigation = useNavigation();
 
   // Parameters for fetching menu items
-  const [minPrice, setMinPrice] = useState(10);
-  const [maxPrice, setMaxPrice] = useState(20);
-  const [priceRange, setPriceRange] = useState([0, 50]);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(100);
+  const [priceRange, setPriceRange] = useState([0, 100]);
 
   const [pageNumber, setPageNumber] = useState(0);
   const [pageSize, setPageSize] = useState(20);
@@ -54,6 +54,7 @@ export default function Menu() {
     // setLoading(true);
     try {
       const data = await fetchMenuItems(minPrice, maxPrice, pageNumber, pageSize, sortAscending);
+      console.log("data: ", data);
       setMenuItems(formatImages(data.content)); // Set the fetched menu items in the cart context
       setTotalPages(data.totalPages); // Set the total pages for pagination
     } catch (error) {
@@ -65,11 +66,11 @@ export default function Menu() {
 
   useEffect(() => {
     loadMenuItems();
-    const intervalId = setInterval(() => {
-      loadMenuItems(); // Reload items every X milliseconds
-    }, 5000); // 5000 ms = 5 seconds
+    // const intervalId = setInterval(() => {
+    //   loadMenuItems(); // Reload items every X milliseconds
+    // }, 5000); // 5000 ms = 5 seconds
 
-    return () => clearInterval(intervalId);
+    // return () => clearInterval(intervalId);
   }, [loadMenuItems]);
 
   const onRefresh = useCallback(async () => {
