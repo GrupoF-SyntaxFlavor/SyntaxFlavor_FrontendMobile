@@ -110,6 +110,7 @@ export default function Menu() {
     setMinPrice(minPrice);
     setMaxPrice(maxPrice);
     setPageNumber(0); // Reset to the first page
+    setSelectedCategory("Todo");
   };
 
   const loadMoreItems = async (nextPage: number) => {
@@ -133,12 +134,11 @@ export default function Menu() {
 
   const categories = [
     { label: "Todo", value: "Todo" },
-    { label: "Elegir precio", value: "Precio" },
+    { label: "Filtrar por precio", value: "Precio" },
   ];
 
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
-    // setFilters((prev) => ({ ...prev, status: category }));
   };
 
   return (
@@ -182,35 +182,37 @@ export default function Menu() {
             ))}
           </ScrollView>
           
-          <View style={styles.sliderContainer}>
-            <Text style={styles.sliderLabel}>
-              Precio: {priceRange[0]} - {priceRange[1]}
-            </Text>
-            <MultiSlider
-              values={priceRange}
-              min={0}
-              max={50}
-              step={1}
-              onValuesChange={handleValuesChange}
-              selectedStyle={{ backgroundColor: '#86AB9A' }}
-              unselectedStyle={{ backgroundColor: '#000000' }}
-              markerStyle={{ backgroundColor: '#86AB9A', height: 30, width: 30 }}
-            />
-            <View style={styles.buttonRowContainer}>
-              <TouchableOpacity onPress={applyPriceFilter} style={styles.applyButton}>
-                <Text style={styles.applyButtonText}>Aplicar filtro</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity onPress={toggleSortOrder} style={styles.sortButton}>
-              <FontAwesome
-                name={sortAscending ? "sort-alpha-asc" : "sort-alpha-desc"}
-                size={24}
-                color="#666"
+          {selectedCategory === "Precio" && (
+            <View style={styles.sliderContainer}>
+              <Text style={styles.sliderLabel}>
+                Precio: {priceRange[0]} - {priceRange[1]}
+              </Text>
+              <MultiSlider
+                values={priceRange}
+                min={0}
+                max={50}
+                step={1}
+                onValuesChange={handleValuesChange}
+                selectedStyle={{ backgroundColor: '#86AB9A' }}
+                unselectedStyle={{ backgroundColor: '#000000' }}
+                markerStyle={{ backgroundColor: '#86AB9A', height: 30, width: 30 }}
               />
-              </TouchableOpacity>
+              <View style={styles.buttonRowContainer}>
+                <TouchableOpacity onPress={applyPriceFilter} style={styles.applyButton}>
+                  <Text style={styles.applyButtonText}>Aplicar filtro</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity onPress={toggleSortOrder} style={styles.sortButton}>
+                <FontAwesome
+                  name={sortAscending ? "sort-alpha-asc" : "sort-alpha-desc"}
+                  size={24}
+                  color="#666"
+                />
+                </TouchableOpacity>
+              </View>
             </View>
+          )}
 
-          </View>
           <View style={styles.divider} />
           <ScrollView
             refreshControl={
