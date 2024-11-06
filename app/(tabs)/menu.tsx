@@ -37,7 +37,7 @@ export default function Menu() {
   const [pageNumber, setPageNumber] = useState(0);
   const [pageSize, setPageSize] = useState(20);
   const [sortAscending, setSortAscending] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("Menú");
+  const [selectedCategory, setSelectedCategory] = useState("Todo");
 
   // Temporary state for sliders
   const [tempMinPrice, setTempMinPrice] = useState(minPrice);
@@ -131,6 +131,16 @@ export default function Menu() {
     setPageNumber(page);
   };
 
+  const categories = [
+    { label: "Todo", value: "Todo" },
+    { label: "Elegir precio", value: "Precio" },
+  ];
+
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+    // setFilters((prev) => ({ ...prev, status: category }));
+  };
+
   return (
     <View style={styles.container}>
       {loading ? (
@@ -138,7 +148,40 @@ export default function Menu() {
       ) : (
         <>
           
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.categoryBar}
+          >
+            <TouchableOpacity onPress={toggleSortOrder} style={styles.sortButtonCategory}>
+              <FontAwesome
+                name={sortAscending ? "sort-alpha-asc" : "sort-alpha-desc"}
+                size={24}
+                color="#666"
+              />
+              </TouchableOpacity>
 
+            {categories.map((category, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.categoryButton,
+                  selectedCategory === category.value && styles.selectedCategoryButton,
+                ]}
+                onPress={() => handleCategorySelect(category.value)}
+              >
+                <Text
+                  style={[
+                    styles.categoryText,
+                    selectedCategory === category.value && styles.selectedCategoryText,
+                  ]}
+                >
+                  {category.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+          
           <View style={styles.sliderContainer}>
             <Text style={styles.sliderLabel}>
               Precio: {priceRange[0]} - {priceRange[1]}
