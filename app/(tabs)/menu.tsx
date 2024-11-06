@@ -230,7 +230,7 @@ export default function Menu() {
             </View>
           )}
 
-          <View style={styles.divider} />
+          <View/>
           <ScrollView
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1, // Ajusta el grosor de la línea
     backgroundColor: '#C0C0C0', // Color de la línea
-    // marginVertical: 15, // Espaciado alrededor de la línea
+    marginVertical: 15, // Espaciado alrededor de la línea
   },  
   card: {
     backgroundColor: "#fff",
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
     maxHeight: "10%",
     minHeight: "9%",
     flexWrap: "wrap",
-    marginBottom: 10,
+    // marginBottom: 10,
   },
   categoryButton: {
     flexDirection: "row",
