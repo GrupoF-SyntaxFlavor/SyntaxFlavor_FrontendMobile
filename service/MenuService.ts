@@ -1,6 +1,5 @@
 // MenuService.ts
 import { BACKEND_DOMAIN, MINIO_PORT, SPRING_PORT } from "@/constants/.backend-dir";
-import { formatImages } from "@/lib/ImageUtils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const API_URL = `http://${BACKEND_DOMAIN}${SPRING_PORT}`; // Cuando pasemos a https cambiar aquí

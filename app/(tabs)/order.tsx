@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView, ActivityIndicator, PermissionsAndroid } from "react-native";
 import { DataTable } from 'react-native-paper';
 import { Ionicons } from "@expo/vector-icons";
 import { usePastOrders, PastOrderFilters } from "@/contexts/PastOrdersContext";
@@ -146,7 +146,7 @@ const PastOrdersScreen = () => {
           </Text>
         </View>
       ) : (
-        <ScrollView>
+        <ScrollView style={styles.containerCard}>
           {pastOrders.map((order, index) => (
             <View key={index} style={styles.card}>
               <View style={styles.orderHeader}>
@@ -233,7 +233,7 @@ const PastOrdersScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    // padding: 10,
     backgroundColor: "#f7f7f7",
   },
   categoryBar: {
@@ -242,9 +242,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
-    maxHeight: "13%",
+    maxHeight: "10%",
+    minHeight: "9%",
     flexWrap: "wrap",
-    marginBottom: 10,
+    // marginBottom: 10,
   },
   categoryButton: {
     flexDirection: "row",
@@ -274,7 +275,7 @@ const styles = StyleSheet.create({
   sortButton: {
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 10,
+    // paddingVertical: 10,
     paddingHorizontal: 20,
     backgroundColor: "#fff",
     borderRadius: 20,
@@ -282,6 +283,12 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     marginRight: 10,
   },
+
+  containerCard: {
+    padding: 10,
+    
+  },
+
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -361,7 +368,7 @@ const styles = StyleSheet.create({
   paginationContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 10,
+    // padding: 10,
     backgroundColor: "#fff",
   },
   paginationButton: {
