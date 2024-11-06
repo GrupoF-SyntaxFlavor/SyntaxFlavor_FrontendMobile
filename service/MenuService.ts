@@ -1,14 +1,14 @@
 // MenuService.ts
 import { BACKEND_DOMAIN, MINIO_PORT, SPRING_PORT } from "@/constants/.backend-dir";
 import { formatImages } from "@/lib/ImageUtils";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
+
 
 const API_URL = `http://${BACKEND_DOMAIN}${SPRING_PORT}`; // Cuando pasemos a https cambiar aquí
 
 export const fetchMenuItems = async (minPrice = 10, maxPrice = 20, pageNumber = 0, pageSize = 20, sortAscending = false) => {
   try {
-    // Recuperar el token desde AsyncStorage
-    const token = await AsyncStorage.getItem('access_token');
+    const token = await SecureStore.getItem('access_token');
     
     if (!token) {
       throw new Error('No se encontró un token de acceso');
@@ -30,7 +30,7 @@ export const fetchMenuItems = async (minPrice = 10, maxPrice = 20, pageNumber = 
     }
 
     const data = await response.json();
-    console.log("Menu items:", data);
+    //console.log("Menu items:", data);
 
     if (!Array.isArray(data.payload.content)) {
       throw new Error('Expected payload.content to be an array');

@@ -1,8 +1,9 @@
 import { getCustomerProfile, updateCustomerProfile, login as loginService } from "@/service/UserService";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { AxiosError } from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 
 interface UserContextProps {
     name: string,
@@ -36,8 +37,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         const loadBillingData = async () => {
-            const storedBillName = await AsyncStorage.getItem('billName');
-            const storedNIT = await AsyncStorage.getItem('nit');
+            const storedBillName = await SecureStore.getItem('billName');
+            const storedNIT = await SecureStore.getItem('nit');
             if (storedBillName) setBillName(storedBillName);
             if (storedNIT) setNIT(storedNIT);
         };
@@ -50,10 +51,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             const response = await loginService(loginData);
     
             if (response?.payload?.access_token) {
-                await AsyncStorage.setItem("access_token", response.payload.access_token);
-                await AsyncStorage.setItem("refresh_token", response.payload.refresh_token);
-                await AsyncStorage.setItem("expires_in", response.payload.expires_in.toString());
-                await AsyncStorage.setItem("refresh_expires_in", response.payload.refresh_expires_in.toString());
+                await SecureStore.setItemAsync("access_token", response.payload.access_token);
+                await SecureStore.setItemAsync("refresh_token", response.payload.refresh_token);
+                await SecureStore.setItemAsync("expires_in", response.payload.expires_in.toString());
+                await SecureStore.setItemAsync("refresh_expires_in", response.payload.refresh_expires_in.toString());
     
                 setJWT(response.payload.access_token);
                 router.push("/(tabs)/menu");
@@ -80,8 +81,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             setEmail(data.user.email);
             setBillName(data.billName);
             setNIT(data.nit);
-            await AsyncStorage.setItem('billName', data.billName);
-            await AsyncStorage.setItem('nit', data.nit);
+            await SecureStore.setItem('billName', data.billName);
+            await SecureStore.setItem('nit', data.nit);
         } catch (error) {
             console.error("Error fetching profile data:", error);
         }
@@ -99,11 +100,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             if (field === "billName") {
                 await updateCustomerProfile(inputValue, nit);
                 setBillName(inputValue);
-                await AsyncStorage.setItem('billName', inputValue);
+                await SecureStore.setItem('billName', inputValue);
             } else if (field === "ci") {
                 await updateCustomerProfile(billName, inputValue);
                 setNIT(inputValue);
-                await AsyncStorage.setItem('nit', inputValue);
+                await SecureStore.setItem('nit', inputValue);
             }
         } catch (error) {
             console.error("Error updating profile data:", error);
@@ -111,13 +112,27 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const logout = async () => {
-        await AsyncStorage.clear();
-        setName('');
-        setEmail('');
-        setNIT('');
-        setBillName('');
-        setJWT('');
-        router.push("/login");
+        try {
+            // Borra cada dato específico de SecureStore
+            await SecureStore.deleteItemAsync("access_token");
+            await SecureStore.deleteItemAsync("refresh_token");
+            await SecureStore.deleteItemAsync("expires_in");
+            await SecureStore.deleteItemAsync("refresh_expires_in");
+            await SecureStore.deleteItemAsync("billName");
+            await SecureStore.deleteItemAsync("nit");
+    
+            // Restablece el estado de los datos de usuario
+            setName('');
+            setEmail('');
+            setNIT('');
+            setBillName('');
+            setJWT('');
+    
+            // Navega a la pantalla de inicio de sesión
+            router.push("/login");
+        } catch (error) {
+            console.error("Error al cerrar sesión:", error);
+        }
     };
 
     return (

@@ -1,5 +1,6 @@
 import { BACKEND_DOMAIN, SPRING_PORT } from "@/constants/.backend-dir"; 
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
+
 
 import { Bill } from "@/models/Bill";
 
@@ -7,8 +8,8 @@ const API_URL = `http://${BACKEND_DOMAIN}${SPRING_PORT}` // Cuando pasemos a htt
 
 export const createBill = async (bill: Bill) => {
     try {
-        // Recuperar el token desde AsyncStorage
-        const token = await AsyncStorage.getItem('access_token');
+        // Recuperar el token desde SecureStore
+        const token = await SecureStore.getItem('access_token');
         // console.log("recupera el token", token)
         
         if (!token) {
