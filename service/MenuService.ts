@@ -3,7 +3,6 @@ import { BACKEND_DOMAIN, MINIO_PORT, SPRING_PORT } from "@/constants/.backend-di
 import { formatImages } from "@/lib/ImageUtils";
 import * as SecureStore from 'expo-secure-store';
 
-
 const API_URL = `http://${BACKEND_DOMAIN}${SPRING_PORT}`; // Cuando pasemos a https cambiar aquí
 
 export const fetchMenuItems = async (minPrice = 10, maxPrice = 20, pageNumber = 0, pageSize = 20, sortAscending = false) => {
