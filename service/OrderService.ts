@@ -1,13 +1,12 @@
 import { BACKEND_DOMAIN, SPRING_PORT } from "@/constants/.backend-dir"; 
 import { Order } from "@/models/Order";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 
 const API_URL = `http://${BACKEND_DOMAIN}${SPRING_PORT}` // Cuando pasemos a https cambiar aquí
 
 export const createOrder = async (orderData: Order) => {
     try {
-      // Recuperar el token desde AsyncStorage
-      const token = await AsyncStorage.getItem('access_token');
+      const token = await SecureStore.getItem('access_token');
       
       if (!token) {
         throw new Error('No se encontró un token de acceso');
@@ -40,8 +39,8 @@ export const createOrder = async (orderData: Order) => {
 
 export const fetchPastOrders = async (status = 'Pendiente', pageNumber = 0, pageSize = 10, sortAscending = false) => {
     try {
-        // Recuperar el token desde AsyncStorage
-        const token = await AsyncStorage.getItem('access_token');
+        // Recuperar el token desde SecureStore
+        const token = await SecureStore.getItem('access_token');
         console.log("recupera el token", token);
         
         if (!token) {
@@ -75,8 +74,8 @@ export const fetchPastOrders = async (status = 'Pendiente', pageNumber = 0, page
 
 export const cancelOrder = async (orderId: number) => {
     try {
-        // Recuperar el token desde AsyncStorage
-        const token = await AsyncStorage.getItem('access_token');
+        // Recuperar el token desde SecureStore
+        const token = await SecureStore.getItem('access_token');
         
         if (!token) {
             throw new Error('No se encontró un token de acceso');

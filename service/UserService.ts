@@ -1,8 +1,7 @@
 import { BACKEND_DOMAIN, SPRING_PORT } from "@/constants/.backend-dir"; 
 import { Login } from "@/models/Login";
 import { SignUp } from "../models/SignUp";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 
 const API_URL = `http://${BACKEND_DOMAIN}${SPRING_PORT}` // Cuando pasemos a https cambiar aquí
 
@@ -62,8 +61,8 @@ export const signup = async (SignUp: SignUp) => {
 
 export const getCustomerProfile = async () => {
   try {
-    // Recuperar el token desde AsyncStorage
-    const token = await AsyncStorage.getItem("access_token");
+    // Recuperar el token desde SecureStore
+    const token = await SecureStore.getItem("access_token");
     // console.log("recupera el token", token)
 
     if (!token) {
@@ -98,8 +97,8 @@ export const updateCustomerProfile = async (
 ) => {
   console.log("-------datos", billName, newCI);
   try {
-    // Recuperar el token desde AsyncStorage
-    const token = await AsyncStorage.getItem("access_token");
+    // Recuperar el token desde SecureStore
+    const token = await SecureStore.getItem("access_token");
     // console.log("recupera el token", token)
 
     if (!token) {
