@@ -32,6 +32,7 @@ export default function MenuItem() {
       image: Array.isArray(productImage) ? productImage[0] : productImage,
       description: Array.isArray(productDescription) ? productDescription[0] : productDescription,
       quantity: 1, // Siempre 1 porque se agregará en un bucle
+      status: true, // Siempre true porque se agregará en un bucle
     };
 
     for (let i = 0; i < quantity; i++) {
