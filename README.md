@@ -2,7 +2,69 @@
 
 ## Cómo correr el proyecto
 
-TODO: Agregar instrucciones para correr el proyecto
+### Cómo correr el proyecto
+
+1. **Instalar dependencias**: Asegúrate de tener las herramientas necesarias instaladas en tu entorno local.
+
+   - **Node.js**: Instala la última versión estable desde [nodejs.org](https://nodejs.org).
+   - **Expo CLI**: Instala Expo CLI globalmente si aún no lo tienes.
+     ```bash
+     npm install -g expo-cli
+     ```
+   - **Android Studio o Xcode (opcional)**: Si deseas ejecutar el proyecto en un emulador.
+
+2. **Clonar el repositorio**: Si no tienes el código en tu máquina, clónalo desde el repositorio.
+
+   ```bash
+   git clone <URL-del-repositorio>
+   cd <nombre-del-proyecto>
+   ```
+
+3. **Instalar dependencias del proyecto**: Ejecuta el siguiente comando dentro del directorio raíz del proyecto para instalar todas las dependencias necesarias.
+
+   ```bash
+   npm install
+   ```
+
+4. **Configurar el backend**: Modifica la configuración del backend en el archivo `.backend-dir.ts` dentro de la carpeta `constants`. 
+
+   - Por defecto, el backend se conecta a `http://localhost:8080`. Si tu backend está en otra dirección o puerto, actualiza las siguientes constantes:
+
+     ```typescript
+     export const BACKEND_DOMAIN = "localhost"; // Cambia a tu dirección IP o dominio
+     export const SPRING_PORT = ":8080"; // Cambia si el puerto es diferente
+     export const MINIO_PORT = ":9090"; // Cambia si utilizas otro puerto para MinIO
+     ```
+
+   - Guarda los cambios. Este archivo está en `.gitignore`, por lo que no afectará a otros desarrolladores.
+
+5. **Iniciar el servidor backend**: Asegúrate de que el backend esté ejecutándose y accesible en la dirección configurada.
+
+6. **Ejecutar el proyecto**: Inicia el servidor de desarrollo de Expo.
+
+   ```bash
+   npx expo start
+   ```
+
+   Esto abrirá una ventana en tu navegador con un código QR que puedes escanear usando la aplicación **Expo Go** en tu dispositivo móvil.
+
+7. **Probar la aplicación en un dispositivo/emulador**:
+
+   - **Dispositivo físico**: Descarga la app **Expo Go** desde Google Play Store o App Store. Escanea el código QR generado por Expo CLI.
+   - **Emulador Android/iOS**:
+     - Asegúrate de que Android Studio o Xcode estén configurados correctamente.
+     - Haz clic en **Run on Android device/emulator** o **Run on iOS simulator** desde la ventana del servidor Expo.
+
+8. **Configuraciones opcionales**:
+   - **Variables de entorno**: Si utilizas un archivo `.env`, asegúrate de que esté configurado correctamente con las variables necesarias para la aplicación.
+
+   - **Resolución de problemas comunes**:
+     - Si encuentras un error relacionado con la caché, intenta limpiar el caché de Expo:
+       ```bash
+       expo start -c
+       ```
+
+¡Ahora deberías poder correr la aplicación sin problemas! 🚀
 
 ### Configuración del backend
 
