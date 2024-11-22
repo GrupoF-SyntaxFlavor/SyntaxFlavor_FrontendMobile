@@ -11,9 +11,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        tabBarInactiveTintColor: Colors[colorScheme ?? "light"].tabIconDefault,
         tabBarStyle: {
-          backgroundColor: Colors[colorScheme ?? "light"].background, // Color de fondo para la barra de pestañas
           borderTopWidth: 1,
           borderTopColor: "#ddd", // Borde superior de la barra de pestañas
           height: 80,
@@ -26,7 +24,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="menu"
         options={{
-          title: "",
+          title: "Inicio",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "home" : "home-outline"}
@@ -38,7 +36,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="order"
         options={{
-          title: "",
+          title: "Pedidos",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "receipt" : "receipt-outline"}
@@ -50,7 +48,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "",
+          title: "Mi Perfil",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "person" : "person-outline"}
