@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DataTable, Divider, TextInput, HelperText } from "react-native-paper";
 import {
   ScrollView,
@@ -8,43 +8,47 @@ import {
   TouchableOpacity,
   Modal,
   Button,
+  Alert,
+  Switch,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useCart } from "@/contexts/CartContext";
+import { getCustomerProfile, updateCustomerProfile } from "@/service/UserService"; 
 
 export default function InvoiceScreen() {
   const router = useRouter();
   const [visible, setVisible] = React.useState(false);
   const { cartItems } = useCart();
+  // TODO: Restaurar a un estado global UseUser
+  const [products] = useState(cartItems); //Productos seleccionados
+  const [billName, setBillName] = React.useState(""); // Estado para el nombre de facturación
+  const [nit, setNit] = React.useState(""); // Estado para el NIT/CI
+  const [originalBillName, setOriginalBillName] = useState(""); // Estado para el nombre original
+  const [originalNit, setOriginalNit] = useState(""); 
+  const [isTakeaway, setIsTakeaway] = useState(true); // Estado de para llevar
+  const { tableCode, setTableCode } = useCart(); // Estado para el número de mesa
+  
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const profileData = await getCustomerProfile(); // Llama al servicio
+        setBillName(profileData.billName); // Establece el nombre de facturación
+        setNit(profileData.nit); // Establece el NIT/CI
+        setOriginalBillName(profileData.billName); // Guarda el nombre original
+        setOriginalNit(profileData.nit); // Guarda el NIT original
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+        Alert.alert("Error", "No se pudieron cargar los datos de facturación.");
+      }
+    };
 
-  const hideDialog = () => setVisible(false);
-
-  const handlePaymentPress = () => {
-    if (hasErrorsBillName() || hasErrorsNit()) {
-      setVisible(true);
-    } else {
-      const total = calculateTotal();
-      router.push({
-        pathname: "/payment-method",
-        params: {
-          billName: billName,
-          nit: nit,
-          total: total.toString(),
-        },
-      });
-    }
-  };
-
-  // Lista de productos seleccionados
-  const [products, setProducts] = useState(cartItems);
-  //Campo para el nombre de la factura
-  const [billName, setBillName] = React.useState("Doe");
-  //Campo para el NIT o CI de la factura
-  const [nit, setNit] = React.useState("123456");
+    fetchProfileData(); // Llama a la función cuando se monta el componente
+  }, []);
 
   //Funciones para el nombre de la factura
   const onChangeBillName = (billName: React.SetStateAction<string>) =>
-    setBillName(billName);
+    setBillName(billName); // Actualiza el estado del nombre de la factura
+
   const hasErrorsBillName = () => {
     return !/^[a-zA-Z\s]+$/.test(billName); // Permite letras y espacios
   };
@@ -53,6 +57,56 @@ export default function InvoiceScreen() {
   const onChangeNit = (nit: React.SetStateAction<string>) => setNit(nit);
   const hasErrorsNit = () => {
     return !/^\d+$/.test(nit); // Retorna true si hay caracteres no numéricos
+  };
+
+  const hideDialog = () => setVisible(false);
+
+  const handlePaymentPress = () => {
+    if (hasErrorsBillName() || hasErrorsNit()) {
+      setVisible(true); // Mostrar modal si hay errores
+    } else {
+      // Verificar si los datos han sido modificados
+      if (billName !== originalBillName || nit !== originalNit) {
+        Alert.alert(
+          "Guardar Datos", // <-- Título del Alert
+          "¿Desea guardar los nuevos datos como predeterminados?",
+          [
+            {
+              text: "No",
+              onPress: () => proceedToPayment(),
+              style: "cancel",
+            },
+            { text: "Sí", onPress: () => saveAndProceed() },
+          ]
+        );
+      } else {
+        proceedToPayment();
+      }
+    }
+  };
+
+  const saveAndProceed = async () => {
+    try {
+      // Llamar al servicio para actualizar los datos de facturación
+      await updateCustomerProfile(billName, nit); // Guarda los nuevos datos en el backend
+      Alert.alert("Éxito", "Datos de facturación actualizados correctamente.");
+      proceedToPayment(); // Proceder al pago después de guardar
+    } catch (error) {
+      console.error("Error al actualizar los datos de facturación:", error);
+      Alert.alert("Error", "Hubo un problema al actualizar los datos de facturación.");
+    }
+  };
+
+  const proceedToPayment = () => {
+    const total = calculateTotal(); // Calcular total
+    router.push({
+      pathname: "/payment-method",
+      params: {
+        billName: billName,
+        nit: nit,
+        total: total.toString(),
+      },
+    });
   };
 
   // Calcular el total por producto (cantidad * precio)
@@ -90,10 +144,10 @@ export default function InvoiceScreen() {
             </DataTable.Row>
           ))}
         </DataTable>
+        <Text style={styles.priceTotal}>Total: {calculateTotal()}</Text>
       </View>
 
       {/* Total de la compra */}
-      <Text style={styles.priceTotal}>Total: {calculateTotal()}</Text>
 
       {/* Espacio entre la tabla y el divisor */}
       <View style={{ marginBottom: 10 }}></View>
@@ -129,10 +183,31 @@ export default function InvoiceScreen() {
           El NIT/ CI debe contener sólo números
         </HelperText>
       </View>
-      {/* Espacio entre los datos y el divisor */}
-      <View style={{ marginBottom: 10 }}></View>
+      {/* Switch para "Para llevar" */}
+      <View style={styles.switchContainer}>
+        <Text style={styles.subtitle}>¿Para llevar?</Text>
+        <Switch
+          value={isTakeaway}
+          onValueChange={setIsTakeaway}
+          trackColor={{ false: "#e0e0e0", true: "#D1E4DE" }} // Color de la pista
+          thumbColor={isTakeaway ? "#86AB9A" : "#ccc"} // Color del botón
+        />
+      </View>
+
+      {/* Input para el número de mesa (se muestra solo si no es para llevar) */}
+      {!isTakeaway && (
+        <View>
+          <TextInput
+            label="Número de Mesa"
+            value={tableCode}
+            onChangeText={setTableCode}
+            theme={{ colors: { primary: "#86AB9A" } }}
+            style={styles.input}
+            keyboardType="numeric"
+          />
+        </View>
+      )}
       <Divider />
-      <View style={{ marginBottom: 10 }}></View>
       <TouchableOpacity
         style={styles.submitButton}
         onPress={handlePaymentPress}
@@ -153,13 +228,13 @@ export default function InvoiceScreen() {
             <Text style={styles.modalText}>
               Por favor, revise los datos ingresados
             </Text>
-            <TouchableOpacity style={styles.submitButton} onPress={hideDialog}>
-              <Text style={styles.submitButtonText}> Cerrar </Text>
+            <TouchableOpacity style={styles.modalButton} onPress={hideDialog}>
+              <Text style={styles.modalButtonText}> Cerrar </Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
-      <View style={{ marginBottom: 30 }}></View>
+      <View style={{ marginBottom: 20 }}></View>
     </ScrollView>
   );
 }
@@ -189,18 +264,20 @@ const styles = StyleSheet.create({
     marginBottom: 20, // Espacio inferior
   },
   subtitle: {
-    fontSize: 20, // Un poco más grande
+    fontSize: 22, // Un poco más grande
     fontWeight: "bold",
-    textAlign: "left", // Alineación a la izquierda para una estructura más profesional
+    textAlign: "center", // Alineación a la izquierda para una estructura más profesional
     color: "#333", // Mismo tono oscuro
     marginBottom: 15, // Mayor separación entre secciones
+    marginTop: 10, // Separación del título anterior
   },
   priceTotal: {
-    fontSize: 20, // Tamaño mayor para destacar el total
+    fontSize: 20,
     fontWeight: "bold",
     textAlign: "right",
-    marginBottom: 10, // Más espacio para resaltar
-    marginRight: 15,
+    marginTop: 15,
+    marginBottom: 0,
+    marginRight: 5,
   },
   submitButton: {
     backgroundColor: "#86AB9A", // Color más suave para que se integre bien con la aplicación
@@ -216,7 +293,13 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: "#fff", // Fondo blanco
-    marginBottom: 15, // Espacio entre los inputs
+  },
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+    
   },
   centeredView: {
     flex: 1,
@@ -225,19 +308,28 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo oscuro semitransparente
   },
   modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 35,
+    margin: 10,
+    backgroundColor: "#F0F0F2",
+    borderRadius: 25,
+    padding: 25,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    width: "85%",
   },
   modalText: {
-    marginBottom: 15,
+    marginBottom: 16,
+    fontSize: 17,
     textAlign: "center",
+  },
+  modalButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: "#86AB9A",
+    borderRadius: 5,
+    marginHorizontal: 10,
+  },
+  modalButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 15,
   },
 });

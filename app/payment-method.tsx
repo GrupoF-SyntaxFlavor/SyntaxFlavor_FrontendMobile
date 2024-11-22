@@ -15,11 +15,13 @@ import { createBill } from "@/service/BillService"; // Importamos el nuevo endpo
 import { makeOrderPayload } from "@/lib/OrderUtils";
 import { useCart } from "@/contexts/CartContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useUser } from "@/contexts/UserContext";
 
 export default function Payment() {
-  const { cartItems, updateQuantity, removeFromCart, setCartItems } = useCart();
-  const { billName = "", nit = "", total = "0" } = useLocalSearchParams();
+  const { cartItems, updateQuantity, removeFromCart, setCartItems, tableCode } = useCart();
+  const { billName, nit } = useUser();
   const [selectedMethod, setSelectedMethod] = useState("QR"); // Estado para el método de pago seleccionado
+  const { total = "0" } = useLocalSearchParams();
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -102,7 +104,7 @@ export default function Payment() {
                   onPress: async () => {
                     console.log("cartitems", cartItems);
                     // Create the order
-                    const orderPayload = makeOrderPayload(1, cartItems);
+                    const orderPayload = makeOrderPayload(cartItems, tableCode);
                     console.log("makeorderpayload", orderPayload);
                     try {
                       // Create the order
@@ -141,7 +143,7 @@ export default function Payment() {
                       await AsyncStorage.removeItem("cartItems");
 
                       // Redirect user to the home page
-                      router.push("/");
+                      router.push("/(tabs)/menu");
                     } catch (error) {
                       console.error("Error creating order or bill:", error);
                       Alert.alert(

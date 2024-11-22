@@ -1,11 +1,24 @@
-import { BACKEND_URL } from "@/constants/.backend-dir";
+import { BACKEND_DOMAIN, SPRING_PORT } from "@/constants/.backend-dir"; 
+import * as SecureStore from 'expo-secure-store';
+
+
 import { Bill } from "@/models/Bill";
+
+const API_URL = `http://${BACKEND_DOMAIN}${SPRING_PORT}` // Cuando pasemos a https cambiar aquí
 
 export const createBill = async (bill: Bill) => {
     try {
-        const response = await fetch(`${BACKEND_URL}/api/v1/bill`, {
+        // Recuperar el token desde SecureStore
+        const token = await SecureStore.getItem('access_token');
+        // console.log("recupera el token", token)
+        
+        if (!token) {
+        throw new Error('No se encontró un token de acceso');
+        }
+        const response = await fetch(`${API_URL}/api/v1/bill`, {
             method: "POST",
             headers: {
+                Authorization: `Bearer ${token}`,
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
